@@ -81,11 +81,11 @@ jobs:
       with:
         make: setup
 
-    - name: "Update Venue Information"
-      if: ${{ steps.pre.outputs.skip != 'true' }}
-      uses: martinthomson/i-d-template@v1
-      with:
-        make: update-venue
+    # - name: "Update Venue Information"
+    #   if: ${{ steps.pre.outputs.skip != 'true' }}
+    #   uses: martinthomson/i-d-template@v1
+    #   with:
+    #     make: update-venue
 
     - name: "Update GitHub Pages"
       if: ${{ steps.pre.outputs.skip != 'true' }}
