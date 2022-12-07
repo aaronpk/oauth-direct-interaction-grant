@@ -21,10 +21,9 @@ venue:
   latest: https://aaronpk.github.io/oauth-direct-interaction-grant/draft-parecki-oauth-direct-interaction-grant.html
 
 author:
- -
-    fullname: Aaron Parecki
+ -  fullname: Aaron Parecki
     organization: Okta
-    email: aaron.parecki@okta.com
+    email: aaron@parecki.com
 
 normative:
   RFC6749:
