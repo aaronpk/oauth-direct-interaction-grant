@@ -13,10 +13,10 @@ workgroup: OAuth Working Group
 keyword:
  - oauth
 venue:
- group: OAuth
- type: Working Group
- mail: oauth@ietf.org
- arch: https://oauth.net
+  group: OAuth
+  type: Working Group
+  mail: oauth@ietf.org
+  arch: https://oauth.net
   github: aaronpk/oauth-direct-interaction-grant
   latest: https://aaronpk.github.io/oauth-direct-interaction-grant/draft-parecki-oauth-direct-interaction-grant.html
 
