@@ -35,7 +35,19 @@ informative:
 
 --- abstract
 
-TODO Abstract
+This document extends the OAuth 2.0 Authorization Framework {{RFC6749}} with a
+new grant type, the "Direct Interaction Grant", which can be used by applications
+that want to control the user experience of the process of obtaining authorization
+from the user.
+
+In many cases, this can provide an entirely browserless experience suited for native
+applications, only delegating to the browser in unexpected or error conditions.
+
+While a fully-delegated approach using the Authorization Code Grant is generally
+preferred, this draft provides a mechanism for the client to directly interact
+with the user. This requires a high degree of trust between the authorization server
+and the client, as well as should only be considered when there are usability
+concerns with a browser-based approach, such as for native mobile or desktop applications.
 
 
 --- middle
@@ -46,11 +58,16 @@ TODO Introduction
 
 ## Usage and Applicability
 
+TODO
 
 
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
+
+
+
+
 
 
 # Security Considerations
