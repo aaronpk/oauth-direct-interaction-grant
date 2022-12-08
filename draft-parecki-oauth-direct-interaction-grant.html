@@ -1358,15 +1358,18 @@ and "Token Endpoint" defined by <span>[<a href="#RFC6749" class="cite xref">RFC6
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-client-initiates-direct-int" class="section-name selfRef">Client initiates direct interaction request</a>
         </h3>
 <p id="section-4.2-1">The client makes a request to the token endpoint with a <code>grant_type</code> value of <code>urn:ietf:params:oauth:grant-type:direct</code>, providing the user identifer in the request.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">```
+<div class="alignLeft art-text artwork" id="section-4.2-2">
+<pre>
 POST /token
 Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3">grant_type=urn:ietf:params:oauth:grant-type:direct
+Content-type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:direct
 &amp;client_id=XXXXXXX
 &amp;username=user@example.com
 &amp;scope=contacts+openid+profile
-```<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+</pre><a href="#section-4.2-2" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="authorization-server-returns-challenge-types">
@@ -1375,17 +1378,20 @@ Content-type: application/x-www-form-urlencoded<a href="#section-4.2-2" class="p
 <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-authorization-server-return" class="section-name selfRef">Authorization Server returns challenge types</a>
         </h3>
 <p id="section-4.3-1">The AS returns an interaction code, as well as a list of challenge types supported.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">```
+<div class="alignLeft art-text artwork" id="section-4.3-2">
+<pre>
 HTTP/1.1 403 Forbidden
-Content-type: application/json<a href="#section-4.3-2" class="pilcrow">¶</a></p>
-<p id="section-4.3-3">{
+Content-type: application/json
+
+{
   "error": "...?",
   "interaction_code": "b135ac938e3e84",
   "challenge_type": [
     "password+totp", "email_otp", "redirect"
   ]
 }
-```<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+</pre><a href="#section-4.3-2" class="pilcrow">¶</a>
+</div>
 <div id="one-time-code">
 <section id="section-4.3.1">
           <h4 id="name-one-time-code">
@@ -1469,37 +1475,43 @@ Content-type: application/json<a href="#section-4.3-2" class="pilcrow">¶</a></p
 needs to signal to the AS that it should deliver this code. (Without this step, the AS may not know
 which of the available options the client will be communicating to the user, and may not want to send
 a code via both email and SMS.)<a href="#section-4.4-2" class="pilcrow">¶</a></p>
-<p id="section-4.4-3">```
+<div class="alignLeft art-text artwork" id="section-4.4-3">
+<pre>
 POST /challenge
 Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded<a href="#section-4.4-3" class="pilcrow">¶</a></p>
-<p id="section-4.4-4">challenge_type=email_otp
+Content-type: application/x-www-form-urlencoded
+
+challenge_type=email_otp
 &amp;interaction_code=b135ac938e3e84
-```<a href="#section-4.4-4" class="pilcrow">¶</a></p>
-<p id="section-4.4-5">The authorization server sends a challenge code to the user via the selected platform.<a href="#section-4.4-5" class="pilcrow">¶</a></p>
-<p id="section-4.4-6">The authorization server responds with an authentication challenge code and other information such as timeouts.<a href="#section-4.4-6" class="pilcrow">¶</a></p>
-<p id="section-4.4-7">```
+</pre><a href="#section-4.4-3" class="pilcrow">¶</a>
+</div>
+<p id="section-4.4-4">The authorization server sends a challenge code to the user via the selected platform.<a href="#section-4.4-4" class="pilcrow">¶</a></p>
+<p id="section-4.4-5">The authorization server responds with an authentication challenge code and other information such as timeouts.<a href="#section-4.4-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.4-6">
+<pre>
 HTTP/1.1 200 OK
-Content-type: application/json<a href="#section-4.4-7" class="pilcrow">¶</a></p>
-<p id="section-4.4-8">{
+Content-type: application/json
+
+{
   "challenge_type": "email_otp",
   "challenge_code": "a6f4463ad1d8e3f",
   "expires_in": 600,
   "interval": 5
 }
-```<a href="#section-4.4-8" class="pilcrow">¶</a></p>
+</pre><a href="#section-4.4-6" class="pilcrow">¶</a>
+</div>
 <ul class="normal">
-<li class="normal" id="section-4.4-9.1">
-            <code>challenge_type</code> -<a href="#section-4.4-9.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4-7.1">
+            <code>challenge_type</code> -<a href="#section-4.4-7.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.4-9.2">
-            <code>challenge_code</code> -<a href="#section-4.4-9.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-7.2">
+            <code>challenge_code</code> -<a href="#section-4.4-7.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.4-9.3">
-            <code>expires_in</code> - Optional<a href="#section-4.4-9.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-7.3">
+            <code>expires_in</code> - Optional<a href="#section-4.4-7.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.4-9.4">
-            <code>interval</code> - Optional<a href="#section-4.4-9.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-7.4">
+            <code>interval</code> - Optional<a href="#section-4.4-7.4" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
@@ -1525,22 +1537,26 @@ Content-type: application/json<a href="#section-4.4-7" class="pilcrow">¶</a></p
 <a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-token-request" class="section-name selfRef">Token request</a>
           </h4>
 <p id="section-4.5.1-1">The client makes a request to the token endpoint with the <code>grant_type</code> value of <code>urn:ietf:params:oauth:grant-type:direct</code>, providing the information collected from the user as well as the previous interaction code and optional challenge code.<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.5.1-2">```
-POST /token<a href="#section-4.5.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.5.1-3">Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded<a href="#section-4.5.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.5.1-4">grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
+<div class="alignLeft art-text artwork" id="section-4.5.1-2">
+<pre>
+POST /token
+
+Host: authorization-server.com
+Content-type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
 &amp;client_id=XXXXXXX
 &amp;interaction_code=b135ac938e3e84
 &amp;challenge_code=a6f4463ad1d8e3f
 &amp;challenge_value=512512
-```<a href="#section-4.5.1-4" class="pilcrow">¶</a></p>
+</pre><a href="#section-4.5.1-2" class="pilcrow">¶</a>
+</div>
 <ul class="normal">
-<li class="normal" id="section-4.5.1-5.1">
-              <code>challenge_value</code> - The value that was sent to the user. Should this be different depending on the challenge type?<a href="#section-4.5.1-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.5.1-3.1">
+              <code>challenge_value</code> - The value that was sent to the user. Should this be different depending on the challenge type?<a href="#section-4.5.1-3.1" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.5.1-6">TODO: What happens if more than one code is requested? Maybe make it so only one can be collected at a time? It would be weird to ask the user to enter two codes at the same time anyway<a href="#section-4.5.1-6" class="pilcrow">¶</a></p>
+<p id="section-4.5.1-4">TODO: What happens if more than one code is requested? Maybe make it so only one can be collected at a time? It would be weird to ask the user to enter two codes at the same time anyway<a href="#section-4.5.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1628,10 +1644,14 @@ that tells the client they need to get the user to re-authenticate or provide an
         </h3>
 <p id="section-7.2-1">This specification registers the following values in the IANA "OAuth URI"
 registry <span>[<a href="#IANA.OAuth.Parameters" class="cite xref">IANA.OAuth.Parameters</a>]</span> established by <span>[<a href="#RFC6755" class="cite xref">RFC6755</a>]</span>.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">URN: <code>urn:ietf:params:oauth:grant-type:direct</code>
-  Common Name: Direct Interaction Grant Type for OAuth 2.0
-  Change Controller: IESG
-  Specification Document:<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.2-2">
+<pre>
+URN: `urn:ietf:params:oauth:grant-type:direct`
+Common Name: Direct Interaction Grant Type for OAuth 2.0
+Change Controller: IESG
+Specification Document:
+</pre><a href="#section-7.2-2" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="oauth-extensions-error-registration">
@@ -1642,7 +1662,11 @@ registry <span>[<a href="#IANA.OAuth.Parameters" class="cite xref">IANA.OAuth.Pa
 <p id="section-7.3-1">This specification registers the following values in the IANA "OAuth
 Extensions Error Registry" registry <span>[<a href="#IANA.OAuth.Parameters" class="cite xref">IANA.OAuth.Parameters</a>]</span>
 established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2">Name: ...<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.3-2">
+<pre>
+Name: ...
+</pre><a href="#section-7.3-2" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 </section>
