@@ -31,7 +31,7 @@ author:
 normative:
   RFC6749:
   RFC6755:
-  IANA.OAuth.Parameters:
+  RFC7637:
 
 informative:
 
@@ -104,13 +104,12 @@ TODO: User identifier can be an email, phone number, or username, at the discret
 
 ## Client initiates direct interaction request
 
-The client makes a request to the token endpoint with a `grant_type` value of `urn:ietf:params:oauth:grant-type:direct`, providing the user identifer in the request.
+The client makes a request to the interaction request endpoint providing the client ID and user identifer hint in the request.
 
-    POST /token
+    POST /interaction
     Host: authorization-server.com
     Content-type: application/x-www-form-urlencoded
 
-    grant_type=urn:ietf:params:oauth:grant-type:direct
     &client_id=XXXXXXX
     &username=user@example.com
     &scope=contacts+openid+profile
@@ -154,6 +153,21 @@ Legacy password authentication
 * `push_notification`
 
 A push notification delivered to a native application
+
+### Redirect
+
+* `redirect`
+
+In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the `redirect` challenge type. In this case, no `interaction_code` is returned. Instead, the client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to {{RFC6749}} and {{RFC7636}}.
+<!-- TODO: Replace this reference with OAuth 2.1 once published. -->
+
+TODO: Instead of no interaction code, should this require the client include the interaction code in the authorization request so the AS can link it to an app-initiated session? Alternatively, if we make the first request require a PKCE code challenge, we could require the same PKCE code challenge be used in the authorization request.
+
+This can be used to:
+
+* offer the client a fallback mechanism at the client's perogative (by returning the `redirect` type as the last item in the `challenge_type` list)
+* force the client to use a browser-redirect-based flow (by returning only the `redirect` type)
+* enable authentication with social providers or third party IdPs which require a browser flow
 
 ### Combinations
 
@@ -218,7 +232,7 @@ The client makes a request to the token endpoint with the `grant_type` value of 
     Host: authorization-server.com
     Content-type: application/x-www-form-urlencoded
 
-    grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
+    grant_type=urn:ietf:params:oauth:grant-type:direct
     &client_id=XXXXXXX
     &interaction_code=b135ac938e3e84
     &challenge_code=a6f4463ad1d8e3f
@@ -294,6 +308,14 @@ Extensions Error Registry" registry {{IANA.OAuth.Parameters}}
 established by {{RFC6749}}.
 
     Name: ...
+
+## Authorization Server Metadata
+
+This specification defines two new endpoints at the authorization server.
+TODO: Need to register these in the Authorization Server Metadata document too.
+
+* interaction endpoint
+* challenge endpoint
 
 
 --- back
