@@ -1205,10 +1205,13 @@ concerns with a browser-based approach, such as for native mobile or desktop app
                     <p id="section-toc.1-1.4.2.3.2.4.1"><a href="#section-4.3.4" class="auto internal xref">4.3.4</a>.  <a href="#name-push-notification" class="internal xref">Push notification</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.5">
-                    <p id="section-toc.1-1.4.2.3.2.5.1"><a href="#section-4.3.5" class="auto internal xref">4.3.5</a>.  <a href="#name-combinations" class="internal xref">Combinations</a></p>
+                    <p id="section-toc.1-1.4.2.3.2.5.1"><a href="#section-4.3.5" class="auto internal xref">4.3.5</a>.  <a href="#name-redirect" class="internal xref">Redirect</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.6">
-                    <p id="section-toc.1-1.4.2.3.2.6.1"><a href="#section-4.3.6" class="auto internal xref">4.3.6</a>.  <a href="#name-defining-additional-methods" class="internal xref">Defining additional methods</a></p>
+                    <p id="section-toc.1-1.4.2.3.2.6.1"><a href="#section-4.3.6" class="auto internal xref">4.3.6</a>.  <a href="#name-combinations" class="internal xref">Combinations</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.7">
+                    <p id="section-toc.1-1.4.2.3.2.7.1"><a href="#section-4.3.7" class="auto internal xref">4.3.7</a>.  <a href="#name-defining-additional-methods" class="internal xref">Defining additional methods</a></p>
 </li>
                 </ul>
 </li>
@@ -1259,6 +1262,9 @@ concerns with a browser-based approach, such as for native mobile or desktop app
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
                 <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-oauth-extensions-error-regi" class="internal xref">OAuth Extensions Error Registration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-authorization-server-metada" class="internal xref">Authorization Server Metadata</a></p>
 </li>
             </ul>
 </li>
@@ -1357,14 +1363,13 @@ and "Token Endpoint" defined by <span>[<a href="#RFC6749" class="cite xref">RFC6
         <h3 id="name-client-initiates-direct-int">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-client-initiates-direct-int" class="section-name selfRef">Client initiates direct interaction request</a>
         </h3>
-<p id="section-4.2-1">The client makes a request to the token endpoint with a <code>grant_type</code> value of <code>urn:ietf:params:oauth:grant-type:direct</code>, providing the user identifer in the request.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">The client makes a request to the interaction request endpoint providing the client ID and user identifer hint in the request.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4.2-2">
 <pre>
-POST /token
+POST /interaction
 Host: authorization-server.com
 Content-type: application/x-www-form-urlencoded
 
-grant_type=urn:ietf:params:oauth:grant-type:direct
 &amp;client_id=XXXXXXX
 &amp;username=user@example.com
 &amp;scope=contacts+openid+profile
@@ -1447,20 +1452,43 @@ Content-type: application/json
 <p id="section-4.3.4-2">A push notification delivered to a native application<a href="#section-4.3.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="combinations">
+<div id="redirect">
 <section id="section-4.3.5">
-          <h4 id="name-combinations">
-<a href="#section-4.3.5" class="section-number selfRef">4.3.5. </a><a href="#name-combinations" class="section-name selfRef">Combinations</a>
+          <h4 id="name-redirect">
+<a href="#section-4.3.5" class="section-number selfRef">4.3.5. </a><a href="#name-redirect" class="section-name selfRef">Redirect</a>
           </h4>
-<p id="section-4.3.5-1">The AS <span class="bcp14">MAY</span> combine challenge types by concatenating strings with a <code>+</code>, which indicates that all the combined types are required to complete the challenge.<a href="#section-4.3.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.3.5-1.1">
+              <code>redirect</code><a href="#section-4.3.5-1.1" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-4.3.5-2">In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the <code>redirect</code> challenge type. In this case, no <code>interaction_code</code> is returned. Instead, the client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-4.3.5-2" class="pilcrow">¶</a></p>
+<p id="section-4.3.5-3">TODO: Instead of no interaction code, should this require the client include the interaction code in the authorization request so the AS can link it to an app-initiated session? Alternatively, if we make the first request require a PKCE code challenge, we could require the same PKCE code challenge be used in the authorization request.<a href="#section-4.3.5-3" class="pilcrow">¶</a></p>
+<p id="section-4.3.5-4">This can be used to:<a href="#section-4.3.5-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.3.5-5.1">offer the client a fallback mechanism at the client's perogative (by returning the <code>redirect</code> type as the last item in the <code>challenge_type</code> list)<a href="#section-4.3.5-5.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.3.5-5.2">force the client to use a browser-redirect-based flow (by returning only the <code>redirect</code> type)<a href="#section-4.3.5-5.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.3.5-5.3">enable authentication with social providers or third party IdPs which require a browser flow<a href="#section-4.3.5-5.3" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+<div id="combinations">
+<section id="section-4.3.6">
+          <h4 id="name-combinations">
+<a href="#section-4.3.6" class="section-number selfRef">4.3.6. </a><a href="#name-combinations" class="section-name selfRef">Combinations</a>
+          </h4>
+<p id="section-4.3.6-1">The AS <span class="bcp14">MAY</span> combine challenge types by concatenating strings with a <code>+</code>, which indicates that all the combined types are required to complete the challenge.<a href="#section-4.3.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="defining-additional-methods">
-<section id="section-4.3.6">
+<section id="section-4.3.7">
           <h4 id="name-defining-additional-methods">
-<a href="#section-4.3.6" class="section-number selfRef">4.3.6. </a><a href="#name-defining-additional-methods" class="section-name selfRef">Defining additional methods</a>
+<a href="#section-4.3.7" class="section-number selfRef">4.3.7. </a><a href="#name-defining-additional-methods" class="section-name selfRef">Defining additional methods</a>
           </h4>
-<p id="section-4.3.6-1">Extensibility...<a href="#section-4.3.6-1" class="pilcrow">¶</a></p>
+<p id="section-4.3.7-1">Extensibility...<a href="#section-4.3.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1544,7 +1572,7 @@ POST /token
 Host: authorization-server.com
 Content-type: application/x-www-form-urlencoded
 
-grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
+grant_type=urn:ietf:params:oauth:grant-type:direct
 &amp;client_id=XXXXXXX
 &amp;interaction_code=b135ac938e3e84
 &amp;challenge_code=a6f4463ad1d8e3f
@@ -1669,6 +1697,21 @@ Name: ...
 </div>
 </section>
 </div>
+<div id="authorization-server-metadata">
+<section id="section-7.4">
+        <h3 id="name-authorization-server-metada">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-authorization-server-metada" class="section-name selfRef">Authorization Server Metadata</a>
+        </h3>
+<p id="section-7.4-1">This specification defines two new endpoints at the authorization server.
+TODO: Need to register these in the Authorization Server Metadata document too.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.4-2.1">interaction endpoint<a href="#section-7.4-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-7.4-2.2">challenge endpoint<a href="#section-7.4-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+</section>
+</div>
 </section>
 </div>
 <section id="section-8">
@@ -1691,6 +1734,10 @@ Name: ...
 <dt id="RFC6755">[RFC6755]</dt>
       <dd>
 <span class="refAuthor">Campbell, B.</span> and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"An IETF URN Sub-Namespace for OAuth"</span>, <span class="seriesInfo">RFC 6755</span>, <span class="seriesInfo">DOI 10.17487/RFC6755</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6755">https://www.rfc-editor.org/rfc/rfc6755</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7636">[RFC7636]</dt>
+      <dd>
+<span class="refAuthor">Sakimura, N., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Agarwal</span>, <span class="refTitle">"Proof Key for Code Exchange by OAuth Public Clients"</span>, <span class="seriesInfo">RFC 7636</span>, <span class="seriesInfo">DOI 10.17487/RFC7636</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7636">https://www.rfc-editor.org/rfc/rfc7636</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
     <dd>

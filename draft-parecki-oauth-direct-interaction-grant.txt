@@ -95,8 +95,9 @@ Table of Contents
        4.3.2.  TOTP
        4.3.3.  Password
        4.3.4.  Push notification
-       4.3.5.  Combinations
-       4.3.6.  Defining additional methods
+       4.3.5.  Redirect
+       4.3.6.  Combinations
+       4.3.7.  Defining additional methods
      4.4.  Client requests an authentication challenge
      4.5.  Client provides authentication details
        4.5.1.  Token request
@@ -111,6 +112,7 @@ Table of Contents
      7.1.  OAuth Parameter Registration
      7.2.  OAuth URI Registration
      7.3.  OAuth Extensions Error Registration
+     7.4.  Authorization Server Metadata
    8.  Normative References
    Acknowledgments
    Authors' Addresses
@@ -176,15 +178,13 @@ Table of Contents
 
 4.2.  Client initiates direct interaction request
 
-   The client makes a request to the token endpoint with a grant_type
-   value of urn:ietf:params:oauth:grant-type:direct, providing the user
-   identifer in the request.
+   The client makes a request to the interaction request endpoint
+   providing the client ID and user identifer hint in the request.
 
-   POST /token
+   POST /interaction
    Host: authorization-server.com
    Content-type: application/x-www-form-urlencoded
 
-   grant_type=urn:ietf:params:oauth:grant-type:direct
    &client_id=XXXXXXX
    &username=user@example.com
    &scope=contacts+openid+profile
@@ -231,13 +231,42 @@ Table of Contents
 
    A push notification delivered to a native application
 
-4.3.5.  Combinations
+4.3.5.  Redirect
+
+   *  redirect
+
+   In the case where the authorization server wishes to interact with
+   the user itself, limiting the client's interaction with the user, it
+   can return the redirect challenge type.  In this case, no
+   interaction_code is returned.  Instead, the client is expected to
+   initiate a traditional OAuth Authorization Code flow with PKCE
+   according to [RFC6749] and [RFC7636].
+
+   TODO: Instead of no interaction code, should this require the client
+   include the interaction code in the authorization request so the AS
+   can link it to an app-initiated session?  Alternatively, if we make
+   the first request require a PKCE code challenge, we could require the
+   same PKCE code challenge be used in the authorization request.
+
+   This can be used to:
+
+   *  offer the client a fallback mechanism at the client's perogative
+      (by returning the redirect type as the last item in the
+      challenge_type list)
+
+   *  force the client to use a browser-redirect-based flow (by
+      returning only the redirect type)
+
+   *  enable authentication with social providers or third party IdPs
+      which require a browser flow
+
+4.3.6.  Combinations
 
    The AS MAY combine challenge types by concatenating strings with a +,
    which indicates that all the combined types are required to complete
    the challenge.
 
-4.3.6.  Defining additional methods
+4.3.7.  Defining additional methods
 
    Extensibility...
 
@@ -304,16 +333,16 @@ Table of Contents
    information collected from the user as well as the previous
    interaction code and optional challenge code.
 
-POST /token
+   POST /token
 
-Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded
+   Host: authorization-server.com
+   Content-type: application/x-www-form-urlencoded
 
-grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
-&client_id=XXXXXXX
-&interaction_code=b135ac938e3e84
-&challenge_code=a6f4463ad1d8e3f
-&challenge_value=512512
+   grant_type=urn:ietf:params:oauth:grant-type:direct
+   &client_id=XXXXXXX
+   &interaction_code=b135ac938e3e84
+   &challenge_code=a6f4463ad1d8e3f
+   &challenge_value=512512
 
    *  challenge_value - The value that was sent to the user.  Should
       this be different depending on the challenge type?
@@ -391,6 +420,16 @@ grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a d
 
    Name: ...
 
+7.4.  Authorization Server Metadata
+
+   This specification defines two new endpoints at the authorization
+   server.  TODO: Need to register these in the Authorization Server
+   Metadata document too.
+
+   *  interaction endpoint
+
+   *  challenge endpoint
+
 8.  Normative References
 
    [IANA.OAuth.Parameters]
@@ -408,6 +447,11 @@ grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a d
    [RFC6755]  Campbell, B. and H. Tschofenig, "An IETF URN Sub-Namespace
               for OAuth", RFC 6755, DOI 10.17487/RFC6755, October 2012,
               <https://www.rfc-editor.org/rfc/rfc6755>.
+
+   [RFC7636]  Sakimura, N., Ed., Bradley, J., and N. Agarwal, "Proof Key
+              for Code Exchange by OAuth Public Clients", RFC 7636,
+              DOI 10.17487/RFC7636, September 2015,
+              <https://www.rfc-editor.org/rfc/rfc7636>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
