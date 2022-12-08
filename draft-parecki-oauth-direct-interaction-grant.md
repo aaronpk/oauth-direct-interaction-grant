@@ -106,33 +106,29 @@ TODO: User identifier can be an email, phone number, or username, at the discret
 
 The client makes a request to the token endpoint with a `grant_type` value of `urn:ietf:params:oauth:grant-type:direct`, providing the user identifer in the request.
 
-```
-POST /token
-Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded
+    POST /token
+    Host: authorization-server.com
+    Content-type: application/x-www-form-urlencoded
 
-grant_type=urn:ietf:params:oauth:grant-type:direct
-&client_id=XXXXXXX
-&username=user@example.com
-&scope=contacts+openid+profile
-```
+    grant_type=urn:ietf:params:oauth:grant-type:direct
+    &client_id=XXXXXXX
+    &username=user@example.com
+    &scope=contacts+openid+profile
 
 ## Authorization Server returns challenge types
 
 The AS returns an interaction code, as well as a list of challenge types supported.
 
-```
-HTTP/1.1 403 Forbidden
-Content-type: application/json
+    HTTP/1.1 403 Forbidden
+    Content-type: application/json
 
-{
-  "error": "...?",
-  "interaction_code": "b135ac938e3e84",
-  "challenge_type": [
-    "password+totp", "email_otp", "redirect"
-  ]
-}
-```
+    {
+      "error": "...?",
+      "interaction_code": "b135ac938e3e84",
+      "challenge_type": [
+        "password+totp", "email_otp", "redirect"
+      ]
+    }
 
 ### One-Time code
 
@@ -176,30 +172,26 @@ needs to signal to the AS that it should deliver this code. (Without this step, 
 which of the available options the client will be communicating to the user, and may not want to send
 a code via both email and SMS.)
 
-```
-POST /challenge
-Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded
+    POST /challenge
+    Host: authorization-server.com
+    Content-type: application/x-www-form-urlencoded
 
-challenge_type=email_otp
-&interaction_code=b135ac938e3e84
-```
+    challenge_type=email_otp
+    &interaction_code=b135ac938e3e84
 
 The authorization server sends a challenge code to the user via the selected platform.
 
 The authorization server responds with an authentication challenge code and other information such as timeouts.
 
-```
-HTTP/1.1 200 OK
-Content-type: application/json
+    HTTP/1.1 200 OK
+    Content-type: application/json
 
-{
-  "challenge_type": "email_otp",
-  "challenge_code": "a6f4463ad1d8e3f",
-  "expires_in": 600,
-  "interval": 5
-}
-```
+    {
+      "challenge_type": "email_otp",
+      "challenge_code": "a6f4463ad1d8e3f",
+      "expires_in": 600,
+      "interval": 5
+    }
 
 * `challenge_type` -
 * `challenge_code` -
@@ -221,18 +213,16 @@ Some methods such as acknowledging a push notification may not require the user 
 
 The client makes a request to the token endpoint with the `grant_type` value of `urn:ietf:params:oauth:grant-type:direct`, providing the information collected from the user as well as the previous interaction code and optional challenge code.
 
-```
-POST /token
+    POST /token
 
-Host: authorization-server.com
-Content-type: application/x-www-form-urlencoded
+    Host: authorization-server.com
+    Content-type: application/x-www-form-urlencoded
 
-grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
-&client_id=XXXXXXX
-&interaction_code=b135ac938e3e84
-&challenge_code=a6f4463ad1d8e3f
-&challenge_value=512512
-```
+    grant_type=urn:ietf:params:oauth:grant-type:direct   // TODO: should this be a different value here?
+    &client_id=XXXXXXX
+    &interaction_code=b135ac938e3e84
+    &challenge_code=a6f4463ad1d8e3f
+    &challenge_value=512512
 
 * `challenge_value` - The value that was sent to the user. Should this be different depending on the challenge type?
 
@@ -292,10 +282,10 @@ TODO
 This specification registers the following values in the IANA "OAuth URI"
 registry {{IANA.OAuth.Parameters}} established by {{RFC6755}}.
 
-  URN: `urn:ietf:params:oauth:grant-type:direct`
-  Common Name: Direct Interaction Grant Type for OAuth 2.0
-  Change Controller: IESG
-  Specification Document:
+    URN: `urn:ietf:params:oauth:grant-type:direct`
+    Common Name: Direct Interaction Grant Type for OAuth 2.0
+    Change Controller: IESG
+    Specification Document:
 
 ## OAuth Extensions Error Registration
 
@@ -303,7 +293,7 @@ This specification registers the following values in the IANA "OAuth
 Extensions Error Registry" registry {{IANA.OAuth.Parameters}}
 established by {{RFC6749}}.
 
-  Name: ...
+    Name: ...
 
 
 --- back
