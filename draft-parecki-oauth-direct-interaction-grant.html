@@ -13,11 +13,11 @@ new grant type, the "Direct Interaction Grant", which can be used by application
 that want to control the user experience of the process of obtaining authorization
 from the user. 
        In many cases, this can provide an entirely browserless experience suited for native
-applications, only delegating to the browser in unexpected or error conditions. 
+applications, delegating to the browser in unexpected or error conditions. 
        While a fully-delegated approach using the Authorization Code Grant is generally
 preferred, this draft provides a mechanism for the client to directly interact
 with the user. This requires a high degree of trust between the authorization server
-and the client, as well as should only be considered when there are usability
+and the client. It  SHOULD  only be considered when there are usability
 concerns with a browser-based approach, such as for native mobile or desktop applications. 
     ' name="description">
 <meta content="xml2rfc 3.15.3" name="generator">
@@ -1050,7 +1050,7 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Parecki &amp; Kasselman</td>
-<td class="center">Expires 11 June 2023</td>
+<td class="center">Expires 12 June 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-parecki-oauth-direct-interaction-grant-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-12-08" class="published">8 December 2022</time>
+<time datetime="2022-12-09" class="published">9 December 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-06-11">11 June 2023</time></dd>
+<dd class="expires"><time datetime="2023-06-12">12 June 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1090,11 +1090,11 @@ new grant type, the "Direct Interaction Grant", which can be used by application
 that want to control the user experience of the process of obtaining authorization
 from the user.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">In many cases, this can provide an entirely browserless experience suited for native
-applications, only delegating to the browser in unexpected or error conditions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+applications, delegating to the browser in unexpected or error conditions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 <p id="section-abstract-3">While a fully-delegated approach using the Authorization Code Grant is generally
 preferred, this draft provides a mechanism for the client to directly interact
 with the user. This requires a high degree of trust between the authorization server
-and the client, as well as should only be considered when there are usability
+and the client. It <span class="bcp14">SHOULD</span> only be considered when there are usability
 concerns with a browser-based approach, such as for native mobile or desktop applications.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
@@ -1132,7 +1132,7 @@ concerns with a browser-based approach, such as for native mobile or desktop app
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 11 June 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 June 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1162,10 +1162,45 @@ concerns with a browser-based approach, such as for native mobile or desktop app
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
                 <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-usage-and-applicability" class="internal xref">Usage and Applicability</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.1">
+                    <p id="section-toc.1-1.1.2.2.2.1.1" class="keepWithNext"><a href="#section-1.2.1" class="auto internal xref">1.2.1</a>.  <a href="#name-sign-up-with-verification" class="internal xref">Sign-up with verification</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.2">
+                    <p id="section-toc.1-1.1.2.2.2.2.1" class="keepWithNext"><a href="#section-1.2.2" class="auto internal xref">1.2.2</a>.  <a href="#name-register-new-authentication" class="internal xref">Register new authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.3">
+                    <p id="section-toc.1-1.1.2.2.2.3.1"><a href="#section-1.2.3" class="auto internal xref">1.2.3</a>.  <a href="#name-sign-in-with-first-factor" class="internal xref">Sign-in with first factor</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.4">
+                    <p id="section-toc.1-1.1.2.2.2.4.1"><a href="#section-1.2.4" class="auto internal xref">1.2.4</a>.  <a href="#name-sign-in-with-additional-fac" class="internal xref">Sign-in with additional factor</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.5">
+                    <p id="section-toc.1-1.1.2.2.2.5.1"><a href="#section-1.2.5" class="auto internal xref">1.2.5</a>.  <a href="#name-discover-supported-authenti" class="internal xref">Discover supported authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.6">
+                    <p id="section-toc.1-1.1.2.2.2.6.1"><a href="#section-1.2.6" class="auto internal xref">1.2.6</a>.  <a href="#name-discover-supported-account-" class="internal xref">Discover supported account recover authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.7">
+                    <p id="section-toc.1-1.1.2.2.2.7.1"><a href="#section-1.2.7" class="auto internal xref">1.2.7</a>.  <a href="#name-discover-supported-account-r" class="internal xref">Discover supported account recover authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.8">
+                    <p id="section-toc.1-1.1.2.2.2.8.1"><a href="#section-1.2.8" class="auto internal xref">1.2.8</a>.  <a href="#name-update-an-existing-authenti" class="internal xref">Update an existing authentication method</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.9">
+                    <p id="section-toc.1-1.1.2.2.2.9.1"><a href="#section-1.2.9" class="auto internal xref">1.2.9</a>.  <a href="#name-initiate-browser-based-inte" class="internal xref">Initiate browser-based interaction for certain scenarios</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.10">
+                    <p id="section-toc.1-1.1.2.2.2.10.1"><a href="#section-1.2.10" class="auto internal xref">1.2.10</a>. <a href="#name-discovering-custom-user-att" class="internal xref">Discovering custom user attributes</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -1173,7 +1208,7 @@ concerns with a browser-based approach, such as for native mobile or desktop app
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
 </li>
             </ul>
 </li>
@@ -1184,50 +1219,53 @@ concerns with a browser-based approach, such as for native mobile or desktop app
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-protocol" class="internal xref">Protocol</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-client-collects-user-identi" class="internal xref">Client collects user identifier</a></p>
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-client-receives-trigger-for" class="internal xref">Client receives trigger for authentication</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-client-initiates-direct-int" class="internal xref">Client initiates direct interaction request</a></p>
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-client-collects-user-identi" class="internal xref">Client collects user identifier</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-authorization-server-return" class="internal xref">Authorization Server returns challenge types</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.1">
-                    <p id="section-toc.1-1.4.2.3.2.1.1"><a href="#section-4.3.1" class="auto internal xref">4.3.1</a>.  <a href="#name-one-time-code" class="internal xref">One-Time code</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.2">
-                    <p id="section-toc.1-1.4.2.3.2.2.1"><a href="#section-4.3.2" class="auto internal xref">4.3.2</a>.  <a href="#name-totp" class="internal xref">TOTP</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.3">
-                    <p id="section-toc.1-1.4.2.3.2.3.1"><a href="#section-4.3.3" class="auto internal xref">4.3.3</a>.  <a href="#name-password" class="internal xref">Password</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.4">
-                    <p id="section-toc.1-1.4.2.3.2.4.1"><a href="#section-4.3.4" class="auto internal xref">4.3.4</a>.  <a href="#name-push-notification" class="internal xref">Push notification</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.5">
-                    <p id="section-toc.1-1.4.2.3.2.5.1"><a href="#section-4.3.5" class="auto internal xref">4.3.5</a>.  <a href="#name-redirect" class="internal xref">Redirect</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.6">
-                    <p id="section-toc.1-1.4.2.3.2.6.1"><a href="#section-4.3.6" class="auto internal xref">4.3.6</a>.  <a href="#name-combinations" class="internal xref">Combinations</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.7">
-                    <p id="section-toc.1-1.4.2.3.2.7.1"><a href="#section-4.3.7" class="auto internal xref">4.3.7</a>.  <a href="#name-defining-additional-methods" class="internal xref">Defining additional methods</a></p>
-</li>
-                </ul>
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-client-initiates-direct-int" class="internal xref">Client initiates direct interaction request</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-client-requests-an-authenti" class="internal xref">Client requests an authentication challenge</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
-                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-client-provides-authenticat" class="internal xref">Client provides authentication details</a></p>
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-authorization-server-return" class="internal xref">Authorization Server returns challenge types</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5.2.1">
-                    <p id="section-toc.1-1.4.2.5.2.1.1"><a href="#section-4.5.1" class="auto internal xref">4.5.1</a>.  <a href="#name-token-request" class="internal xref">Token request</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.1">
+                    <p id="section-toc.1-1.4.2.4.2.1.1"><a href="#section-4.4.1" class="auto internal xref">4.4.1</a>.  <a href="#name-one-time-code" class="internal xref">One-Time code</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.2">
+                    <p id="section-toc.1-1.4.2.4.2.2.1"><a href="#section-4.4.2" class="auto internal xref">4.4.2</a>.  <a href="#name-totp" class="internal xref">TOTP</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.3">
+                    <p id="section-toc.1-1.4.2.4.2.3.1"><a href="#section-4.4.3" class="auto internal xref">4.4.3</a>.  <a href="#name-password" class="internal xref">Password</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.4">
+                    <p id="section-toc.1-1.4.2.4.2.4.1"><a href="#section-4.4.4" class="auto internal xref">4.4.4</a>.  <a href="#name-push-notification" class="internal xref">Push notification</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.5">
+                    <p id="section-toc.1-1.4.2.4.2.5.1"><a href="#section-4.4.5" class="auto internal xref">4.4.5</a>.  <a href="#name-redirect" class="internal xref">Redirect</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.6">
+                    <p id="section-toc.1-1.4.2.4.2.6.1"><a href="#section-4.4.6" class="auto internal xref">4.4.6</a>.  <a href="#name-combinations" class="internal xref">Combinations</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.7">
+                    <p id="section-toc.1-1.4.2.4.2.7.1"><a href="#section-4.4.7" class="auto internal xref">4.4.7</a>.  <a href="#name-defining-additional-methods" class="internal xref">Defining additional methods</a></p>
 </li>
                 </ul>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-client-requests-an-authenti" class="internal xref">Client requests an authentication challenge</a></p>
+</li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.6">
-                <p id="section-toc.1-1.4.2.6.1"><a href="#section-4.6" class="auto internal xref">4.6</a>.  <a href="#name-checking-for-additional-req" class="internal xref">Checking for additional requirements</a></p>
+                <p id="section-toc.1-1.4.2.6.1"><a href="#section-4.6" class="auto internal xref">4.6</a>.  <a href="#name-client-provides-authenticat" class="internal xref">Client provides authentication details</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.6.2.1">
+                    <p id="section-toc.1-1.4.2.6.2.1.1"><a href="#section-4.6.1" class="auto internal xref">4.6.1</a>.  <a href="#name-token-request" class="internal xref">Token request</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.7">
+                <p id="section-toc.1-1.4.2.7.1"><a href="#section-4.7" class="auto internal xref">4.7</a>.  <a href="#name-checking-for-additional-req" class="internal xref">Checking for additional requirements</a></p>
 </li>
             </ul>
 </li>
@@ -1241,13 +1279,16 @@ concerns with a browser-based approach, such as for native mobile or desktop app
                 <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-phishing" class="internal xref">Phishing</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-client-authentication" class="internal xref">Client Authentication</a></p>
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-native-client-and-authorisa" class="internal xref">Native client and Authorisation Server trust relationship</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-leaking-information" class="internal xref">Leaking Information</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-client-authentication" class="internal xref">Client Authentication</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-notification-fatigue" class="internal xref">Notification fatigue</a></p>
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-leaking-information" class="internal xref">Leaking Information</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-notification-fatigue" class="internal xref">Notification fatigue</a></p>
 </li>
             </ul>
 </li>
@@ -1286,13 +1327,101 @@ concerns with a browser-based approach, such as for native mobile or desktop app
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">TODO<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">TODO: Key points to address include problem description, the relationship to the step-up authentication spec (use of acr etc.), properties of the protocol (extensibility etc).<a href="#section-1-1" class="pilcrow">¶</a></p>
 <div id="usage-and-applicability">
 <section id="section-1.1">
         <h3 id="name-usage-and-applicability">
 <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-usage-and-applicability" class="section-name selfRef">Usage and Applicability</a>
         </h3>
 <p id="section-1.1-1">TODO: Mention the trust prerequisites for this to be useful. Absolutely not allowed for third-party apps. Designed for native apps, specifically first-party, when the AS and app are operated by the same entity, and the user understands them both as the same entity...<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="use-cases">
+<section id="section-1.2">
+        <h3 id="name-use-cases">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
+        </h3>
+<p id="section-1.2-1">TODO: We may move these to the appendix, but outlining them in the document will also help guide developers to understand what they can (and cannot) expect to be able to to<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<div id="sign-up-with-verification">
+<section id="section-1.2.1">
+          <h4 id="name-sign-up-with-verification">
+<a href="#section-1.2.1" class="section-number selfRef">1.2.1. </a><a href="#name-sign-up-with-verification" class="section-name selfRef">Sign-up with verification</a>
+          </h4>
+<p id="section-1.2.1-1">e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail during sign-up/account creation.<a href="#section-1.2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="register-new-authentication-methods">
+<section id="section-1.2.2">
+          <h4 id="name-register-new-authentication">
+<a href="#section-1.2.2" class="section-number selfRef">1.2.2. </a><a href="#name-register-new-authentication" class="section-name selfRef">Register new authentication methods</a>
+          </h4>
+<p id="section-1.2.2-1">e.g. user selects password, provides phone for SMS codes, etc<a href="#section-1.2.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sign-in-with-first-factor">
+<section id="section-1.2.3">
+          <h4 id="name-sign-in-with-first-factor">
+<a href="#section-1.2.3" class="section-number selfRef">1.2.3. </a><a href="#name-sign-in-with-first-factor" class="section-name selfRef">Sign-in with first factor</a>
+          </h4>
+<p id="section-1.2.3-1">e.g. username password<a href="#section-1.2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sign-in-with-additional-factor">
+<section id="section-1.2.4">
+          <h4 id="name-sign-in-with-additional-fac">
+<a href="#section-1.2.4" class="section-number selfRef">1.2.4. </a><a href="#name-sign-in-with-additional-fac" class="section-name selfRef">Sign-in with additional factor</a>
+          </h4>
+<p id="section-1.2.4-1">e.g. user already signed in with one factor (username/password), but now need to "step-up" to second factor (e.g. SMS code).<a href="#section-1.2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discover-supported-authentication-methods">
+<section id="section-1.2.5">
+          <h4 id="name-discover-supported-authenti">
+<a href="#section-1.2.5" class="section-number selfRef">1.2.5. </a><a href="#name-discover-supported-authenti" class="section-name selfRef">Discover supported authentication methods</a>
+          </h4>
+<p id="section-1.2.5-1">e.g. developer can query the authorisation server to determine what authentication methods are supported.<a href="#section-1.2.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discover-supported-account-recover-authentication-methods">
+<section id="section-1.2.6">
+          <h4 id="name-discover-supported-account-">
+<a href="#section-1.2.6" class="section-number selfRef">1.2.6. </a><a href="#name-discover-supported-account-" class="section-name selfRef">Discover supported account recover authentication methods</a>
+          </h4>
+<p id="section-1.2.6-1">e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.<a href="#section-1.2.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discover-supported-account-recover-authentication-methods-1">
+<section id="section-1.2.7">
+          <h4 id="name-discover-supported-account-r">
+<a href="#section-1.2.7" class="section-number selfRef">1.2.7. </a><a href="#name-discover-supported-account-r" class="section-name selfRef">Discover supported account recover authentication methods</a>
+          </h4>
+<p id="section-1.2.7-1">e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.<a href="#section-1.2.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="update-an-existing-authentication-method">
+<section id="section-1.2.8">
+          <h4 id="name-update-an-existing-authenti">
+<a href="#section-1.2.8" class="section-number selfRef">1.2.8. </a><a href="#name-update-an-existing-authenti" class="section-name selfRef">Update an existing authentication method</a>
+          </h4>
+<p id="section-1.2.8-1">e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.<a href="#section-1.2.8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="initiate-browser-based-interaction-for-certain-scenarios">
+<section id="section-1.2.9">
+          <h4 id="name-initiate-browser-based-inte">
+<a href="#section-1.2.9" class="section-number selfRef">1.2.9. </a><a href="#name-initiate-browser-based-inte" class="section-name selfRef">Initiate browser-based interaction for certain scenarios</a>
+          </h4>
+<p id="section-1.2.9-1">e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).<a href="#section-1.2.9-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discovering-custom-user-attributes">
+<section id="section-1.2.10">
+          <h4 id="name-discovering-custom-user-att">
+<a href="#section-1.2.10" class="section-number selfRef">1.2.10. </a><a href="#name-discovering-custom-user-att" class="section-name selfRef">Discovering custom user attributes</a>
+          </h4>
+<p id="section-1.2.10-1">e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?<a href="#section-1.2.10-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 </section>
@@ -1326,21 +1455,23 @@ and "Token Endpoint" defined by <span>[<a href="#RFC6749" class="cite xref">RFC6
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-protocol-overview" class="section-name selfRef">Protocol Overview</a>
       </h2>
 <ol start="1" type="1" class="normal type-1" id="section-3-1">
-<li id="section-3-1.1">The client prompts the user and collects their user identifier (e.g. email address)<a href="#section-3-1.1" class="pilcrow">¶</a>
+<li id="section-3-1.1">The client receives a signal from resource server indicating that a step-up authentication is requried<a href="#section-3-1.1" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.2">The client sends the identifier to the AS<a href="#section-3-1.2" class="pilcrow">¶</a>
+        <li id="section-3-1.2">The client prompts the user and collects their user identifier (e.g. email address)<a href="#section-3-1.2" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.3">The AS replies with the supported authentication mechanisms based on the user ID provided<a href="#section-3-1.3" class="pilcrow">¶</a>
+        <li id="section-3-1.3">The client sends the identifier to the AS, along with any hint it may have received about the authentication level required<a href="#section-3-1.3" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.4">The client requests an authentication challenge from the AS<a href="#section-3-1.4" class="pilcrow">¶</a>
+        <li id="section-3-1.4">The AS replies with the supported authentication mechanisms based on the user ID provided (should these be amr values?)<a href="#section-3-1.4" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.5">The AS delivers a challenge to the user (e.g. one-time code via email, SMS, or a push notification in an app)<a href="#section-3-1.5" class="pilcrow">¶</a>
+        <li id="section-3-1.5">The client requests an authentication challenge from the AS (this is optional - only if the authentication method requires it)<a href="#section-3-1.5" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.6">The client collects the necessary authentication details from the user and sends them back to the AS<a href="#section-3-1.6" class="pilcrow">¶</a>
+        <li id="section-3-1.6">The AS delivers a challenge to the user (e.g. one-time code via email, SMS, or a push notification in an app) (this is optional - only if it is a challenge response type authentiation method).<a href="#section-3-1.6" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.7">The AS decides if additional requirements need to be met, repeating steps 3 through 6 as needed<a href="#section-3-1.7" class="pilcrow">¶</a>
+        <li id="section-3-1.7">The client collects the necessary authentication details from the user and sends them back to the AS<a href="#section-3-1.7" class="pilcrow">¶</a>
 </li>
-        <li id="section-3-1.8">The AS replies with the token response<a href="#section-3-1.8" class="pilcrow">¶</a>
+        <li id="section-3-1.8">The AS decides if additional requirements need to be met, repeating steps 3 through 6 as needed (the AS knows this due to the acr_value sent by the client initially)<a href="#section-3-1.8" class="pilcrow">¶</a>
+</li>
+        <li id="section-3-1.9">The AS replies with the token response<a href="#section-3-1.9" class="pilcrow">¶</a>
 </li>
       </ol>
 </section>
@@ -1350,21 +1481,30 @@ and "Token Endpoint" defined by <span>[<a href="#RFC6749" class="cite xref">RFC6
       <h2 id="name-protocol">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-protocol" class="section-name selfRef">Protocol</a>
       </h2>
-<div id="client-collects-user-identifier">
+<div id="client-receives-trigger-for-authentication">
 <section id="section-4.1">
-        <h3 id="name-client-collects-user-identi">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-client-collects-user-identi" class="section-name selfRef">Client collects user identifier</a>
+        <h3 id="name-client-receives-trigger-for">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-client-receives-trigger-for" class="section-name selfRef">Client receives trigger for authentication</a>
         </h3>
-<p id="section-4.1-1">TODO: User identifier can be an email, phone number, or username, at the discretion of the AS.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-1">TODO: The client may receive a trigger from the resource server to initiate an authentication, possibly with a hint from the resource provider in the form of an acr value, indicating it needs to initiate and authentications.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">TBD: May need to reference the existing step-up authentication draft instead<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-collects-user-identifier">
+<section id="section-4.2">
+        <h3 id="name-client-collects-user-identi">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-client-collects-user-identi" class="section-name selfRef">Client collects user identifier</a>
+        </h3>
+<p id="section-4.2-1">TODO: User identifier can be an email, phone number, or username, at the discretion of the AS.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="client-initiates-direct-interaction-request">
-<section id="section-4.2">
+<section id="section-4.3">
         <h3 id="name-client-initiates-direct-int">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-client-initiates-direct-int" class="section-name selfRef">Client initiates direct interaction request</a>
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-client-initiates-direct-int" class="section-name selfRef">Client initiates direct interaction request</a>
         </h3>
-<p id="section-4.2-1">The client makes a request to the interaction request endpoint providing the client ID and user identifer hint in the request.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.2-2">
+<p id="section-4.3-1">The client makes a request to the interaction request endpoint providing the client ID and user identifer hint in the request.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.3-2">
 <pre>
 POST /interaction
 Host: authorization-server.com
@@ -1373,17 +1513,17 @@ Content-type: application/x-www-form-urlencoded
 &amp;client_id=XXXXXXX
 &amp;username=user@example.com
 &amp;scope=contacts+openid+profile
-</pre><a href="#section-4.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.3-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="authorization-server-returns-challenge-types">
-<section id="section-4.3">
+<section id="section-4.4">
         <h3 id="name-authorization-server-return">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-authorization-server-return" class="section-name selfRef">Authorization Server returns challenge types</a>
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-authorization-server-return" class="section-name selfRef">Authorization Server returns challenge types</a>
         </h3>
-<p id="section-4.3-1">The AS returns an interaction code, as well as a list of challenge types supported.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3-2">
+<p id="section-4.4-1">The AS returns an interaction code, as well as a list of challenge types supported.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.4-2">
 <pre>
 HTTP/1.1 403 Forbidden
 Content-type: application/json
@@ -1395,115 +1535,116 @@ Content-type: application/json
     "password+totp", "email_otp", "redirect"
   ]
 }
-</pre><a href="#section-4.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
 </div>
 <div id="one-time-code">
-<section id="section-4.3.1">
+<section id="section-4.4.1">
           <h4 id="name-one-time-code">
-<a href="#section-4.3.1" class="section-number selfRef">4.3.1. </a><a href="#name-one-time-code" class="section-name selfRef">One-Time code</a>
+<a href="#section-4.4.1" class="section-number selfRef">4.4.1. </a><a href="#name-one-time-code" class="section-name selfRef">One-Time code</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-4.3.1-1.1">
-              <code>email_otp</code><a href="#section-4.3.1-1.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4.1-1.1">
+              <code>email_otp</code><a href="#section-4.4.1-1.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4.3.1-1.2">
-              <code>sms_otp</code><a href="#section-4.3.1-1.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-4.4.1-1.2">
+              <code>sms_otp</code><a href="#section-4.4.1-1.2" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.1-2">One-time codes sent via email or SMS<a href="#section-4.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.1-2">One-time codes sent via email or SMS<a href="#section-4.4.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="totp">
-<section id="section-4.3.2">
+<section id="section-4.4.2">
           <h4 id="name-totp">
-<a href="#section-4.3.2" class="section-number selfRef">4.3.2. </a><a href="#name-totp" class="section-name selfRef">TOTP</a>
+<a href="#section-4.4.2" class="section-number selfRef">4.4.2. </a><a href="#name-totp" class="section-name selfRef">TOTP</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-4.3.2-1.1">
-              <code>totp</code><a href="#section-4.3.2-1.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4.2-1.1">
+              <code>totp</code><a href="#section-4.4.2-1.1" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.2-2">TOTP codes generated by an authenticator app<a href="#section-4.3.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.2-2">TOTP codes generated by an authenticator app<a href="#section-4.4.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="password">
-<section id="section-4.3.3">
+<section id="section-4.4.3">
           <h4 id="name-password">
-<a href="#section-4.3.3" class="section-number selfRef">4.3.3. </a><a href="#name-password" class="section-name selfRef">Password</a>
+<a href="#section-4.4.3" class="section-number selfRef">4.4.3. </a><a href="#name-password" class="section-name selfRef">Password</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-4.3.3-1.1">
-              <code>password</code><a href="#section-4.3.3-1.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4.3-1.1">
+              <code>password</code><a href="#section-4.4.3-1.1" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.3-2">Legacy password authentication<a href="#section-4.3.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.3-2">Legacy password authentication<a href="#section-4.4.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="push-notification">
-<section id="section-4.3.4">
+<section id="section-4.4.4">
           <h4 id="name-push-notification">
-<a href="#section-4.3.4" class="section-number selfRef">4.3.4. </a><a href="#name-push-notification" class="section-name selfRef">Push notification</a>
+<a href="#section-4.4.4" class="section-number selfRef">4.4.4. </a><a href="#name-push-notification" class="section-name selfRef">Push notification</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-4.3.4-1.1">
-              <code>push_notification</code><a href="#section-4.3.4-1.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4.4-1.1">
+              <code>push_notification</code><a href="#section-4.4.4-1.1" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.4-2">A push notification delivered to a native application<a href="#section-4.3.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.4-2">A push notification delivered to a native application<a href="#section-4.4.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="redirect">
-<section id="section-4.3.5">
+<section id="section-4.4.5">
           <h4 id="name-redirect">
-<a href="#section-4.3.5" class="section-number selfRef">4.3.5. </a><a href="#name-redirect" class="section-name selfRef">Redirect</a>
+<a href="#section-4.4.5" class="section-number selfRef">4.4.5. </a><a href="#name-redirect" class="section-name selfRef">Redirect</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-4.3.5-1.1">
-              <code>redirect</code><a href="#section-4.3.5-1.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4.5-1.1">
+              <code>redirect</code><a href="#section-4.4.5-1.1" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.5-2">In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the <code>redirect</code> challenge type. In this case, no <code>interaction_code</code> is returned. Instead, the client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-4.3.5-2" class="pilcrow">¶</a></p>
-<p id="section-4.3.5-3">TODO: Instead of no interaction code, should this require the client include the interaction code in the authorization request so the AS can link it to an app-initiated session? Alternatively, if we make the first request require a PKCE code challenge, we could require the same PKCE code challenge be used in the authorization request.<a href="#section-4.3.5-3" class="pilcrow">¶</a></p>
-<p id="section-4.3.5-4">This can be used to:<a href="#section-4.3.5-4" class="pilcrow">¶</a></p>
+<p id="section-4.4.5-2">In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the <code>redirect</code> challenge type. In this case, no <code>interaction_code</code> is returned. Instead, the client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-4.4.5-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.5-3">TODO: Instead of no interaction code, should this require the client include the interaction code in the authorization request so the AS can link it to an app-initiated session? Alternatively, if we make the first request require a PKCE code challenge, we could require the same PKCE code challenge be used in the authorization request. My preference here is to include the PKCE code verifier at the start of the protocol. PKCE is well understood and re-using the interaction code to establish the link feels like we are overloading the interaction code. Another option may be to add a session identifier (or return a session identifier as a unique parameter) for the redirect case.<a href="#section-4.4.5-3" class="pilcrow">¶</a></p>
+<p id="section-4.4.5-4">This can be used to:<a href="#section-4.4.5-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.3.5-5.1">offer the client a fallback mechanism at the client's perogative (by returning the <code>redirect</code> type as the last item in the <code>challenge_type</code> list)<a href="#section-4.3.5-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4.5-5.1">offer the client a fallback mechanism at the client's perogative (by returning the <code>redirect</code> type as the last item in the <code>challenge_type</code> list)<a href="#section-4.4.5-5.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4.3.5-5.2">force the client to use a browser-redirect-based flow (by returning only the <code>redirect</code> type)<a href="#section-4.3.5-5.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-4.4.5-5.2">force the client to use a browser-redirect-based flow (by returning only the <code>redirect</code> type)<a href="#section-4.4.5-5.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4.3.5-5.3">enable authentication with social providers or third party IdPs which require a browser flow<a href="#section-4.3.5-5.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-4.4.5-5.3">enable authentication with social providers or third party IdPs which require a browser flow<a href="#section-4.4.5-5.3" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="combinations">
-<section id="section-4.3.6">
+<section id="section-4.4.6">
           <h4 id="name-combinations">
-<a href="#section-4.3.6" class="section-number selfRef">4.3.6. </a><a href="#name-combinations" class="section-name selfRef">Combinations</a>
+<a href="#section-4.4.6" class="section-number selfRef">4.4.6. </a><a href="#name-combinations" class="section-name selfRef">Combinations</a>
           </h4>
-<p id="section-4.3.6-1">The AS <span class="bcp14">MAY</span> combine challenge types by concatenating strings with a <code>+</code>, which indicates that all the combined types are required to complete the challenge.<a href="#section-4.3.6-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.6-1">The AS <span class="bcp14">MAY</span> combine challenge types by concatenating strings with a <code>+</code>, which indicates that all the combined types are required to complete the challenge.<a href="#section-4.4.6-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.6-2">TODO: Does the absense of a '+' imply an OR?<a href="#section-4.4.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="defining-additional-methods">
-<section id="section-4.3.7">
+<section id="section-4.4.7">
           <h4 id="name-defining-additional-methods">
-<a href="#section-4.3.7" class="section-number selfRef">4.3.7. </a><a href="#name-defining-additional-methods" class="section-name selfRef">Defining additional methods</a>
+<a href="#section-4.4.7" class="section-number selfRef">4.4.7. </a><a href="#name-defining-additional-methods" class="section-name selfRef">Defining additional methods</a>
           </h4>
-<p id="section-4.3.7-1">Extensibility...<a href="#section-4.3.7-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.7-1">Extensibility...<a href="#section-4.4.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="client-requests-an-authentication-challenge">
-<section id="section-4.4">
+<section id="section-4.5">
         <h3 id="name-client-requests-an-authenti">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-client-requests-an-authenti" class="section-name selfRef">Client requests an authentication challenge</a>
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-client-requests-an-authenti" class="section-name selfRef">Client requests an authentication challenge</a>
         </h3>
-<p id="section-4.4-1">Optional.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2">For methods that require the AS to deliver a code to the user, e.g. via email or SMS, the client
+<p id="section-4.5-1">Optional.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.5-2">For methods that require the AS to deliver a code to the user, e.g. via email or SMS, the client
 needs to signal to the AS that it should deliver this code. (Without this step, the AS may not know
 which of the available options the client will be communicating to the user, and may not want to send
-a code via both email and SMS.)<a href="#section-4.4-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.4-3">
+a code via both email and SMS.). It <span class="bcp14">SHOULD</span> only allow one delivery mechanism at a time to minimise the risk of the challenge leaking.<a href="#section-4.5-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.5-3">
 <pre>
 POST /challenge
 Host: authorization-server.com
@@ -1511,11 +1652,11 @@ Content-type: application/x-www-form-urlencoded
 
 challenge_type=email_otp
 &amp;interaction_code=b135ac938e3e84
-</pre><a href="#section-4.4-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.5-3" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4-4">The authorization server sends a challenge code to the user via the selected platform.<a href="#section-4.4-4" class="pilcrow">¶</a></p>
-<p id="section-4.4-5">The authorization server responds with an authentication challenge code and other information such as timeouts.<a href="#section-4.4-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.4-6">
+<p id="section-4.5-4">The authorization server sends a challenge code to the user via the selected platform.<a href="#section-4.5-4" class="pilcrow">¶</a></p>
+<p id="section-4.5-5">The authorization server responds with an authentication challenge code and other information such as timeouts.<a href="#section-4.5-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.5-6">
 <pre>
 HTTP/1.1 200 OK
 Content-type: application/json
@@ -1526,46 +1667,47 @@ Content-type: application/json
   "expires_in": 600,
   "interval": 5
 }
-</pre><a href="#section-4.4-6" class="pilcrow">¶</a>
+</pre><a href="#section-4.5-6" class="pilcrow">¶</a>
 </div>
 <ul class="normal">
-<li class="normal" id="section-4.4-7.1">
-            <code>challenge_type</code> -<a href="#section-4.4-7.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.5-7.1">
+            <code>challenge_type</code> -<a href="#section-4.5-7.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.4-7.2">
-            <code>challenge_code</code> -<a href="#section-4.4-7.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.5-7.2">
+            <code>challenge_code</code> -<a href="#section-4.5-7.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.4-7.3">
-            <code>expires_in</code> - Optional<a href="#section-4.4-7.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.5-7.3">
+            <code>expires_in</code> - Optional<a href="#section-4.5-7.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.4-7.4">
-            <code>interval</code> - Optional<a href="#section-4.4-7.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.5-7.4">
+            <code>interval</code> - Optional<a href="#section-4.5-7.4" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
 </div>
 <div id="client-provides-authentication-details">
-<section id="section-4.5">
+<section id="section-4.6">
         <h3 id="name-client-provides-authenticat">
-<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-client-provides-authenticat" class="section-name selfRef">Client provides authentication details</a>
+<a href="#section-4.6" class="section-number selfRef">4.6. </a><a href="#name-client-provides-authenticat" class="section-name selfRef">Client provides authentication details</a>
         </h3>
-<p id="section-4.5-1">The client prompts the user to enter the challenge.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.6-1">The client prompts the user to enter the challenge.<a href="#section-4.6-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.5-2.1">One-time code<a href="#section-4.5-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.6-2.1">One-time code<a href="#section-4.6-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.5-2.2">Password<a href="#section-4.5-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.6-2.2">Password<a href="#section-4.6-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.5-2.3">Out-of-band interaction<a href="#section-4.5-2.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.6-2.3">Out-of-band interaction<a href="#section-4.6-2.3" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-4.5-3">Some methods such as acknowledging a push notification may not require the user to interact further with the client. The client instead presents a screen to the user explaining that they should acknowledge the challenge on another device.<a href="#section-4.5-3" class="pilcrow">¶</a></p>
+<p id="section-4.6-3">Some methods such as acknowledging a push notification may not require the user to interact further with the client. The client instead presents a screen to the user explaining that they should acknowledge the challenge on another device.<a href="#section-4.6-3" class="pilcrow">¶</a></p>
+<p id="section-4.6-4">TODO: How does the Authorisation Server signal to the client that the push notification succeeded on another device?<a href="#section-4.6-4" class="pilcrow">¶</a></p>
 <div id="token-request">
-<section id="section-4.5.1">
+<section id="section-4.6.1">
           <h4 id="name-token-request">
-<a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-token-request" class="section-name selfRef">Token request</a>
+<a href="#section-4.6.1" class="section-number selfRef">4.6.1. </a><a href="#name-token-request" class="section-name selfRef">Token request</a>
           </h4>
-<p id="section-4.5.1-1">The client makes a request to the token endpoint with the <code>grant_type</code> value of <code>urn:ietf:params:oauth:grant-type:direct</code>, providing the information collected from the user as well as the previous interaction code and optional challenge code.<a href="#section-4.5.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.5.1-2">
+<p id="section-4.6.1-1">The client makes a request to the token endpoint with the <code>grant_type</code> value of <code>urn:ietf:params:oauth:grant-type:direct</code>, providing the information collected from the user as well as the previous interaction code and optional challenge code.<a href="#section-4.6.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.6.1-2">
 <pre>
 POST /token
 
@@ -1577,28 +1719,28 @@ grant_type=urn:ietf:params:oauth:grant-type:direct
 &amp;interaction_code=b135ac938e3e84
 &amp;challenge_code=a6f4463ad1d8e3f
 &amp;challenge_value=512512
-</pre><a href="#section-4.5.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.6.1-2" class="pilcrow">¶</a>
 </div>
 <ul class="normal">
-<li class="normal" id="section-4.5.1-3.1">
-              <code>challenge_value</code> - The value that was sent to the user. Should this be different depending on the challenge type?<a href="#section-4.5.1-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.6.1-3.1">
+              <code>challenge_value</code> - The value that was sent to the user. Should this be different depending on the challenge type?<a href="#section-4.6.1-3.1" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.5.1-4">TODO: What happens if more than one code is requested? Maybe make it so only one can be collected at a time? It would be weird to ask the user to enter two codes at the same time anyway<a href="#section-4.5.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.6.1-4">TODO: What happens if more than one code is requested? Maybe make it so only one can be collected at a time? It would be weird to ask the user to enter two codes at the same time anyway. Not sure we should have a unique interaction code per token. Should the interaction code cover all the interactions (i.e. all interactions are bundled up as one interaction). Once all interactions are complete all tokens for which that interaction is good can be released?<a href="#section-4.6.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="checking-for-additional-requirements">
-<section id="section-4.6">
+<section id="section-4.7">
         <h3 id="name-checking-for-additional-req">
-<a href="#section-4.6" class="section-number selfRef">4.6. </a><a href="#name-checking-for-additional-req" class="section-name selfRef">Checking for additional requirements</a>
+<a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-checking-for-additional-req" class="section-name selfRef">Checking for additional requirements</a>
         </h3>
-<p id="section-4.6-1">If the initial set of information provided by the client is correct, the AS
-<span class="bcp14">MAY</span> choose to either respond immetiately with a successful token request,
-or prompt the client with an additional challenge.<a href="#section-4.6-1" class="pilcrow">¶</a></p>
-<p id="section-4.6-2">For example, the AS could first require the client prompt the user for a one-time-code they
-received via email, and then in a second step, ask the client to prompt the user<a href="#section-4.6-2" class="pilcrow">¶</a></p>
+<p id="section-4.7-1">If the initial set of information provided by the client is correct, the AS
+<span class="bcp14">MAY</span> choose to either respond immetiately with a successful token request (response?),
+or prompt the client with an additional challenge.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+<p id="section-4.7-2">For example, the AS could first require the client prompt the user for a one-time-code they
+received via email, and then in a second step, ask the client to prompt the user<a href="#section-4.7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1626,28 +1768,36 @@ that tells the client they need to get the user to re-authenticate or provide an
 <p id="section-6.1-1">TODO: Describe the phishing risk this opens up.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="client-authentication">
+<div id="native-client-and-authorisation-server-trust-relationship">
 <section id="section-6.2">
-        <h3 id="name-client-authentication">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-client-authentication" class="section-name selfRef">Client Authentication</a>
+        <h3 id="name-native-client-and-authorisa">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-native-client-and-authorisa" class="section-name selfRef">Native client and Authorisation Server trust relationship</a>
         </h3>
-<p id="section-6.2-1">TODO: Describe the lack of client authentication possible because this is expected to be deployed by native apps. Maybe mention alternatives to client authentication such as App Attestation, or using a risk engine to analyze other aspects of the request from the client.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">TODO: Emphasise the 'same owner' relationship between the native client and the authorisation server<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-authentication">
+<section id="section-6.3">
+        <h3 id="name-client-authentication">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-client-authentication" class="section-name selfRef">Client Authentication</a>
+        </h3>
+<p id="section-6.3-1">TODO: Describe the lack of client authentication possible because this is expected to be deployed by native apps. Maybe mention alternatives to client authentication such as App Attestation, or using a risk engine to analyze other aspects of the request from the client.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="leaking-information">
-<section id="section-6.3">
+<section id="section-6.4">
         <h3 id="name-leaking-information">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-leaking-information" class="section-name selfRef">Leaking Information</a>
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-leaking-information" class="section-name selfRef">Leaking Information</a>
         </h3>
-<p id="section-6.3-1">TODO: Attackers may be able to query the AS with user IDs to learn whether an identifier corresponds to an active account and which types of authentication a particular account has configured. What mitigations needed here? Possibly avoiding returning an error for unrecognized identifiers.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">TODO: Attackers may be able to query the AS with user IDs to learn whether an identifier corresponds to an active account and which types of authentication a particular account has configured. What mitigations needed here? Possibly avoiding returning an error for unrecognized identifiers.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="notification-fatigue">
-<section id="section-6.4">
+<section id="section-6.5">
         <h3 id="name-notification-fatigue">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-notification-fatigue" class="section-name selfRef">Notification fatigue</a>
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-notification-fatigue" class="section-name selfRef">Notification fatigue</a>
         </h3>
-<p id="section-6.4-1">TODO: A client may be able to cause repeated notifications to any user given their user ID. Mitigations?<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-1">TODO: A client may be able to cause repeated notifications to any user given their user ID. Mitigations - throttling<a href="#section-6.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1671,7 +1821,7 @@ that tells the client they need to get the user to re-authenticate or provide an
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-oauth-uri-registration" class="section-name selfRef">OAuth URI Registration</a>
         </h3>
 <p id="section-7.2-1">This specification registers the following values in the IANA "OAuth URI"
-registry <span>[<a href="#IANA.OAuth.Parameters" class="cite xref">IANA.OAuth.Parameters</a>]</span> established by <span>[<a href="#RFC6755" class="cite xref">RFC6755</a>]</span>.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+registry (IANA.OAuth.Parameters) established by <span>[<a href="#RFC6755" class="cite xref">RFC6755</a>]</span>.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-7.2-2">
 <pre>
 URN: `urn:ietf:params:oauth:grant-type:direct`
@@ -1688,7 +1838,7 @@ Specification Document:
 <a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-oauth-extensions-error-regi" class="section-name selfRef">OAuth Extensions Error Registration</a>
         </h3>
 <p id="section-7.3-1">This specification registers the following values in the IANA "OAuth
-Extensions Error Registry" registry <span>[<a href="#IANA.OAuth.Parameters" class="cite xref">IANA.OAuth.Parameters</a>]</span>
+Extensions Error Registry" registry (IANA.OAuth.Parameters)
 established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-7.3-2">
 <pre>
@@ -1719,10 +1869,6 @@ TODO: Need to register these in the Authorization Server Metadata document too.<
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
-<dt id="IANA.OAuth.Parameters">[IANA.OAuth.Parameters]</dt>
-      <dd>
-<span class="refTitle">"*** BROKEN REFERENCE ***"</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>

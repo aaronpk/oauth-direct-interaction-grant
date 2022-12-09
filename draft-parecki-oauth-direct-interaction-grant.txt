@@ -5,8 +5,8 @@
 OAuth Working Group                                           A. Parecki
 Internet-Draft                                                      Okta
 Intended status: Standards Track                            P. Kasselman
-Expires: 11 June 2023                                          Microsoft
-                                                         8 December 2022
+Expires: 12 June 2023                                          Microsoft
+                                                         9 December 2022
 
 
                    OAuth 2.0 Direct Interaction Grant
@@ -20,15 +20,15 @@ Abstract
    process of obtaining authorization from the user.
 
    In many cases, this can provide an entirely browserless experience
-   suited for native applications, only delegating to the browser in
+   suited for native applications, delegating to the browser in
    unexpected or error conditions.
 
    While a fully-delegated approach using the Authorization Code Grant
    is generally preferred, this draft provides a mechanism for the
    client to directly interact with the user.  This requires a high
-   degree of trust between the authorization server and the client, as
-   well as should only be considered when there are usability concerns
-   with a browser-based approach, such as for native mobile or desktop
+   degree of trust between the authorization server and the client.  It
+   SHOULD only be considered when there are usability concerns with a
+   browser-based approach, such as for native mobile or desktop
    applications.
 
 About This Document
@@ -64,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 June 2023.
+   This Internet-Draft will expire on 12 June 2023.
 
 Copyright Notice
 
@@ -84,30 +84,46 @@ Table of Contents
 
    1.  Introduction
      1.1.  Usage and Applicability
+     1.2.  Use Cases
+       1.2.1.  Sign-up with verification
+       1.2.2.  Register new authentication methods
+       1.2.3.  Sign-in with first factor
+       1.2.4.  Sign-in with additional factor
+       1.2.5.  Discover supported authentication methods
+       1.2.6.  Discover supported account recover authentication
+               methods
+       1.2.7.  Discover supported account recover authentication
+               methods
+       1.2.8.  Update an existing authentication method
+       1.2.9.  Initiate browser-based interaction for certain
+               scenarios
+       1.2.10. Discovering custom user attributes
    2.  Conventions and Definitions
      2.1.  Terminology
    3.  Protocol Overview
    4.  Protocol
-     4.1.  Client collects user identifier
-     4.2.  Client initiates direct interaction request
-     4.3.  Authorization Server returns challenge types
-       4.3.1.  One-Time code
-       4.3.2.  TOTP
-       4.3.3.  Password
-       4.3.4.  Push notification
-       4.3.5.  Redirect
-       4.3.6.  Combinations
-       4.3.7.  Defining additional methods
-     4.4.  Client requests an authentication challenge
-     4.5.  Client provides authentication details
-       4.5.1.  Token request
-     4.6.  Checking for additional requirements
+     4.1.  Client receives trigger for authentication
+     4.2.  Client collects user identifier
+     4.3.  Client initiates direct interaction request
+     4.4.  Authorization Server returns challenge types
+       4.4.1.  One-Time code
+       4.4.2.  TOTP
+       4.4.3.  Password
+       4.4.4.  Push notification
+       4.4.5.  Redirect
+       4.4.6.  Combinations
+       4.4.7.  Defining additional methods
+     4.5.  Client requests an authentication challenge
+     4.6.  Client provides authentication details
+       4.6.1.  Token request
+     4.7.  Checking for additional requirements
    5.  Refresh Token Grant
    6.  Security Considerations
      6.1.  Phishing
-     6.2.  Client Authentication
-     6.3.  Leaking Information
-     6.4.  Notification fatigue
+     6.2.  Native client and Authorisation Server trust relationship
+     6.3.  Client Authentication
+     6.4.  Leaking Information
+     6.5.  Notification fatigue
    7.  IANA Considerations
      7.1.  OAuth Parameter Registration
      7.2.  OAuth URI Registration
@@ -119,7 +135,9 @@ Table of Contents
 
 1.  Introduction
 
-   TODO
+   TODO: Key points to address include problem description, the
+   relationship to the step-up authentication spec (use of acr etc.),
+   properties of the protocol (extensibility etc).
 
 1.1.  Usage and Applicability
 
@@ -128,6 +146,68 @@ Table of Contents
    apps, specifically first-party, when the AS and app are operated by
    the same entity, and the user understands them both as the same
    entity...
+
+1.2.  Use Cases
+
+   TODO: We may move these to the appendix, but outlining them in the
+   document will also help guide developers to understand what they can
+   (and cannot) expect to be able to to
+
+1.2.1.  Sign-up with verification
+
+   e.g. user provides e-mail, is sent a verification code, and then uses
+   the verification code to prove they control the e-mail during sign-
+   up/account creation.
+
+1.2.2.  Register new authentication methods
+
+   e.g. user selects password, provides phone for SMS codes, etc
+
+1.2.3.  Sign-in with first factor
+
+   e.g. username password
+
+1.2.4.  Sign-in with additional factor
+
+   e.g. user already signed in with one factor (username/password), but
+   now need to "step-up" to second factor (e.g.  SMS code).
+
+1.2.5.  Discover supported authentication methods
+
+   e.g. developer can query the authorisation server to determine what
+   authentication methods are supported.
+
+1.2.6.  Discover supported account recover authentication methods
+
+   e.g. developer can query the authorisation server to determine what
+   authentication methods are used for account recovery if one of the
+   methods are lost.
+
+1.2.7.  Discover supported account recover authentication methods
+
+   e.g. developer can query the authorisation server to determine what
+   authentication methods are used for account recovery if one of the
+   methods are lost.
+
+1.2.8.  Update an existing authentication method
+
+   e.g. the authorisation server may require the user to update a
+   password or provide a new phone number, key or alternative e-mail
+   address if it believes the existing mechanism is no longer
+   trustworthy.
+
+1.2.9.  Initiate browser-based interaction for certain scenarios
+
+   e.g. some scenarios don't benefit from a native implementation and
+   may be more efficiently or securely implemented through the browser
+   (e.g. error scenarios, password recovery, identity verification,
+   social sign-in).
+
+1.2.10.  Discovering custom user attributes
+
+   e.g.  Ability to know mandatory and optional custom attributes
+   configured on the authorisation server (can this be achieve through
+   AS metadata instead of as part of the protocol)?
 
 2.  Conventions and Definitions
 
@@ -148,35 +228,52 @@ Table of Contents
 
 3.  Protocol Overview
 
-   1.  The client prompts the user and collects their user identifier
+   1.  The client receives a signal from resource server indicating that
+       a step-up authentication is requried
+
+   2.  The client prompts the user and collects their user identifier
        (e.g. email address)
 
-   2.  The client sends the identifier to the AS
+   3.  The client sends the identifier to the AS, along with any hint it
+       may have received about the authentication level required
 
-   3.  The AS replies with the supported authentication mechanisms based
-       on the user ID provided
+   4.  The AS replies with the supported authentication mechanisms based
+       on the user ID provided (should these be amr values?)
 
-   4.  The client requests an authentication challenge from the AS
+   5.  The client requests an authentication challenge from the AS (this
+       is optional - only if the authentication method requires it)
 
-   5.  The AS delivers a challenge to the user (e.g. one-time code via
-       email, SMS, or a push notification in an app)
+   6.  The AS delivers a challenge to the user (e.g. one-time code via
+       email, SMS, or a push notification in an app) (this is optional -
+       only if it is a challenge response type authentiation method).
 
-   6.  The client collects the necessary authentication details from the
+   7.  The client collects the necessary authentication details from the
        user and sends them back to the AS
 
-   7.  The AS decides if additional requirements need to be met,
-       repeating steps 3 through 6 as needed
+   8.  The AS decides if additional requirements need to be met,
+       repeating steps 3 through 6 as needed (the AS knows this due to
+       the acr_value sent by the client initially)
 
-   8.  The AS replies with the token response
+   9.  The AS replies with the token response
 
 4.  Protocol
 
-4.1.  Client collects user identifier
+4.1.  Client receives trigger for authentication
+
+   TODO: The client may receive a trigger from the resource server to
+   initiate an authentication, possibly with a hint from the resource
+   provider in the form of an acr value, indicating it needs to initiate
+   and authentications.
+
+   TBD: May need to reference the existing step-up authentication draft
+   instead
+
+4.2.  Client collects user identifier
 
    TODO: User identifier can be an email, phone number, or username, at
    the discretion of the AS.
 
-4.2.  Client initiates direct interaction request
+4.3.  Client initiates direct interaction request
 
    The client makes a request to the interaction request endpoint
    providing the client ID and user identifer hint in the request.
@@ -189,7 +286,7 @@ Table of Contents
    &username=user@example.com
    &scope=contacts+openid+profile
 
-4.3.  Authorization Server returns challenge types
+4.4.  Authorization Server returns challenge types
 
    The AS returns an interaction code, as well as a list of challenge
    types supported.
@@ -205,7 +302,7 @@ Table of Contents
      ]
    }
 
-4.3.1.  One-Time code
+4.4.1.  One-Time code
 
    *  email_otp
 
@@ -213,25 +310,25 @@ Table of Contents
 
    One-time codes sent via email or SMS
 
-4.3.2.  TOTP
+4.4.2.  TOTP
 
    *  totp
 
    TOTP codes generated by an authenticator app
 
-4.3.3.  Password
+4.4.3.  Password
 
    *  password
 
    Legacy password authentication
 
-4.3.4.  Push notification
+4.4.4.  Push notification
 
    *  push_notification
 
    A push notification delivered to a native application
 
-4.3.5.  Redirect
+4.4.5.  Redirect
 
    *  redirect
 
@@ -246,7 +343,13 @@ Table of Contents
    include the interaction code in the authorization request so the AS
    can link it to an app-initiated session?  Alternatively, if we make
    the first request require a PKCE code challenge, we could require the
-   same PKCE code challenge be used in the authorization request.
+   same PKCE code challenge be used in the authorization request.  My
+   preference here is to include the PKCE code verifier at the start of
+   the protocol.  PKCE is well understood and re-using the interaction
+   code to establish the link feels like we are overloading the
+   interaction code.  Another option may be to add a session identifier
+   (or return a session identifier as a unique parameter) for the
+   redirect case.
 
    This can be used to:
 
@@ -260,17 +363,19 @@ Table of Contents
    *  enable authentication with social providers or third party IdPs
       which require a browser flow
 
-4.3.6.  Combinations
+4.4.6.  Combinations
 
    The AS MAY combine challenge types by concatenating strings with a +,
    which indicates that all the combined types are required to complete
    the challenge.
 
-4.3.7.  Defining additional methods
+   TODO: Does the absense of a '+' imply an OR?
+
+4.4.7.  Defining additional methods
 
    Extensibility...
 
-4.4.  Client requests an authentication challenge
+4.5.  Client requests an authentication challenge
 
    Optional.
 
@@ -278,7 +383,9 @@ Table of Contents
    via email or SMS, the client needs to signal to the AS that it should
    deliver this code.  (Without this step, the AS may not know which of
    the available options the client will be communicating to the user,
-   and may not want to send a code via both email and SMS.)
+   and may not want to send a code via both email and SMS.).  It SHOULD
+   only allow one delivery mechanism at a time to minimise the risk of
+   the challenge leaking.
 
    POST /challenge
    Host: authorization-server.com
@@ -311,7 +418,7 @@ Table of Contents
 
    *  interval - Optional
 
-4.5.  Client provides authentication details
+4.6.  Client provides authentication details
 
    The client prompts the user to enter the challenge.
 
@@ -326,7 +433,10 @@ Table of Contents
    instead presents a screen to the user explaining that they should
    acknowledge the challenge on another device.
 
-4.5.1.  Token request
+   TODO: How does the Authorisation Server signal to the client that the
+   push notification succeeded on another device?
+
+4.6.1.  Token request
 
    The client makes a request to the token endpoint with the grant_type
    value of urn:ietf:params:oauth:grant-type:direct, providing the
@@ -349,13 +459,18 @@ Table of Contents
 
    TODO: What happens if more than one code is requested?  Maybe make it
    so only one can be collected at a time?  It would be weird to ask the
-   user to enter two codes at the same time anyway
+   user to enter two codes at the same time anyway.  Not sure we should
+   have a unique interaction code per token.  Should the interaction
+   code cover all the interactions (i.e. all interactions are bundled up
+   as one interaction).  Once all interactions are complete all tokens
+   for which that interaction is good can be released?
 
-4.6.  Checking for additional requirements
+4.7.  Checking for additional requirements
 
    If the initial set of information provided by the client is correct,
    the AS MAY choose to either respond immetiately with a successful
-   token request, or prompt the client with an additional challenge.
+   token request (response?), or prompt the client with an additional
+   challenge.
 
    For example, the AS could first require the client prompt the user
    for a one-time-code they received via email, and then in a second
@@ -375,7 +490,12 @@ Table of Contents
 
    TODO: Describe the phishing risk this opens up.
 
-6.2.  Client Authentication
+6.2.  Native client and Authorisation Server trust relationship
+
+   TODO: Emphasise the 'same owner' relationship between the native
+   client and the authorisation server
+
+6.3.  Client Authentication
 
    TODO: Describe the lack of client authentication possible because
    this is expected to be deployed by native apps.  Maybe mention
@@ -383,7 +503,7 @@ Table of Contents
    using a risk engine to analyze other aspects of the request from the
    client.
 
-6.3.  Leaking Information
+6.4.  Leaking Information
 
    TODO: Attackers may be able to query the AS with user IDs to learn
    whether an identifier corresponds to an active account and which
@@ -391,10 +511,10 @@ Table of Contents
    mitigations needed here?  Possibly avoiding returning an error for
    unrecognized identifiers.
 
-6.4.  Notification fatigue
+6.5.  Notification fatigue
 
    TODO: A client may be able to cause repeated notifications to any
-   user given their user ID.  Mitigations?
+   user given their user ID.  Mitigations - throttling
 
 7.  IANA Considerations
 
@@ -405,7 +525,7 @@ Table of Contents
 7.2.  OAuth URI Registration
 
    This specification registers the following values in the IANA "OAuth
-   URI" registry [IANA.OAuth.Parameters] established by [RFC6755].
+   URI" registry (IANA.OAuth.Parameters) established by [RFC6755].
 
    URN: `urn:ietf:params:oauth:grant-type:direct`
    Common Name: Direct Interaction Grant Type for OAuth 2.0
@@ -415,7 +535,7 @@ Table of Contents
 7.3.  OAuth Extensions Error Registration
 
    This specification registers the following values in the IANA "OAuth
-   Extensions Error Registry" registry [IANA.OAuth.Parameters]
+   Extensions Error Registry" registry (IANA.OAuth.Parameters)
    established by [RFC6749].
 
    Name: ...
@@ -431,9 +551,6 @@ Table of Contents
    *  challenge endpoint
 
 8.  Normative References
-
-   [IANA.OAuth.Parameters]
-              "*** BROKEN REFERENCE ***".
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
