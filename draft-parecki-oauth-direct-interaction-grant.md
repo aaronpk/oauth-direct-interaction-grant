@@ -32,7 +32,6 @@ normative:
   RFC6749:
   RFC6755:
   RFC7636:
-  IANA.OAuth.Parameters:
 
 informative:
 
@@ -333,7 +332,7 @@ TODO
 ## OAuth URI Registration
 
 This specification registers the following values in the IANA "OAuth URI"
-registry {{IANA.OAuth.Parameters}} established by {{RFC6755}}.
+registry (IANA.OAuth.Parameters) established by {{RFC6755}}.
 
     URN: `urn:ietf:params:oauth:grant-type:direct`
     Common Name: Direct Interaction Grant Type for OAuth 2.0
