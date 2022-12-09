@@ -45,12 +45,12 @@ that want to control the user experience of the process of obtaining authorizati
 from the user.
 
 In many cases, this can provide an entirely browserless experience suited for native
-applications, only delegating to the browser in unexpected or error conditions.
+applications, delegating to the browser in unexpected or error conditions.
 
 While a fully-delegated approach using the Authorization Code Grant is generally
 preferred, this draft provides a mechanism for the client to directly interact
 with the user. This requires a high degree of trust between the authorization server
-and the client, as well as should only be considered when there are usability
+and the client. It SHOULD only be considered when there are usability
 concerns with a browser-based approach, such as for native mobile or desktop applications.
 
 
@@ -58,15 +58,44 @@ concerns with a browser-based approach, such as for native mobile or desktop app
 
 # Introduction
 
-TODO
-
-
-
+TODO: Key points to address include problem description, the relationship to the step-up authentication spec (use of acr etc.), properties of the protocol (extensibility etc).
 
 ## Usage and Applicability
 
 TODO: Mention the trust prerequisites for this to be useful. Absolutely not allowed for third-party apps. Designed for native apps, specifically first-party, when the AS and app are operated by the same entity, and the user understands them both as the same entity...
 
+## Use Cases
+TODO: We may move these to the appendix, but outlining them in the document will also help guide developers to understand what they can (and cannot) expect to be able to to
+
+###Sign-up with verification
+e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail during sign-up/account creation.
+
+###Register new authentication methods
+e.g. user selects password, provides phone for SMS codes, etc
+
+###Sign-in with first factor
+e.g. username password
+
+###Sign-in with additional factor
+e.g. user already signed in with one factor (username/password), but now need to "step-up" to second factor (e.g. SMS code).
+
+###Discover supported authentication methods
+e.g. developer can query the authorisation server to determine what authentication methods are supported.
+
+###Discover supported account recover authentication methods
+e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.
+
+###Discover supported account recover authentication methods
+e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.
+
+###Update an existing authentication method
+e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.
+
+###Initiate browser-based interaction for certain scenarios
+e.g. some scenarios don't benefit from a anative implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in) 
+
+###Discovering custom user attributes
+e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?
 
 # Conventions and Definitions
 
@@ -86,18 +115,21 @@ and "Token Endpoint" defined by {{RFC6749}}.
 
 
 
-1. The client prompts the user and collects their user identifier (e.g. email address)
-2. The client sends the identifier to the AS
-3. The AS replies with the supported authentication mechanisms based on the user ID provided
-4. The client requests an authentication challenge from the AS
-5. The AS delivers a challenge to the user (e.g. one-time code via email, SMS, or a push notification in an app)
-6. The client collects the necessary authentication details from the user and sends them back to the AS
-7. The AS decides if additional requirements need to be met, repeating steps 3 through 6 as needed
-8. The AS replies with the token response
-
-
+1. The client receives a signal from resource provider indicating that a step-up authentication is requried
+2. The client prompts the user and collects their user identifier (e.g. email address)
+3. The client sends the identifier to the AS, along with any hint it may have received about the authentication level required
+4. The AS replies with the supported authentication mechanisms based on the user ID provided (should these be amr values?)
+5. The client requests an authentication challenge from the AS (this is optional - only if the authentication method requires it)
+6. The AS delivers a challenge to the user (e.g. one-time code via email, SMS, or a push notification in an app) (this is optional - only if it is a challenge response type authentiation method).
+7. The client collects the necessary authentication details from the user and sends them back to the AS
+8. The AS decides if additional requirements need to be met, repeating steps 3 through 6 as needed (the AS knows this due to the acr_value sent by the client initially)
+9. The AS replies with the token response
 
 # Protocol
+
+## Client receives trigger for authentication
+
+TODO: The client may receive a trigger from the resource provider to initiate an authentication, possibly with a hint from the resource provider in the form of an acr value, indicating it needs to initiate and authentications. 
 
 ## Client collects user identifier
 
@@ -162,7 +194,7 @@ A push notification delivered to a native application
 In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the `redirect` challenge type. In this case, no `interaction_code` is returned. Instead, the client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to {{RFC6749}} and {{RFC7636}}.
 <!-- TODO: Replace this reference with OAuth 2.1 once published. -->
 
-TODO: Instead of no interaction code, should this require the client include the interaction code in the authorization request so the AS can link it to an app-initiated session? Alternatively, if we make the first request require a PKCE code challenge, we could require the same PKCE code challenge be used in the authorization request.
+TODO: Instead of no interaction code, should this require the client include the interaction code in the authorization request so the AS can link it to an app-initiated session? Alternatively, if we make the first request require a PKCE code challenge, we could require the same PKCE code challenge be used in the authorization request. My preference here is to include the PKCE code verifier at the start of the protocol. PKCE is well understood and re-using the interaction code to establish the link feels like we are overloading the interaction code. Another option may be to add a session identifier (or return a session identifier as a unique parameter) for the redirect case.
 
 This can be used to:
 
@@ -173,6 +205,8 @@ This can be used to:
 ### Combinations
 
 The AS MAY combine challenge types by concatenating strings with a `+`, which indicates that all the combined types are required to complete the challenge.
+
+TODO: Does the absense of a '+' imply an OR?
 
 ### Defining additional methods
 
@@ -185,7 +219,7 @@ Optional.
 For methods that require the AS to deliver a code to the user, e.g. via email or SMS, the client
 needs to signal to the AS that it should deliver this code. (Without this step, the AS may not know
 which of the available options the client will be communicating to the user, and may not want to send
-a code via both email and SMS.)
+a code via both email and SMS.). It SHOULD only allow one delivery mechanism at a time to minimise the risk of the challenge leaking.
 
     POST /challenge
     Host: authorization-server.com
@@ -224,6 +258,8 @@ The client prompts the user to enter the challenge.
 
 Some methods such as acknowledging a push notification may not require the user to interact further with the client. The client instead presents a screen to the user explaining that they should acknowledge the challenge on another device.
 
+TODO: How does the Authorisation Server signal to the client that the push notification succeeded on another device?
+
 ### Token request
 
 The client makes a request to the token endpoint with the `grant_type` value of `urn:ietf:params:oauth:grant-type:direct`, providing the information collected from the user as well as the previous interaction code and optional challenge code.
@@ -241,13 +277,13 @@ The client makes a request to the token endpoint with the `grant_type` value of 
 
 * `challenge_value` - The value that was sent to the user. Should this be different depending on the challenge type?
 
-TODO: What happens if more than one code is requested? Maybe make it so only one can be collected at a time? It would be weird to ask the user to enter two codes at the same time anyway
+TODO: What happens if more than one code is requested? Maybe make it so only one can be collected at a time? It would be weird to ask the user to enter two codes at the same time anyway. Not sure we should have a unique interaction code per token. Should the interaction code cover all the interactions (i.e. all interactions are bundled up as one interaction). Once all interactions are complete all tokens for which that interaction is good can be released?
 
 
 ## Checking for additional requirements
 
 If the initial set of information provided by the client is correct, the AS
-MAY choose to either respond immetiately with a successful token request,
+MAY choose to either respond immetiately with a successful token request (response?),
 or prompt the client with an additional challenge.
 
 For example, the AS could first require the client prompt the user for a one-time-code they
@@ -270,6 +306,8 @@ TODO Security
 
 TODO: Describe the phishing risk this opens up.
 
+## Native client and Authorisation Server trust relationship
+TODO: Emphasise the 'same owner' relationship between the native client and the authorisation server
 
 ## Client Authentication
 
@@ -283,7 +321,7 @@ TODO: Attackers may be able to query the AS with user IDs to learn whether an id
 
 ## Notification fatigue
 
-TODO: A client may be able to cause repeated notifications to any user given their user ID. Mitigations?
+TODO: A client may be able to cause repeated notifications to any user given their user ID. Mitigations - throttling
 
 
 # IANA Considerations
