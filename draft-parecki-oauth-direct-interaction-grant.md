@@ -91,7 +91,7 @@ e.g. developer can query the authorisation server to determine what authenticati
 e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.
 
 ###Initiate browser-based interaction for certain scenarios
-e.g. some scenarios don't benefit from a anative implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in) 
+e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).
 
 ###Discovering custom user attributes
 e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?
@@ -114,7 +114,7 @@ and "Token Endpoint" defined by {{RFC6749}}.
 
 
 
-1. The client receives a signal from resource provider indicating that a step-up authentication is requried
+1. The client receives a signal from resource server indicating that a step-up authentication is requried
 2. The client prompts the user and collects their user identifier (e.g. email address)
 3. The client sends the identifier to the AS, along with any hint it may have received about the authentication level required
 4. The AS replies with the supported authentication mechanisms based on the user ID provided (should these be amr values?)
@@ -128,7 +128,9 @@ and "Token Endpoint" defined by {{RFC6749}}.
 
 ## Client receives trigger for authentication
 
-TODO: The client may receive a trigger from the resource provider to initiate an authentication, possibly with a hint from the resource provider in the form of an acr value, indicating it needs to initiate and authentications. 
+TODO: The client may receive a trigger from the resource server to initiate an authentication, possibly with a hint from the resource provider in the form of an acr value, indicating it needs to initiate and authentications.
+
+TBD: May need to reference the existing step-up authentication draft instead
 
 ## Client collects user identifier
 
