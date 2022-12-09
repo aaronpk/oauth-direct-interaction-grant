@@ -342,7 +342,7 @@ registry (IANA.OAuth.Parameters) established by {{RFC6755}}.
 ## OAuth Extensions Error Registration
 
 This specification registers the following values in the IANA "OAuth
-Extensions Error Registry" registry {{IANA.OAuth.Parameters}}
+Extensions Error Registry" registry (IANA.OAuth.Parameters)
 established by {{RFC6749}}.
 
     Name: ...
