@@ -1,0 +1,83 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2022-12-11T01:01:01.035310+00:00",
+  "repo": "aaronpk/oauth-direct-interaction-grant",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOIk8Zl85E8PjN",
+      "title": "First round of updates",
+      "url": "https://github.com/aaronpk/oauth-direct-interaction-grant/pull/1",
+      "state": "MERGED",
+      "author": "PieterKas",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fleshing out use cases/scenarios, link to step-up auth, security considerations",
+      "createdAt": "2022-12-09T20:24:10Z",
+      "updatedAt": "2022-12-09T20:30:37Z",
+      "baseRepository": "aaronpk/oauth-direct-interaction-grant",
+      "baseRefName": "main",
+      "baseRefOid": "aaf9ac53b814f145b4567700f4982dda8a8e0d20",
+      "headRepository": "PieterKas/oauth-direct-interaction-grant",
+      "headRefName": "patch-1",
+      "headRefOid": "2f13cb7d454a61969fbbf1e387071c27b6e614fb",
+      "closedAt": "2022-12-09T20:30:37Z",
+      "mergedAt": "2022-12-09T20:30:37Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "a1a9117ea305068adbca1aad63b6bd5ca2b4f8f1"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
