@@ -2029,65 +2029,79 @@ transaction code that is valid for a limited time.  It then initiates
 an out-of-band authorization operation, the details of which are out
 of scope for this specification.  It then responds with an OOB
 authorization challenge type containing the following parameters:<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.2-2">
+<span class="break"></span><dl class="dlParallel" id="section-6.2.2-2">
+            <dt id="section-6.2.2-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.2-2.2">
+              <p id="section-6.2.2-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to "oob".<a href="#section-6.2.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.2-2.3">"oob_code":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.2-2.4">
+              <p id="section-6.2.2-2.4.1"><span class="bcp14">REQUIRED</span>.  The out-of-band transaction code.  The out-of-band
+transaction code <span class="bcp14">MUST</span> expire shortly after it is issued to
+mitigate the risk of leaks.  A maximum out-of-band transaction
+code lifetime of 10 minutes is <span class="bcp14">RECOMMENDED</span>.
+TODO: Determine whether this is required or what benefit it provides if any.<a href="#section-6.2.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.2-2.5">"binding_code":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.2-2.6">
+              <p id="section-6.2.2-2.6.1"><span class="bcp14">OPTIONAL</span>.  The end-user verification code used to bind the
+authorization operation on the secondary channel with the primary
+channel.  <span class="bcp14">REQUIRED</span>, if the value of "binding_method" is set to
+"transfer" or "compare".<a href="#section-6.2.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.2-2.7">"binding_method":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.2-2.8">
+              <p id="section-6.2.2-2.8.1"><span class="bcp14">OPTIONAL</span>.  The method used to bind the authorization operation on
+the secondary channel with the primary channel.  If no value is
+provided, clients <span class="bcp14">MUST</span> use "none" as the default.  Values defined
+by this specification are:<a href="#section-6.2.2-2.8.1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.2.2-2.8.2">
 <pre>
-challenge_type
-  REQUIRED.  Value MUST be set to "oob".
+"prompt":
+:  The end user should be prompted to enter a code received during
+   out-of-band authorization via the secondary channel into the
+   client.  For example, the end user receives a code on their
+   mobile phone (typically a 6-digit code) and types it into the
+   client.
 
-oob_code
-  REQUIRED.  The out-of-band transaction code.  The out-of-band
-  transaction code MUST expire shortly after it is issued to
-  mitigate the risk of leaks.  A maximum out-of-band transaction
-  code lifetime of 10 minutes is RECOMMENDED.
-  TODO: Determine whether this is required or what benefit it provides if any.
+"transfer":
+:  The client displays or otherwise communicates the
+   "binding_code" to the end user and instructs them to enter it
+   into or otherwise transfer it to the secondary channel.  For
+   example, the end user may view the "binding_code" on the client
+   and either type it into an app on their mobile phone or use a
+   QR code to effect the transfer.
 
-binding_code
-  OPTIONAL.  The end-user verification code used to bind the
-  authorization operation on the secondary channel with the primary
-  channel.  REQUIRED, if the value of "binding_method" is set to
-  "transfer" or "compare".
+"compare":
+:  The client displays the "binding_code" to the end user and
+   instructs them to compare it to the code received during out-
+   of-band authorization before confirming authorization via the
+   secondary channel.
 
-binding_method
-  OPTIONAL.  The method used to bind the authorization operation on
-  the secondary channel with the primary channel.  If no value is
-  provided, clients MUST use "none" as the default.  Values defined
-  by this specification are:
-
-  prompt
-     The end user should be prompted to enter a code received during
-     out-of-band authorization via the secondary channel into the
-     client.  For example, the end user receives a code on their
-     mobile phone (typically a 6-digit code) and types it into the
-     client.
-
-  transfer
-     The client displays or otherwise communicates the
-     "binding_code" to the end user and instructs them to enter it
-     into or otherwise transfer it to the secondary channel.  For
-     example, the end user may view the "binding_code" on the client
-     and either type it into an app on their mobile phone or use a
-     QR code to effect the transfer.
-
-  compare
-     The client displays the "binding_code" to the end user and
-     instructs them to compare it to the code received during out-
-     of-band authorization before confirming authorization via the
-     secondary channel.
-
-  none
-     No binding is performed between the client on the primary
-     channel and the out-of-band authorization operation via the
-     secondary channel.
-
-expires_in
-  OPTIONAL.  The lifetime in seconds of the "oob_code".
-
-interval
-  OPTIONAL.  The minimum amount of time in seconds that the client
-  SHOULD wait between polling requests to the token endpoint.  If no
-  value is provided, clients MUST use 5 as the default.
-</pre><a href="#section-6.2.2-2" class="pilcrow">¶</a>
+"none":
+:  No binding is performed between the client on the primary
+   channel and the out-of-band authorization operation via the
+   secondary channel.
+</pre><a href="#section-6.2.2-2.8.2" class="pilcrow">¶</a>
 </div>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.2-2.9">"expires_in":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.2-2.10">
+              <p id="section-6.2.2-2.10.1"><span class="bcp14">OPTIONAL</span>.  The lifetime in seconds of the <code>oob_code</code>.<a href="#section-6.2.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-6.2.2-2.11">"interval":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.2-2.12">
+              <p id="section-6.2.2-2.12.1"><span class="bcp14">OPTIONAL</span>.  The minimum amount of time in seconds that the client
+<span class="bcp14">SHOULD</span> wait between polling requests to the token endpoint.  If no
+value is provided, clients <span class="bcp14">MUST</span> use 5 as the default.<a href="#section-6.2.2-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
 <p id="section-6.2.2-3">For example:<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-6.2.2-4">
 <pre>
@@ -2114,12 +2128,13 @@ Cache-Control: no-store
 <p id="section-6.2.3-1">If the authorization server requires a recovery code as an
 authorization grant, it responds with a recovery code authorization
 challenge containing the following parameters:<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.3-2">
-<pre>
-challenge_type
-    REQUIRED.  Value MUST be set to "recovery-code".
-</pre><a href="#section-6.2.3-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.2.3-2">
+            <dt id="section-6.2.3-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.3-2.2">
+              <p id="section-6.2.3-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to <code>recovery-code</code>.<a href="#section-6.2.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
 <p id="section-6.2.3-3">No additional parameters are specified for the recovery code
 authorization challenge type.<a href="#section-6.2.3-3" class="pilcrow">¶</a></p>
 <p id="section-6.2.3-4">For example:<a href="#section-6.2.3-4" class="pilcrow">¶</a></p>
@@ -2131,7 +2146,7 @@ Cache-Control: no-store
 Pragma: no-cache
 
 {
-    "challenge_type": "recovery-code"
+  "challenge_type": "recovery-code"
 }
 </pre><a href="#section-6.2.3-5" class="pilcrow">¶</a>
 </div>
@@ -2207,23 +2222,30 @@ the MFA challenges previously described.<a href="#section-7-1" class="pilcrow">�
 <p id="section-7.1-1">The client makes a request to the token endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
 format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.1-2">
-<pre>
-grant_type
-    REQUIRED. `urn:ietf:params:oauth:grant-type:mfa-otp`
-
-otp
-    REQUIRED. The one-time password generated by a device. e.g. 123456
-
-mfa_token
-    REQUIRED. The MFA token, "mfa_token" from the prior authorization
-    challenge error response
-
-client_id
-    REQUIRED if the client is not authenticating with the
-    authorization server.
-</pre><a href="#section-7.1-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-7.1-2">
+          <dt id="section-7.1-2.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.2">
+            <p id="section-7.1-2.2.1"><span class="bcp14">REQUIRED</span>. <code>urn:ietf:params:oauth:grant-type:mfa-otp</code><a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.1-2.3">"otp":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.4">
+            <p id="section-7.1-2.4.1"><span class="bcp14">REQUIRED</span>. The one-time password generated by a device. e.g. 123456<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.1-2.5">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.6">
+            <p id="section-7.1-2.6.1"><span class="bcp14">REQUIRED</span>. The MFA token, "mfa_token" from the prior authorization
+challenge error response<a href="#section-7.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.1-2.7">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.8">
+            <p id="section-7.1-2.8.1"><span class="bcp14">REQUIRED</span> if the client is not authenticating with the
+authorization server.<a href="#section-7.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 <p id="section-7.1-3">For example:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-7.1-4">
 <pre>
@@ -2246,7 +2268,7 @@ authentication requirements),<a href="#section-7.1-6.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-6.3">ensure that the MFA token was issued to the authenticated
 confidential client, or if the client is public, ensure that the
-token was issued to "client_id" in the request,<a href="#section-7.1-6.3" class="pilcrow">¶</a>
+token was issued to <code>client_id</code> in the request,<a href="#section-7.1-6.3" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-6.4">verify that the MFA token is valid,<a href="#section-7.1-6.4" class="pilcrow">¶</a>
 </li>
@@ -2267,29 +2289,38 @@ validation algorithm.<a href="#section-7.1-6.6" class="pilcrow">¶</a>
 <p id="section-7.2-1">The client makes a request to the token endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
 format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.2-2">
-<pre>
-grant_type
-  REQUIRED. `urn:ietf:params:oauth:grant-type:mfa-oob`
-
-oob_code
-  REQUIRED.  The out-of-band transaction code, `oob_code` from the
-  authorization challenge, defined in {{oob-authorization-challenge}}
-
-binding_code
-  REQUIRED, if the binding method of the authorization challenge
-  is set to "prompt".
-
-mfa_token
-  REQUIRED.  The MFA token, "mfa_token" from the prior authorization
-  challenge error response, defined in {{mfa-token-response}}.
-
-client_id
-  REQUIRED, if the client is not authenticating with the
-  authorization server as described in Section 3.2.1 of OAuth 2.0
-  {{RFC6749}}.
-</pre><a href="#section-7.2-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-7.2-2">
+          <dt id="section-7.2-2.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.2">
+            <p id="section-7.2-2.2.1"><span class="bcp14">REQUIRED</span>. <code>urn:ietf:params:oauth:grant-type:mfa-oob</code><a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-2.3">"oob_code":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.4">
+            <p id="section-7.2-2.4.1"><span class="bcp14">REQUIRED</span>.  The out-of-band transaction code, <code>oob_code</code> from the
+authorization challenge, defined in <a href="#oob-authorization-challenge" class="auto internal xref">Section 6.2.2</a><a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-2.5">"binding_code":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.6">
+            <p id="section-7.2-2.6.1"><span class="bcp14">REQUIRED</span>, if the binding method of the authorization challenge
+ is set to "prompt".<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-2.7">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.8">
+            <p id="section-7.2-2.8.1"><span class="bcp14">REQUIRED</span>.  The MFA token, "mfa_token" from the prior authorization
+challenge error response, defined in <a href="#mfa-token-response" class="auto internal xref">Section 5</a>.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-2.9">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.10">
+            <p id="section-7.2-2.10.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+authorization server as described in Section 3.2.1 of OAuth 2.0
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 <p id="section-7.2-3">If the client type is confidential or the client was issued client
 credentials (or assigned other authentication requirements), the
 client <span class="bcp14">MUST</span> authenticate with the authorization server as described
@@ -2318,7 +2349,7 @@ authentication requirements),<a href="#section-7.2-7.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.2-7.3">ensure that the MFA token was issued to the authenticated
 confidential client, or if the client is public, ensure that the
-token was issued to "client_id" in the request,<a href="#section-7.2-7.3" class="pilcrow">¶</a>
+token was issued to <code>client_id</code> in the request,<a href="#section-7.2-7.3" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.2-7.4">verify that the MFA token is valid,<a href="#section-7.2-7.4" class="pilcrow">¶</a>
 </li>
@@ -2340,33 +2371,40 @@ validation algorithm.<a href="#section-7.2-7.7" class="pilcrow">¶</a>
 <p id="section-7.2.1-1">In addition to the error codes defined in Section 5.2 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following error codes are specific for the out-of-band
 authorization grant in token endpoint responses:<a href="#section-7.2.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.2.1-2">
-<pre>
-authorization_pending
-  The authorization request is still pending as the out-of-band
-  authorization operation has not yet completed.  The client SHOULD
-  repeat the access token request to the token endpoint (a process
-  known as polling).  Before each new request, the client MUST wait
-  at least the number of seconds specified by the "interval"
-  parameter of the authorization challenge (see Section 3.2.1), or 5
-  seconds if none was provided, and respect any increase in the
-  polling interval required by the "slow_down" error.
-
-slow_down
-  A variant of "authorization_pending", the authorization request is
-  still pending and polling should continue, but the interval MUST
-  be increased by 5 seconds for this and all subsequent requests.
-
-access_denied
-  The authorization request was denied.
-
-expired_token
-  The "oob_code" or "mfa_token" has expired, and the authorization
-  session has concluded.  The client MAY commence a new
-  authorization session but SHOULD wait for user interaction before
-  restarting to avoid unnecessary polling.
-</pre><a href="#section-7.2.1-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-7.2.1-2">
+            <dt id="section-7.2.1-2.1">"authorization_pending":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.1-2.2">
+              <p id="section-7.2.1-2.2.1">The authorization request is still pending as the out-of-band
+authorization operation has not yet completed.  The client <span class="bcp14">SHOULD</span>
+repeat the access token request to the token endpoint (a process
+known as polling).  Before each new request, the client <span class="bcp14">MUST</span> wait
+at least the number of seconds specified by the <code>interval</code>
+parameter of the authorization challenge (see Section X), or 5
+seconds if none was provided, and respect any increase in the
+polling interval required by the <code>slow_down</code> error.<a href="#section-7.2.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.1-2.3">"slow_down":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.1-2.4">
+              <p id="section-7.2.1-2.4.1">A variant of "authorization_pending", the authorization request is
+still pending and polling should continue, but the interval <span class="bcp14">MUST</span>
+be increased by 5 seconds for this and all subsequent requests.<a href="#section-7.2.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.1-2.5">"access_denied":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.1-2.6">
+              <p id="section-7.2.1-2.6.1">The authorization request was denied.<a href="#section-7.2.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.1-2.7">"expired_token":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.1-2.8">
+              <p id="section-7.2.1-2.8.1">The "oob_code" or "mfa_token" has expired, and the authorization
+session has concluded.  The client <span class="bcp14">MAY</span> commence a new
+authorization session but <span class="bcp14">SHOULD</span> wait for user interaction before
+restarting to avoid unnecessary polling.<a href="#section-7.2.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
 <p id="section-7.2.1-3">The <code>authorization_pending</code> and <code>slow_down</code> error codes define
 particularly unique behavior, as they indicate that the OAuth client
 should continue to poll the token endpoint by repeating the token
@@ -2393,24 +2431,31 @@ Authorization Grant <span>[<a href="#RFC8628" class="cite xref">RFC8628</a>]</sp
 <p id="section-7.3-1">The client makes a request to the token endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
 format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.3-2">
-<pre>
-grant_type
-  REQUIRED.  `urn:ietf:params:oauth:grant-type:mfa-recovery-code`
-
-recovery_code
-  REQUIRED.  The recovery code.
-
-mfa_token
-  REQUIRED.  The MFA token, "mfa_token" from the prior authorization
-  challenge error response, defined in {{mfa-token-response}}.
-
-client_id
-  REQUIRED, if the client is not authenticating with the
-  authorization server as described in Section 3.2.1 of OAuth 2.0
-  {{RFC6749}}.
-</pre><a href="#section-7.3-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-7.3-2">
+          <dt id="section-7.3-2.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.3-2.2">
+            <p id="section-7.3-2.2.1"><span class="bcp14">REQUIRED</span>.  <code>urn:ietf:params:oauth:grant-type:mfa-recovery-code</code><a href="#section-7.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.3-2.3">"recovery_code":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.3-2.4">
+            <p id="section-7.3-2.4.1"><span class="bcp14">REQUIRED</span>.  The recovery code.<a href="#section-7.3-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.3-2.5">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.3-2.6">
+            <p id="section-7.3-2.6.1"><span class="bcp14">REQUIRED</span>.  The MFA token, "mfa_token" from the prior authorization
+challenge error response, defined in <a href="#mfa-token-response" class="auto internal xref">Section 5</a>.<a href="#section-7.3-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.3-2.7">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.3-2.8">
+            <p id="section-7.3-2.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+authorization server as described in Section 3.2.1 of OAuth 2.0
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.3-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 <p id="section-7.3-3">If the client type is confidential or the client was issued client
 credentials (or assigned other authentication requirements), the
 client <span class="bcp14">MUST</span> authenticate with the authorization server as described
@@ -2439,7 +2484,7 @@ authentication requirements),<a href="#section-7.3-7.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.3-7.3">ensure that the MFA token was issued to the authenticated
 confidential client, or if the client is public, ensure that the
-token was issued to "client_id" in the request,<a href="#section-7.3-7.3" class="pilcrow">¶</a>
+token was issued to <code>client_id</code> in the request,<a href="#section-7.3-7.3" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.3-7.4">verify that the MFA token is valid,<a href="#section-7.3-7.4" class="pilcrow">¶</a>
 </li>
@@ -2458,14 +2503,15 @@ validation algorithm.<a href="#section-7.3-7.6" class="pilcrow">¶</a>
 <p id="section-7.3.1-1">In addition to the parameters defined in Section 5.1 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following additional parameters are specified for the
 recovery code grant:<a href="#section-7.3.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.3.1-2">
-<pre>
-recovery_code
-  OPTIONAL.  A newly issued recovery code, in which case the client
-  MUST discard the old recovery code and replace it with the new
-  recovery code.
-</pre><a href="#section-7.3.1-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-7.3.1-2">
+            <dt id="section-7.3.1-2.1">"recovery_code":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.3.1-2.2">
+              <p id="section-7.3.1-2.2.1"><span class="bcp14">OPTIONAL</span>.  A newly issued recovery code, in which case the client
+<span class="bcp14">MUST</span> discard the old recovery code and replace it with the new
+recovery code.<a href="#section-7.3.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
 <p id="section-7.3.1-3">TODO: Do most systems currently give the user new recovery codes during this flow?<a href="#section-7.3.1-3" class="pilcrow">¶</a></p>
 <p id="section-7.3.1-4"></p>
 <p id="section-7.3.1-5">Old stuff below<a href="#section-7.3.1-5" class="pilcrow">¶</a></p>

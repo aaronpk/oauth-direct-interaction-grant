@@ -620,61 +620,56 @@ Table of Contents
    of scope for this specification.  It then responds with an OOB
    authorization challenge type containing the following parameters:
 
-challenge_type
-  REQUIRED.  Value MUST be set to "oob".
+   "challenge_type":  REQUIRED.  Value MUST be set to "oob".
 
-oob_code
-  REQUIRED.  The out-of-band transaction code.  The out-of-band
-  transaction code MUST expire shortly after it is issued to
-  mitigate the risk of leaks.  A maximum out-of-band transaction
-  code lifetime of 10 minutes is RECOMMENDED.
-  TODO: Determine whether this is required or what benefit it provides if any.
+   "oob_code":  REQUIRED.  The out-of-band transaction code.  The out-
+      of-band transaction code MUST expire shortly after it is issued to
+      mitigate the risk of leaks.  A maximum out-of-band transaction
+      code lifetime of 10 minutes is RECOMMENDED.  TODO: Determine
+      whether this is required or what benefit it provides if any.
 
-binding_code
-  OPTIONAL.  The end-user verification code used to bind the
-  authorization operation on the secondary channel with the primary
-  channel.  REQUIRED, if the value of "binding_method" is set to
-  "transfer" or "compare".
+   "binding_code":  OPTIONAL.  The end-user verification code used to
+      bind the authorization operation on the secondary channel with the
+      primary channel.  REQUIRED, if the value of "binding_method" is
+      set to "transfer" or "compare".
 
-binding_method
-  OPTIONAL.  The method used to bind the authorization operation on
-  the secondary channel with the primary channel.  If no value is
-  provided, clients MUST use "none" as the default.  Values defined
-  by this specification are:
+   "binding_method":  OPTIONAL.  The method used to bind the
+      authorization operation on the secondary channel with the primary
+      channel.  If no value is provided, clients MUST use "none" as the
+      default.  Values defined by this specification are:
 
-  prompt
-     The end user should be prompted to enter a code received during
-     out-of-band authorization via the secondary channel into the
-     client.  For example, the end user receives a code on their
-     mobile phone (typically a 6-digit code) and types it into the
-     client.
+      "prompt":
+      :  The end user should be prompted to enter a code received during
+         out-of-band authorization via the secondary channel into the
+         client.  For example, the end user receives a code on their
+         mobile phone (typically a 6-digit code) and types it into the
+         client.
 
-  transfer
-     The client displays or otherwise communicates the
-     "binding_code" to the end user and instructs them to enter it
-     into or otherwise transfer it to the secondary channel.  For
-     example, the end user may view the "binding_code" on the client
-     and either type it into an app on their mobile phone or use a
-     QR code to effect the transfer.
+      "transfer":
+      :  The client displays or otherwise communicates the
+         "binding_code" to the end user and instructs them to enter it
+         into or otherwise transfer it to the secondary channel.  For
+         example, the end user may view the "binding_code" on the client
+         and either type it into an app on their mobile phone or use a
+         QR code to effect the transfer.
 
-  compare
-     The client displays the "binding_code" to the end user and
-     instructs them to compare it to the code received during out-
-     of-band authorization before confirming authorization via the
-     secondary channel.
+      "compare":
+      :  The client displays the "binding_code" to the end user and
+         instructs them to compare it to the code received during out-
+         of-band authorization before confirming authorization via the
+         secondary channel.
 
-  none
-     No binding is performed between the client on the primary
-     channel and the out-of-band authorization operation via the
-     secondary channel.
+      "none":
+      :  No binding is performed between the client on the primary
+         channel and the out-of-band authorization operation via the
+         secondary channel.
 
-expires_in
-  OPTIONAL.  The lifetime in seconds of the "oob_code".
+   "expires_in":  OPTIONAL.  The lifetime in seconds of the oob_code.
 
-interval
-  OPTIONAL.  The minimum amount of time in seconds that the client
-  SHOULD wait between polling requests to the token endpoint.  If no
-  value is provided, clients MUST use 5 as the default.
+   "interval":  OPTIONAL.  The minimum amount of time in seconds that
+      the client SHOULD wait between polling requests to the token
+      endpoint.  If no value is provided, clients MUST use 5 as the
+      default.
 
    For example:
 
@@ -696,8 +691,7 @@ interval
    authorization grant, it responds with a recovery code authorization
    challenge containing the following parameters:
 
-   challenge_type
-       REQUIRED.  Value MUST be set to "recovery-code".
+   "challenge_type":  REQUIRED.  Value MUST be set to recovery-code.
 
    No additional parameters are specified for the recovery code
    authorization challenge type.
@@ -710,7 +704,7 @@ interval
    Pragma: no-cache
 
    {
-       "challenge_type": "recovery-code"
+     "challenge_type": "recovery-code"
    }
 
    TODO: It is unclear why the AS would decide a recovery code is
@@ -762,18 +756,15 @@ interval
    following parameters using the "application/x-www-form-urlencoded"
    format with a character encoding of UTF-8 in the HTTP request body:
 
-  grant_type
-      REQUIRED. `urn:ietf:params:oauth:grant-type:mfa-otp`
+   "grant_type":  REQUIRED. urn:ietf:params:oauth:grant-type:mfa-otp
 
-  otp
-      REQUIRED. The one-time password generated by a device. e.g. 123456
+   "otp":  REQUIRED.  The one-time password generated by a device. e.g.
+      123456
 
-  mfa_token
-      REQUIRED. The MFA token, "mfa_token" from the prior authorization
-      challenge error response
+   "mfa_token":  REQUIRED.  The MFA token, "mfa_token" from the prior
+      authorization challenge error response
 
-  client_id
-      REQUIRED if the client is not authenticating with the
+   "client_id":  REQUIRED if the client is not authenticating with the
       authorization server.
 
    For example:
@@ -796,7 +787,7 @@ interval
 
    *  ensure that the MFA token was issued to the authenticated
       confidential client, or if the client is public, ensure that the
-      token was issued to "client_id" in the request,
+      token was issued to client_id in the request,
 
    *  verify that the MFA token is valid,
 
@@ -812,25 +803,20 @@ interval
    following parameters using the "application/x-www-form-urlencoded"
    format with a character encoding of UTF-8 in the HTTP request body:
 
-   grant_type
-     REQUIRED. `urn:ietf:params:oauth:grant-type:mfa-oob`
+   "grant_type":  REQUIRED. urn:ietf:params:oauth:grant-type:mfa-oob
 
-   oob_code
-     REQUIRED.  The out-of-band transaction code, `oob_code` from the
-     authorization challenge, defined in {{oob-authorization-challenge}}
+   "oob_code":  REQUIRED.  The out-of-band transaction code, oob_code
+      from the authorization challenge, defined in Section 6.2.2
 
-   binding_code
-     REQUIRED, if the binding method of the authorization challenge
-     is set to "prompt".
+   "binding_code":  REQUIRED, if the binding method of the authorization
+      challenge is set to "prompt".
 
-   mfa_token
-     REQUIRED.  The MFA token, "mfa_token" from the prior authorization
-     challenge error response, defined in {{mfa-token-response}}.
+   "mfa_token":  REQUIRED.  The MFA token, "mfa_token" from the prior
+      authorization challenge error response, defined in Section 5.
 
-   client_id
-     REQUIRED, if the client is not authenticating with the
-     authorization server as described in Section 3.2.1 of OAuth 2.0
-     {{RFC6749}}.
+   "client_id":  REQUIRED, if the client is not authenticating with the
+      authorization server as described in Section 3.2.1 of OAuth 2.0
+      [RFC6749].
 
    If the client type is confidential or the client was issued client
    credentials (or assigned other authentication requirements), the
@@ -860,7 +846,7 @@ interval
 
    *  ensure that the MFA token was issued to the authenticated
       confidential client, or if the client is public, ensure that the
-      token was issued to "client_id" in the request,
+      token was issued to client_id in the request,
 
    *  verify that the MFA token is valid,
 
@@ -879,29 +865,26 @@ interval
    [RFC6749], the following error codes are specific for the out-of-band
    authorization grant in token endpoint responses:
 
-   authorization_pending
-     The authorization request is still pending as the out-of-band
-     authorization operation has not yet completed.  The client SHOULD
-     repeat the access token request to the token endpoint (a process
-     known as polling).  Before each new request, the client MUST wait
-     at least the number of seconds specified by the "interval"
-     parameter of the authorization challenge (see Section 3.2.1), or 5
-     seconds if none was provided, and respect any increase in the
-     polling interval required by the "slow_down" error.
+   "authorization_pending":  The authorization request is still pending
+      as the out-of-band authorization operation has not yet completed.
+      The client SHOULD repeat the access token request to the token
+      endpoint (a process known as polling).  Before each new request,
+      the client MUST wait at least the number of seconds specified by
+      the interval parameter of the authorization challenge (see
+      Section X), or 5 seconds if none was provided, and respect any
+      increase in the polling interval required by the slow_down error.
 
-   slow_down
-     A variant of "authorization_pending", the authorization request is
-     still pending and polling should continue, but the interval MUST
-     be increased by 5 seconds for this and all subsequent requests.
+   "slow_down":  A variant of "authorization_pending", the authorization
+      request is still pending and polling should continue, but the
+      interval MUST be increased by 5 seconds for this and all
+      subsequent requests.
 
-   access_denied
-     The authorization request was denied.
+   "access_denied":  The authorization request was denied.
 
-   expired_token
-     The "oob_code" or "mfa_token" has expired, and the authorization
-     session has concluded.  The client MAY commence a new
-     authorization session but SHOULD wait for user interaction before
-     restarting to avoid unnecessary polling.
+   "expired_token":  The "oob_code" or "mfa_token" has expired, and the
+      authorization session has concluded.  The client MAY commence a
+      new authorization session but SHOULD wait for user interaction
+      before restarting to avoid unnecessary polling.
 
    The authorization_pending and slow_down error codes define
    particularly unique behavior, as they indicate that the OAuth client
@@ -926,20 +909,17 @@ interval
    following parameters using the "application/x-www-form-urlencoded"
    format with a character encoding of UTF-8 in the HTTP request body:
 
-   grant_type
-     REQUIRED.  `urn:ietf:params:oauth:grant-type:mfa-recovery-code`
+   "grant_type":  REQUIRED.  urn:ietf:params:oauth:grant-type:mfa-
+      recovery-code
 
-   recovery_code
-     REQUIRED.  The recovery code.
+   "recovery_code":  REQUIRED.  The recovery code.
 
-   mfa_token
-     REQUIRED.  The MFA token, "mfa_token" from the prior authorization
-     challenge error response, defined in {{mfa-token-response}}.
+   "mfa_token":  REQUIRED.  The MFA token, "mfa_token" from the prior
+      authorization challenge error response, defined in Section 5.
 
-   client_id
-     REQUIRED, if the client is not authenticating with the
-     authorization server as described in Section 3.2.1 of OAuth 2.0
-     {{RFC6749}}.
+   "client_id":  REQUIRED, if the client is not authenticating with the
+      authorization server as described in Section 3.2.1 of OAuth 2.0
+      [RFC6749].
 
    If the client type is confidential or the client was issued client
    credentials (or assigned other authentication requirements), the
@@ -968,7 +948,7 @@ interval
 
    *  ensure that the MFA token was issued to the authenticated
       confidential client, or if the client is public, ensure that the
-      token was issued to "client_id" in the request,
+      token was issued to client_id in the request,
 
    *  verify that the MFA token is valid,
 
@@ -984,10 +964,9 @@ interval
    [RFC6749], the following additional parameters are specified for the
    recovery code grant:
 
-   recovery_code
-     OPTIONAL.  A newly issued recovery code, in which case the client
-     MUST discard the old recovery code and replace it with the new
-     recovery code.
+   "recovery_code":  OPTIONAL.  A newly issued recovery code, in which
+      case the client MUST discard the old recovery code and replace it
+      with the new recovery code.
 
    TODO: Do most systems currently give the user new recovery codes
    during this flow?
