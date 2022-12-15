@@ -1031,7 +1031,7 @@ TODO: Need to register these in the Authorization Server Metadata document too.
 
 TODO: Outlining these in the document will also help guide developers to understand what they can (and cannot) expect to be able to do. For each use case, briefly describe the expected outcome, and outline each step and which part of the spec accomplishes each step.
 
-### Password + MFA
+## Password + MFA
 
 * User enters username and password (/initiate login_hint= password=)
 * AS responds with `mfa_required`
@@ -1040,12 +1040,12 @@ TODO: Outlining these in the document will also help guide developers to underst
 * Client collects MFA from user (OTP, SMS code, etc)
 * Client makes token request (new mfa-otp/mfa-oob grant type)
 
-### Passwordless OTP
+## Passwordless OTP
 
 * Client collects username and OTP from user
 * Client makes token request (new otp grant type)
 
-### Re-authenticating to an app a week later
+## Re-authenticating to an app a week later
 
 * You log in to an app (in any way, redirect flow or direct)
 * App gets short lived access token and long lived refresh token
@@ -1054,7 +1054,7 @@ TODO: Outlining these in the document will also help guide developers to underst
 * App prompts and collects MFA from user (OTP or OOB)
 * App submits token request with grant_type=mfa_otp and mfa_token (which was already associated with the refresh token)
 
-### Registration
+## Registration
 
 * Client asks for user's email, starts a flow (/initiate login_hint=email@example.com)
 * AS responds with `{"challenge_type":"oob","oob_code":"...",etc}`
@@ -1070,31 +1070,31 @@ TODO: Outlining these in the document will also help guide developers to underst
 * Client receives an access token, now associated with a new account with both a verified email and phone number
 
 
-### Sign-in with only email verification
+## Sign-in with only email verification
 e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail. Can also be used for registration.
 
-### Discover supported authentication methods
+## Discover supported authentication methods
 e.g. developer can query the authorisation server to determine what authentication methods are supported.
 
-### Discover supported account recover authentication methods
+## Discover supported account recover authentication methods
 e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.
 
-### Update an existing authentication method
+## Update an existing authentication method
 e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.
 
-### Initiate browser-based interaction for certain scenarios
+## Initiate browser-based interaction for certain scenarios
 e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).
 
-### Discovering custom user attributes
+## Discovering custom user attributes
 e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?
 
-### Provide different UX depending on a user's enrolled authenticators
+## Provide different UX depending on a user's enrolled authenticators
 An AS may support multiple different authenticators, and a user may have set up only one. A client will not know which a user has set up ahead of time. The AS needs to drive the UI in the client login process depending on the configuration of the user account.
 
-### Register new authentication methods
+## Register new authentication methods
 e.g. user selects password, provides phone for SMS codes, etc
 
-### User registration
+## User registration
 e.g. user enters a new email, completes the email challenge, the AS creates a new account for them, then wants to enroll additional factors such as SMS
 
 
