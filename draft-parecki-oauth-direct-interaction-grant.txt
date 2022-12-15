@@ -117,47 +117,41 @@ Table of Contents
        6.2.1.  OTP Challenge
        6.2.2.  OOB Challenge
        6.2.3.  Recovery Code Challenge
+       6.2.4.  Redirect Challenge
      6.3.  User Interaction
        6.3.1.  OTP Challenge Interaction
        6.3.2.  OOB Challenge Interaction
        6.3.3.  Recovery Code Challenge Interaction
+       6.3.4.  Redirect Challenge Interaction
    7.  Token Request Grant Types
      7.1.  OTP Grant
      7.2.  OOB Grant
        7.2.1.  Token Error Response
      7.3.  Recovery Code Grant
        7.3.1.  Access Token Response
-   8.  Examples
-     8.1.  Client receives trigger for authentication
-     8.2.  Client collects user identifier
-     8.3.  Client initiates direct interaction request
-     8.4.  Authorization Server returns challenge types
-       8.4.1.  One-Time code
-       8.4.2.  TOTP
-       8.4.3.  Password
-       8.4.4.  Push notification
-       8.4.5.  Redirect
-       8.4.6.  Combinations
-       8.4.7.  Defining additional methods
-     8.5.  Client requests an authentication challenge
-     8.6.  Client provides authentication details
-       8.6.1.  Token request
-     8.7.  Checking for additional requirements
+     7.4.  Redirect Grant
+     7.5.  Token Response
+   8.  Authorization Initiation Request
+     8.1.  Authorization Request
+     8.2.  Authorization Response
    9.  Refresh Token Grant
    10. Security Considerations
-     10.1.  Phishing
-     10.2.  Native client and Authorisation Server trust relationship
+     10.1.  Native client and Authorisation Server trust relationship
+     10.2.  Phishing
      10.3.  Client Authentication
      10.4.  Leaking Information
      10.5.  Notification fatigue
-   11. IANA Considerations
-     11.1.  OAuth Parameter Registration
-     11.2.  OAuth URI Registration
-     11.3.  OAuth Extensions Error Registration
-     11.4.  Authorization Server Metadata
-   12. References
-     12.1.  Normative References
-     12.2.  Informative References
+   11. Old Notes
+     11.1.  Client receives trigger for authentication
+     11.2.  Checking for additional requirements
+   12. IANA Considerations
+     12.1.  OAuth Parameter Registration
+     12.2.  OAuth URI Registration
+     12.3.  OAuth Extensions Error Registration
+     12.4.  Authorization Server Metadata
+   13. References
+     13.1.  Normative References
+     13.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -399,7 +393,7 @@ Table of Contents
       -  This specification defines new grant types and new error
          responses
 
-      -  Adds device_secret in token response
+      -  Adds device_session in token response
 
       -  Note: Passwords are never sent to the token endpoint
 
@@ -408,14 +402,14 @@ Table of Contents
       -  A client requests an authorization challenge (e.g. send a user
          an SMS code), which it can later use as an authorization grant
 
-   *  Initiate login endpoint
+   *  Authorization initiation endpoint
 
       -  A client initiates a login flow
 
       -  With or without information collected from the user (e.g.
          password)
 
-      -  May contain a device_secret
+      -  May contain a device_session
 
       -  Returns an mfa_token
 
@@ -547,7 +541,7 @@ Table of Contents
 
    All additional parameters are specified by the authorization
    challenge type.  This document defines the otp type, the oob type,
-   and the recovery-code type.
+   the recovery-code, and the redirect type.
 
    For example:
 
@@ -711,6 +705,24 @@ Table of Contents
    required, since that assumes the AS knows the user has lost their
    other MFA options.
 
+6.2.4.  Redirect Challenge
+
+   In the case where the authorization server wishes to interact with
+   the user itself, limiting the client's interaction with the user, it
+   can return the redirect challenge type.
+
+   "challenge_type":  REQUIRED.  Value MUST be set to redirect.
+
+   The client is expected to initiate a traditional OAuth Authorization
+   Code flow with PKCE according to [RFC6749] and [RFC7636].
+
+   TODO: Should there be some connection to the authorization code flow
+   that the client initiates next?
+
+   This can be used to enable primary or secondary authentication with
+   social providers or third party IdPs which require a browser redirect
+   flow.
+
 6.3.  User Interaction
 
 6.3.1.  OTP Challenge Interaction
@@ -743,6 +755,12 @@ Table of Contents
    recovery code authorization challenge).  In such an event, the client
    SHOULD provide the resource owner a means of directly entering a
    recovery flow.
+
+6.3.4.  Redirect Challenge Interaction
+
+   After receiving a redirect challenge, the client initiates an OAuth
+   authorization code flow with the authorization server.  The tokens
+   are obtained with the traditional authorization code grant.
 
 7.  Token Request Grant Types
 
@@ -971,227 +989,79 @@ Table of Contents
    TODO: Do most systems currently give the user new recovery codes
    during this flow?
 
+7.4.  Redirect Grant
 
-   Old stuff below
+   No changes are made to the authorization code flow after the client
+   receives a redirect challenge.
 
-8.  Examples
+7.5.  Token Response
 
-8.1.  Client receives trigger for authentication
+   In addition to the parameters defined in Section 5.1 of OAuth 2.0
+   [RFC6749], the following additional parameters are specified for any
+   grant type defined by or extended from this specification.
 
-   TODO: The client may receive a trigger from the resource server to
-   initiate an authentication, possibly with a hint from the resource
-   server in the form of an acr value, indicating it needs to initiate
-   and authentications.
+   "device_session":  OPTIONAL.  The device session contains relevant
+      data to the device and the current user authenticated with the
+      device.
 
-   TBD: May need to reference the existing step-up authentication draft
-   instead
+   The device session is completely opaque to the client, and as such
+   the AS MUST adequately protect the value such as using a JWE if the
+   AS is not maintaining state on the backend.
 
-8.2.  Client collects user identifier
+   The device session can be used by the client on a subsequent
+   authorization initiation request, described in Section 8.
 
-   TODO: User identifier can be an email, phone number, or username, at
-   the discretion of the AS.
+8.  Authorization Initiation Request
 
-8.3.  Client initiates direct interaction request
+   A client may wish to initiate an authorization flow by first
+   prompting the user for their user identifier or other account
+   information.  The authorization initiation endpoint is a new endpoint
+   to collect this login hint and direct the client with the next steps,
+   whether that is to do an MFA flow, or perform an OAuth redirect-based
+   flow.
 
-   The client makes a request to the interaction request endpoint
-   providing the client ID and user identifer hint in the request.
+8.1.  Authorization Request
 
-   POST /interaction
-   Host: authorization-server.com
-   Content-type: application/x-www-form-urlencoded
+   The client makes a request to the authorization initiation endpoint
+   by adding the following parameters using the "application/x-www-form-
+   urlencoded" format with a character encoding of UTF-8 in the HTTP
+   request body:
 
-   &client_id=XXXXXXX
-   &username=user@example.com
-   &scope=contacts+openid+profile
+   "login_hint":  OPTIONAL.  If the client has collected the user's
+      username, email, phone number or other identifier, it can provide
+      this in the request.
 
-8.4.  Authorization Server returns challenge types
+   "password":  OPTIONAL.  If the client has collected the user's
+      password, it can provide it at this stage.
 
-   The AS returns an interaction code, as well as a list of challenge
-   types supported.
+   "scope":  OPTIONAL.  The OAuth scope defined in [RFC6749].
 
-   HTTP/1.1 403 Forbidden
-   Content-type: application/json
+   For example:
 
-   {
-     "error": "...?",
-     "interaction_code": "b135ac938e3e84",
-     "challenge_type": [
-       "password+totp", "email_otp", "redirect"
-     ]
-   }
+   POST /initiate HTTP/1.1
+   Host: server.example.com
+   Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+   Content-Type: application/x-www-form-urlencoded
 
-8.4.1.  One-Time code
+   login_hint=%2B1%20%28310%29%20123-4567&scope=profile
 
-   *  email_otp
+8.2.  Authorization Response
 
-   *  sms_otp
+   The authorization server responds with one of the authorization
+   challenge responses defined in Section 6.2.
 
-   One-time codes sent via email or SMS
-
-8.4.2.  TOTP
-
-   *  totp
-
-   TOTP codes generated by an authenticator app
-
-8.4.3.  Password
-
-   *  password
-
-   Legacy password authentication
-
-8.4.4.  Push notification
-
-   *  push_notification
-
-   A push notification delivered to a native application
-
-8.4.5.  Redirect
-
-   *  redirect
-
-   In the case where the authorization server wishes to interact with
-   the user itself, limiting the client's interaction with the user, it
-   can return the redirect challenge type.  In this case, no
-   interaction_code is returned.  Instead, the client is expected to
-   initiate a traditional OAuth Authorization Code flow with PKCE
-   according to [RFC6749] and [RFC7636].
-
-   TODO: Instead of no interaction code, should this require the client
-   include the interaction code in the authorization request so the AS
-   can link it to an app-initiated session?  Alternatively, if we make
-   the first request require a PKCE code challenge, we could require the
-   same PKCE code challenge be used in the authorization request.  My
-   preference here is to include the PKCE code verifier at the start of
-   the protocol.  PKCE is well understood and re-using the interaction
-   code to establish the link feels like we are overloading the
-   interaction code.  Another option may be to add a session identifier
-   (or return a session identifier as a unique parameter) for the
-   redirect case.
-
-   This can be used to:
-
-   *  offer the client a fallback mechanism at the client's perogative
-      (by returning the redirect type as the last item in the
-      challenge_type list)
-
-   *  force the client to use a browser-redirect-based flow (by
-      returning only the redirect type)
-
-   *  enable authentication with social providers or third party IdPs
-      which require a browser flow
-
-8.4.6.  Combinations
-
-   The AS MAY combine challenge types by concatenating strings with a +,
-   which indicates that all the combined types are required to complete
-   the challenge.
-
-   TODO: Does the absense of a '+' imply an OR?
-
-8.4.7.  Defining additional methods
-
-   Extensibility...
-
-8.5.  Client requests an authentication challenge
-
-   Optional.
-
-   For methods that require the AS to deliver a code to the user, e.g.
-   via email or SMS, the client needs to signal to the AS that it should
-   deliver this code.  (Without this step, the AS may not know which of
-   the available options the client will be communicating to the user,
-   and may not want to send a code via both email and SMS.).  It SHOULD
-   only allow one delivery mechanism at a time to minimise the risk of
-   the challenge leaking.
-
-   POST /challenge
-   Host: authorization-server.com
-   Content-type: application/x-www-form-urlencoded
-
-   challenge_type=email_otp
-   &interaction_code=b135ac938e3e84
-
-   The authorization server sends a challenge code to the user via the
-   selected platform.
-
-   The authorization server responds with an authentication challenge
-   code and other information such as timeouts.
+   For example:
 
    HTTP/1.1 200 OK
-   Content-type: application/json
+   Content-Type: application/json;charset=UTF-8
+   Cache-Control: no-store
 
    {
-     "challenge_type": "email_otp",
-     "challenge_code": "a6f4463ad1d8e3f",
-     "expires_in": 600,
-     "interval": 5
+     "oob_code":"GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
+     "binding_method":"prompt",
+     "expires_in":300,
+     "interval":5
    }
-
-   *  challenge_type -
-
-   *  challenge_code -
-
-   *  expires_in - Optional
-
-   *  interval - Optional
-
-8.6.  Client provides authentication details
-
-   The client prompts the user to enter the challenge.
-
-   *  One-time code
-
-   *  Password
-
-   *  Out-of-band interaction
-
-   Some methods such as acknowledging a push notification may not
-   require the user to interact further with the client.  The client
-   instead presents a screen to the user explaining that they should
-   acknowledge the challenge on another device.
-
-   TODO: How does the Authorisation Server signal to the client that the
-   push notification succeeded on another device?
-
-8.6.1.  Token request
-
-   The client makes a request to the token endpoint with the grant_type
-   value of urn:ietf:params:oauth:grant-type:direct, providing the
-   information collected from the user as well as the previous
-   interaction code and optional challenge code.
-
-   POST /token
-
-   Host: authorization-server.com
-   Content-type: application/x-www-form-urlencoded
-
-   grant_type=urn:ietf:params:oauth:grant-type:direct
-   &client_id=XXXXXXX
-   &interaction_code=b135ac938e3e84
-   &challenge_code=a6f4463ad1d8e3f
-   &challenge_value=512512
-
-   *  challenge_value - The value that was sent to the user.  Should
-      this be different depending on the challenge type?
-
-   TODO: What happens if more than one code is requested?  Maybe make it
-   so only one can be collected at a time?  It would be weird to ask the
-   user to enter two codes at the same time anyway.  Not sure we should
-   have a unique interaction code per token.  Should the interaction
-   code cover all the interactions (i.e. all interactions are bundled up
-   as one interaction).  Once all interactions are complete all tokens
-   for which that interaction is good can be released?
-
-8.7.  Checking for additional requirements
-
-   If the initial set of information provided by the client is correct,
-   the AS MAY choose to either respond immediately with a successful
-   token response, or prompt the client for an additional challenge.
-
-   For example, the AS could first require the client prompt the user
-   for a one-time-code they received via email, and then in a second
-   step, ask the client to prompt the user
 
 9.  Refresh Token Grant
 
@@ -1199,18 +1069,21 @@ Table of Contents
    the normal refresh token request that tells the client they need to
    get the user to re-authenticate or provide an MFA token.
 
+   (No normative changes are required beyond what has already been
+   described in the draft at this point.)
+
 10.  Security Considerations
 
    TODO Security
 
-10.1.  Phishing
+10.1.  Native client and Authorisation Server trust relationship
+
+   TODO: Emphasise the first-party 'same owner' relationship between the
+   native client and the authorisation server
+
+10.2.  Phishing
 
    TODO: Describe the phishing risk this opens up.
-
-10.2.  Native client and Authorisation Server trust relationship
-
-   TODO: Emphasise the 'same owner' relationship between the native
-   client and the authorisation server
 
 10.3.  Client Authentication
 
@@ -1239,23 +1112,60 @@ Table of Contents
 
    *  use notification-based methods only as a secondary factor
 
-11.  IANA Considerations
+11.  Old Notes
 
-11.1.  OAuth Parameter Registration
+11.1.  Client receives trigger for authentication
+
+   TODO: The client may receive a trigger from the resource server to
+   initiate an authentication, possibly with a hint from the resource
+   server in the form of an acr value, indicating it needs to initiate
+   and authentications.
+
+   TBD: May need to reference the existing step-up authentication draft
+   instead
+
+11.2.  Checking for additional requirements
+
+   If the initial set of information provided by the client is correct,
+   the AS MAY choose to either respond immediately with a successful
+   token response, or prompt the client for an additional challenge.
+
+   For example, the AS could first require the client prompt the user
+   for a one-time-code they received via email, and then in a second
+   step, ask the client to prompt the user
+
+12.  IANA Considerations
+
+12.1.  OAuth Parameter Registration
 
    TODO
 
-11.2.  OAuth URI Registration
+12.2.  OAuth URI Registration
 
    This specification registers the following values in the IANA "OAuth
    URI" registry (IANA.OAuth.Parameters) established by [RFC6755].
 
-   URN: `urn:ietf:params:oauth:grant-type:direct`
-   Common Name: Direct Interaction Grant Type for OAuth 2.0
+   URN: `urn:ietf:params:oauth:grant-type:...`
+   Common Name: ...
    Change Controller: IESG
    Specification Document:
 
-11.3.  OAuth Extensions Error Registration
+   URN: `urn:ietf:params:oauth:grant-type:...`
+   Common Name: ...
+   Change Controller: IESG
+   Specification Document:
+
+   URN: `urn:ietf:params:oauth:grant-type:...`
+   Common Name: ...
+   Change Controller: IESG
+   Specification Document:
+
+   URN: `urn:ietf:params:oauth:grant-type:...`
+   Common Name: ...
+   Change Controller: IESG
+   Specification Document:
+
+12.3.  OAuth Extensions Error Registration
 
    This specification registers the following values in the IANA "OAuth
    Extensions Error Registry" registry (IANA.OAuth.Parameters)
@@ -1263,19 +1173,19 @@ Table of Contents
 
    Name: ...
 
-11.4.  Authorization Server Metadata
+12.4.  Authorization Server Metadata
 
    This specification defines two new endpoints at the authorization
    server.  TODO: Need to register these in the Authorization Server
    Metadata document too.
 
-   *  interaction endpoint
+   *  authorization initiation endpoint
 
-   *  challenge endpoint
+   *  authorization challenge endpoint
 
-12.  References
+13.  References
 
-12.1.  Normative References
+13.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1304,7 +1214,7 @@ Table of Contents
               DOI 10.17487/RFC8259, December 2017,
               <https://www.rfc-editor.org/rfc/rfc8259>.
 
-12.2.  Informative References
+13.2.  Informative References
 
    [RFC8628]  Denniss, W., Bradley, J., Jones, M., and H. Tschofenig,
               "OAuth 2.0 Device Authorization Grant", RFC 8628,
