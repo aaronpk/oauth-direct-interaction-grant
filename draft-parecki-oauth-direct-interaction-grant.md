@@ -40,19 +40,18 @@ informative:
 
 --- abstract
 
-This document extends the OAuth 2.0 Authorization Framework {{RFC6749}} with a
-new grant type, the "Direct Interaction Grant", which can be used by applications
-that want to control the user experience of the process of obtaining authorization
-from the user.
+This document extends the OAuth 2.0 Authorization Framework {{RFC6749}} with
+new grant types to support multi-factor authentication as well as alternatives to password authentication.
+These can be used by applications that want to control the user experience of the process of obtaining authorization from the user.
 
 In many cases, this can provide an entirely browserless experience suited for native
-applications, delegating to the browser in unexpected or error conditions.
+applications, delegating to the browser in unexpected, high risk, or error conditions.
 
 While a fully-delegated approach using the Authorization Code Grant is generally
 preferred, this draft provides a mechanism for the client to directly interact
 with the user. This requires a high degree of trust between the authorization server
-and the client. It SHOULD only be considered when there are usability
-concerns with a browser-based approach, such as for native mobile or desktop applications.
+and the client. It should only be considered when there are usability
+concerns with a redirect-based approach, such as for native mobile or desktop applications.
 
 
 --- middle
@@ -65,41 +64,7 @@ TODO: Key points to address include problem description, the relationship to the
 
 TODO: Mention the trust prerequisites for this to be useful. Absolutely not allowed for third-party apps. Designed for native apps, specifically first-party, when the AS and app are operated by the same entity, and the user understands them both as the same entity...
 
-## Use Cases
 
-TODO: We may move these to the appendix, but outlining them in the document will also help guide developers to understand what they can (and cannot) expect to be able to do.
-
-TODO: Registration flows may need to be a separate document.
-
-### Sign-up with verification
-e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail during sign-up/account creation.
-
-### Register new authentication methods
-e.g. user selects password, provides phone for SMS codes, etc
-
-### Sign-in with first factor
-e.g. username password
-
-### Sign-in with additional factor
-e.g. user already signed in with one factor (username/password), but now need to "step-up" to second factor (e.g. SMS code).
-
-### Discover supported authentication methods
-e.g. developer can query the authorisation server to determine what authentication methods are supported.
-
-### Discover supported account recover authentication methods
-e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.
-
-### Update an existing authentication method
-e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.
-
-### Initiate browser-based interaction for certain scenarios
-e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).
-
-### Discovering custom user attributes
-e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?
-
-### Provide different UX depending on a user's enrolled authenticators
-An AS may support multiple different authenticators, and a user may have set up only one. A client will not know which a user has set up ahead of time. The AS needs to drive the UI in the client login process depending on the configuration of the user account.
 
 
 # Conventions and Definitions
@@ -129,33 +94,6 @@ TODO: Replace RFC6749 references with OAuth 2.1
 7. The AS decides if additional requirements need to be met, repeating steps 3 through 6 as needed (the AS knows this due to the acr_value sent by the client initially, or from its own requirements)
 8. The AS replies with the token response
 
-
-## Example Flows
-
-TODO: Move these to an appendix
-
-### Password + MFA
-
-* User enters username and password (/initiate login_hint= password=)
-* AS responds with `mfa_required`
-* Client initiates MFA challenge (authorization challenge endpoint)
-* AS responds with details of MFA challenge
-* Client collects MFA from user (OTP, SMS code, etc)
-* Client makes token request (new mfa:otp/mfa:oob grant type)
-
-### Passwordless
-
-* Client collects username and OTP from user
-* Client makes token request (new otp grant type)
-
-### Re-authenticating to an app a week later
-
-* You log in to an app (in any way, redirect flow or direct)
-* App gets short lived access token and long lived refresh token
-* A week later, the user launches the app, access token is expired
-* App uses the refresh token, gets back an `mfa_required` error
-* App prompts and collects MFA from user (OTP or OOB)
-* App submits token request with grant_type=mfa_otp and mfa_token (which was already associated with the refresh token)
 
 
 ## Authorization Grants
@@ -222,27 +160,28 @@ the event another authenticator is lost or malfunctions.
 
 # Protocol Endpoints
 
-* Token endpoint
-  * This specification defines new grant types and new error responses
-  * Adds `device_session` in token response
-  * Note: Passwords are never sent to the token endpoint
-* Authorization challenge endpoint
-  * A client requests an authorization challenge (e.g. send a user an SMS code), which it can later use as an authorization grant
 * Authorization initiation endpoint
   * A client initiates a login flow
   * With or without information collected from the user (e.g. password)
   * May contain a `device_session`
   * Returns an `mfa_token`
+* Authorization challenge endpoint
+  * A client requests an authorization challenge (e.g. send a user an SMS code), which it can later use as an authorization grant
+* Token endpoint
+  * This specification defines new grant types and new error responses
+  * Adds `device_session` in token response
+  * Note: Passwords are never sent to the token endpoint
 
-Not every authorization grant type utilizes both endpoints.
+Not every authorization grant type utilizes all endpoints.
 Extension grant types MAY define additional endpoints as needed.
 
 The token endpoint is used by the client to obtain an access token by
 presenting its authorization grant or refresh token, as described in
 Section 3.2 of OAuth 2.0 {{RFC6749}}.
 
-
-This specification adds additional grant types used at the token endpoint, as well as extends the token endpoint response to allow the authorization server to indicate that further authentication of the user is required.
+This specification adds additional grant types used at the token endpoint,
+as well as extends the token endpoint response to allow the authorization
+server to indicate that further authentication of the user is required.
 
 Extension Grant Types
 
@@ -251,6 +190,78 @@ Extension Grant Types
 * grant_type=urn:ietf:params:oauth:grant-type:mfa-recovery-code
 * grant_type=urn:ietf:params:oauth:grant-type:otp
 * grant_type=urn:ietf:params:oauth:grant-type:oob
+
+
+
+
+# Authorization Initiation Request {#authorization-initiation}
+
+A client may wish to initiate an authorization flow by first prompting the user for their user identifier or other account information. The authorization initiation endpoint is a new endpoint to collect this login hint and direct the client with the next steps, whether that is to do an MFA flow, or perform an OAuth redirect-based flow.
+
+The authorization initiation endpoint is an optional feature that can be used to drive passwordless flows.
+
+
+## Authorization Request
+
+The client makes a request to the authorization initiation endpoint by adding the
+following parameters using the "application/x-www-form-urlencoded"
+format with a character encoding of UTF-8 in the HTTP request body:
+
+"login_hint":
+: OPTIONAL. If the client has collected the user's username, email,
+  phone number or other identifier, it can provide this in the request.
+
+"password":
+: OPTIONAL. If the client has collected the user's password, it can provide
+  it at this stage.
+
+"scope":
+: OPTIONAL. The OAuth scope defined in {{RFC6749}}.
+
+"acr_values":
+: OPTIONAL. The acr_values requested by the client.
+
+"device_session":
+: OPTIONAL. If the client has previously obtained a device session, described in {{device-session}}.
+
+For example:
+
+    POST /initiate HTTP/1.1
+    Host: server.example.com
+    Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+    Content-Type: application/x-www-form-urlencoded
+
+    login_hint=%2B1%20%28310%29%20123-4567&scope=profile
+
+
+## Authorization Response
+
+The authorization server responds with an MFA token
+defined in {{mfa-token-response}}, or an authorization challenge response
+defined in {{authorization-challenge-response}}.
+
+For example, the authorization server can reply with an MFA token,
+as described {{mfa-token-response}}:
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json;charset=UTF-8
+    Cache-Control: no-store
+
+    {
+      "mfa_token": "uY29tL2F1dGhlbnRpY"
+    }
+
+Or, if the authorization server requires that this particular user
+go through a typical redirect flow, can respond with the redirect challenge,
+as described in {{redirect-challenge}}:
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json;charset=UTF-8
+    Cache-Control: no-store
+
+    {
+      "challenge_type": "redirect"
+    }
 
 
 
@@ -297,7 +308,7 @@ knows of a suitable authenticator through an out-of-band mechanism,
 it can obtain a strong authorization grant directly.
 
 
-## Authorization Challenge Request
+## Authorization Challenge Request {#authorization-challenge-request}
 
 The client makes a request to the authorization challenge endpoint by
 adding the following parameters using the "application/x-www-form-
@@ -317,6 +328,9 @@ request body:
 : OPTIONAL.  The identifier of the authenticator to challenge.  The
   authorization server MUST ensure that the authenticator is
   associated with the resource owner.
+
+"device_session":
+: OPTIONAL. The device session, described in {{device-session}}.
 
 "client_id":
 : REQUIRED, if the client is not authenticating with the
@@ -534,17 +548,17 @@ For example:
     HTTP/1.1 200 OK
     Content-Type: application/json;charset=UTF-8
     Cache-Control: no-store
-    Pragma: no-cache
 
     {
       "challenge_type": "recovery-code"
     }
 
-TODO: It is unclear why the AS would decide a recovery code is required,
-since that assumes the AS knows the user has lost their other MFA options.
+While this is likely to be an uncommon challenge response,
+the AS may decide a recovery code is required, for example if
+it is known that the user has lost their other MFA options.
 
 
-### Redirect Challenge
+### Redirect Challenge {#redirect-challenge}
 
 In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the `redirect` challenge type.
 
@@ -552,6 +566,16 @@ In the case where the authorization server wishes to interact with the user itse
 : REQUIRED. Value MUST be set to `redirect`.
 
 The client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to {{RFC6749}} and {{RFC7636}}.
+
+For example:
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json;charset=UTF-8
+    Cache-Control: no-store
+
+    {
+      "challenge_type": "redirect"
+    }
 
 TODO: Should there be some connection to the authorization code flow that the client initiates next?
 
@@ -887,70 +911,19 @@ TODO: OOB only, not in response to an MFA challenge. Looks almost just like the 
 
 
 
-## Token Response
+## Device Session {#device-session}
 
 In addition to the parameters defined in Section 5.1 of OAuth 2.0
 {{RFC6749}}, the following additional parameters are specified for
-any grant type defined by or extended from this specification.
+the token response for any grant type defined by or extended from this specification.
 
 "device_session":
 : OPTIONAL.  The device session contains relevant data to the device and the current user authenticated with the device.
 
 The device session is completely opaque to the client, and as such the AS MUST adequately protect the value such as using a JWE if the AS is not maintaining state on the backend.
 
-The device session can be used by the client on a subsequent authorization initiation request, described in {{authorization-initiation}}.
+The device session can be used by the client on a subsequent authorization initiation request, described in {{authorization-initiation}}, or in an authorization challenge request, described in {{authorization-challenge}}.
 
-
-
-# Authorization Initiation Request {#authorization-initiation}
-
-A client may wish to initiate an authorization flow by first prompting the user for their user identifier or other account information. The authorization initiation endpoint is a new endpoint to collect this login hint and direct the client with the next steps, whether that is to do an MFA flow, or perform an OAuth redirect-based flow.
-
-## Authorization Request
-
-The client makes a request to the authorization initiation endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
-format with a character encoding of UTF-8 in the HTTP request body:
-
-"login_hint":
-: OPTIONAL. If the client has collected the user's username, email,
-  phone number or other identifier, it can provide this in the request.
-
-"password":
-: OPTIONAL. If the client has collected the user's password, it can provide
-  it at this stage.
-
-"scope":
-: OPTIONAL. The OAuth scope defined in {{RFC6749}}.
-
-
-For example:
-
-    POST /initiate HTTP/1.1
-    Host: server.example.com
-    Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-    Content-Type: application/x-www-form-urlencoded
-
-    login_hint=%2B1%20%28310%29%20123-4567&scope=profile
-
-
-## Authorization Response
-
-The authorization server responds with one of the authorization challenge responses
-defined in {{authorization-challenge-response}}.
-
-For example:
-
-    HTTP/1.1 200 OK
-    Content-Type: application/json;charset=UTF-8
-    Cache-Control: no-store
-
-    {
-      "oob_code":"GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
-      "binding_method":"prompt",
-      "expires_in":300,
-      "interval":5
-    }
 
 
 
@@ -960,6 +933,7 @@ TODO: Describe how the AS could return a challenge to the client on the normal r
 that tells the client they need to get the user to re-authenticate or provide an MFA token.
 
 (No normative changes are required beyond what has already been described in the draft at this point.)
+
 
 
 # Security Considerations
@@ -973,13 +947,13 @@ TODO: Emphasise the first-party 'same owner' relationship between the native cli
 
 ## Phishing
 
-TODO: Describe the phishing risk this opens up.
+TODO: Describe the phishing risk this opens up since the client is collecting and providing all the user's information to the authorization server. The AS MAY decide to require the user go through a redirect flow at any stage of the process based on its own risk assessment.
 
 
 
 ## Client Authentication
 
-TODO: Describe the lack of client authentication possible because this is expected to be deployed by native apps. Maybe mention alternatives to client authentication such as App Attestation, or using a risk engine to analyze other aspects of the request from the client.
+TODO: Describe the likely lack of client authentication because this is expected to be deployed by native apps. Maybe mention alternatives to client authentication such as App Attestation, or using a risk engine to analyze other aspects of the request from the client.
 
 
 ## Leaking Information
@@ -994,27 +968,8 @@ TODO: A client may be able to cause repeated notifications to any user given the
 Mitigations:
 
 * rate limiting
-* use notification-based methods only as a secondary factor
+* use notification-based methods only as a secondary factor or when using a previously issued device_session
 
-
-
-# Old Notes
-
-## Client receives trigger for authentication
-
-TODO: The client may receive a trigger from the resource server to initiate an authentication, possibly with a hint from the resource server in the form of an acr value, indicating it needs to initiate and authentications.
-
-TBD: May need to reference the existing step-up authentication draft instead
-
-
-## Checking for additional requirements
-
-If the initial set of information provided by the client is correct, the AS
-MAY choose to either respond immediately with a successful token response,
-or prompt the client for an additional challenge.
-
-For example, the AS could first require the client prompt the user for a one-time-code they
-received via email, and then in a second step, ask the client to prompt the user
 
 
 
@@ -1071,7 +1026,100 @@ TODO: Need to register these in the Authorization Server Metadata document too.
 
 --- back
 
+
+# Use Cases
+
+TODO: Outlining these in the document will also help guide developers to understand what they can (and cannot) expect to be able to do. For each use case, briefly describe the expected outcome, and outline each step and which part of the spec accomplishes each step.
+
+### Password + MFA
+
+* User enters username and password (/initiate login_hint= password=)
+* AS responds with `mfa_required`
+* Client initiates MFA challenge (authorization challenge endpoint)
+* AS responds with details of MFA challenge
+* Client collects MFA from user (OTP, SMS code, etc)
+* Client makes token request (new mfa-otp/mfa-oob grant type)
+
+### Passwordless OTP
+
+* Client collects username and OTP from user
+* Client makes token request (new otp grant type)
+
+### Re-authenticating to an app a week later
+
+* You log in to an app (in any way, redirect flow or direct)
+* App gets short lived access token and long lived refresh token
+* A week later, the user launches the app, access token is expired
+* App uses the refresh token, gets back an `mfa_required` error
+* App prompts and collects MFA from user (OTP or OOB)
+* App submits token request with grant_type=mfa_otp and mfa_token (which was already associated with the refresh token)
+
+### Registration
+
+* Client asks for user's email, starts a flow (/initiate login_hint=email@example.com)
+* AS responds with `{"challenge_type":"oob","oob_code":"...",etc}`
+* Client collects OOB code from user
+* Client makes token request
+* Client receives an access token and device_session
+* Client collects the user's name, updates their profile using the access token
+* Client asks for the user's phone number
+* Client starts a new flow (/initiate login_hint=+1phone device_session=X)
+* AS recognizes existing device_session, responds with `{"challenge_type":"oob","oob_code":"...",etc}`
+* Client collects OOB code from user
+* Client makes token request
+* Client receives an access token, now associated with a new account with both a verified email and phone number
+
+
+### Sign-in with only email verification
+e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail. Can also be used for registration.
+
+### Discover supported authentication methods
+e.g. developer can query the authorisation server to determine what authentication methods are supported.
+
+### Discover supported account recover authentication methods
+e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.
+
+### Update an existing authentication method
+e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.
+
+### Initiate browser-based interaction for certain scenarios
+e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).
+
+### Discovering custom user attributes
+e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?
+
+### Provide different UX depending on a user's enrolled authenticators
+An AS may support multiple different authenticators, and a user may have set up only one. A client will not know which a user has set up ahead of time. The AS needs to drive the UI in the client login process depending on the configuration of the user account.
+
+### Register new authentication methods
+e.g. user selects password, provides phone for SMS codes, etc
+
+### User registration
+e.g. user enters a new email, completes the email challenge, the AS creates a new account for them, then wants to enroll additional factors such as SMS
+
+
+
+# Old Notes
+
+## Client receives trigger for authentication
+
+TODO: The client may receive a trigger from the resource server to initiate an authentication, possibly with a hint from the resource server in the form of an acr value, indicating it needs to initiate and authentications.
+
+TBD: May need to reference the existing step-up authentication draft instead
+
+
+## Checking for additional requirements
+
+If the initial set of information provided by the client is correct, the AS
+MAY choose to either respond immediately with a successful token response,
+or prompt the client for an additional challenge.
+
+For example, the AS could first require the client prompt the user for a one-time-code they
+received via email, and then in a second step, ask the client to prompt the user
+
+
+
+
 # Acknowledgments
-{:numbered="false"}
 
 TODO acknowledge.
