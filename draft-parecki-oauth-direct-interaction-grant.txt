@@ -93,9 +93,9 @@ Table of Contents
        3.1.2.  Out-of-Band Authorization (OOB)
        3.1.3.  Recovery Code
    4.  Protocol Endpoints
-   5.  Authorization Initiation Request
-     5.1.  Authorization Request
-     5.2.  Authorization Response
+   5.  Authorization Initiation
+     5.1.  Authorization Initiation Request
+     5.2.  Authorization Initiation Response
    6.  Authorization Challenge Response
    7.  Authorization Challenge Endpoint
      7.1.  Authorization Challenge Request
@@ -333,7 +333,7 @@ Table of Contents
 
    *  grant_type=urn:ietf:params:oauth:grant-type:oob
 
-5.  Authorization Initiation Request
+5.  Authorization Initiation
 
    A client may wish to initiate an authorization flow by first
    prompting the user for their user identifier or other account
@@ -345,7 +345,7 @@ Table of Contents
    The authorization initiation endpoint is an optional feature that can
    be used to drive passwordless flows.
 
-5.1.  Authorization Request
+5.1.  Authorization Initiation Request
 
    The client makes a request to the authorization initiation endpoint
    by adding the following parameters using the "application/x-www-form-
@@ -375,7 +375,7 @@ Table of Contents
 
    login_hint=%2B1%20%28310%29%20123-4567&scope=profile
 
-5.2.  Authorization Response
+5.2.  Authorization Initiation Response
 
    The authorization server responds with an MFA token defined in
    Section 6, or an authorization challenge response defined in
@@ -458,7 +458,7 @@ Table of Contents
 
    "challenge_type":  OPTIONAL.  List of authorization challenge type
       strings that the client supports, expressed as a list of space-
-      delimited, case- insensitive strings.
+      delimited, case-insensitive strings.
 
    "authenticator_id":  OPTIONAL.  The identifier of the authenticator
       to challenge.  The authorization server MUST ensure that the
@@ -508,6 +508,11 @@ Table of Contents
 
    "challenge_type":  REQUIRED.  The type of the authorization challenge
       issued.  Value is case insensitive.
+
+   TODO: Maybe add "alternative_challenge_types" or allow the whole
+   response to be an array in case the AS wants to let the client
+   choose.  Or we decide that the client indicating its preference in
+   the request is enough flexibility.
 
    All additional parameters are specified by the authorization
    challenge type.  This document defines the otp type, the oob type,
