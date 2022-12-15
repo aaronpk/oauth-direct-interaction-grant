@@ -922,7 +922,7 @@ the token response for any grant type defined by or extended from this specifica
 
 The device session is completely opaque to the client, and as such the AS MUST adequately protect the value such as using a JWE if the AS is not maintaining state on the backend.
 
-The device session can be used by the client on a subsequent authorization initiation request, described in {{authorization-initiation}}, or in an authorization challenge request, described in {{authorization-challenge}}.
+The device session can be used by the client on a subsequent authorization initiation request, described in {{authorization-initiation}}, or in an authorization challenge request, described in {{authorization-challenge-request}}.
 
 
 
