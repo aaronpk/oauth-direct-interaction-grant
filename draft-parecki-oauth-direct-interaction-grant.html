@@ -7,19 +7,18 @@
 <title>OAuth 2.0 Direct Interaction Grant</title>
 <meta content="Aaron Parecki" name="author">
 <meta content="Pieter Kasselman" name="author">
-<meta content='
-       This document extends the OAuth 2.0 Authorization Framework   with a
-new grant type, the "Direct Interaction Grant", which can be used by applications
-that want to control the user experience of the process of obtaining authorization
-from the user. 
+<meta content="
+       This document extends the OAuth 2.0 Authorization Framework   with
+new grant types to support multi-factor authentication as well as alternatives to password authentication.
+These can be used by applications that want to control the user experience of the process of obtaining authorization from the user. 
        In many cases, this can provide an entirely browserless experience suited for native
-applications, delegating to the browser in unexpected or error conditions. 
+applications, delegating to the browser in unexpected, high risk, or error conditions. 
        While a fully-delegated approach using the Authorization Code Grant is generally
 preferred, this draft provides a mechanism for the client to directly interact
 with the user. This requires a high degree of trust between the authorization server
-and the client. It  SHOULD  only be considered when there are usability
-concerns with a browser-based approach, such as for native mobile or desktop applications. 
-    ' name="description">
+and the client. It should only be considered when there are usability
+concerns with a redirect-based approach, such as for native mobile or desktop applications. 
+    " name="description">
 <meta content="xml2rfc 3.15.3" name="generator">
 <meta content="oauth" name="keyword">
 <meta content="draft-parecki-oauth-direct-interaction-grant-latest" name="ietf.draft">
@@ -426,7 +425,7 @@ a[href]:hover {
 a[href].selfRef:hover {
   background-color: var(--highlight-color);
 }
-a.xref:is(.cite, .auto) {
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
 }
 
@@ -1087,17 +1086,16 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <h1 id="title">OAuth 2.0 Direct Interaction Grant</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document extends the OAuth 2.0 Authorization Framework <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> with a
-new grant type, the "Direct Interaction Grant", which can be used by applications
-that want to control the user experience of the process of obtaining authorization
-from the user.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document extends the OAuth 2.0 Authorization Framework <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> with
+new grant types to support multi-factor authentication as well as alternatives to password authentication.
+These can be used by applications that want to control the user experience of the process of obtaining authorization from the user.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">In many cases, this can provide an entirely browserless experience suited for native
-applications, delegating to the browser in unexpected or error conditions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+applications, delegating to the browser in unexpected, high risk, or error conditions.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 <p id="section-abstract-3">While a fully-delegated approach using the Authorization Code Grant is generally
 preferred, this draft provides a mechanism for the client to directly interact
 with the user. This requires a high degree of trust between the authorization server
-and the client. It <span class="bcp14">SHOULD</span> only be considered when there are usability
-concerns with a browser-based approach, such as for native mobile or desktop applications.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+and the client. It should only be considered when there are usability
+concerns with a redirect-based approach, such as for native mobile or desktop applications.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1164,45 +1162,10 @@ concerns with a browser-based approach, such as for native mobile or desktop app
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
                 <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-usage-and-applicability" class="internal xref">Usage and Applicability</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
-                <p id="section-toc.1-1.1.2.2.1"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.1">
-                    <p id="section-toc.1-1.1.2.2.2.1.1" class="keepWithNext"><a href="#section-1.2.1" class="auto internal xref">1.2.1</a>.  <a href="#name-sign-up-with-verification" class="internal xref">Sign-up with verification</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.2">
-                    <p id="section-toc.1-1.1.2.2.2.2.1" class="keepWithNext"><a href="#section-1.2.2" class="auto internal xref">1.2.2</a>.  <a href="#name-register-new-authentication" class="internal xref">Register new authentication methods</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.3">
-                    <p id="section-toc.1-1.1.2.2.2.3.1"><a href="#section-1.2.3" class="auto internal xref">1.2.3</a>.  <a href="#name-sign-in-with-first-factor" class="internal xref">Sign-in with first factor</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.4">
-                    <p id="section-toc.1-1.1.2.2.2.4.1"><a href="#section-1.2.4" class="auto internal xref">1.2.4</a>.  <a href="#name-sign-in-with-additional-fac" class="internal xref">Sign-in with additional factor</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.5">
-                    <p id="section-toc.1-1.1.2.2.2.5.1"><a href="#section-1.2.5" class="auto internal xref">1.2.5</a>.  <a href="#name-discover-supported-authenti" class="internal xref">Discover supported authentication methods</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.6">
-                    <p id="section-toc.1-1.1.2.2.2.6.1"><a href="#section-1.2.6" class="auto internal xref">1.2.6</a>.  <a href="#name-discover-supported-account-" class="internal xref">Discover supported account recover authentication methods</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.7">
-                    <p id="section-toc.1-1.1.2.2.2.7.1"><a href="#section-1.2.7" class="auto internal xref">1.2.7</a>.  <a href="#name-update-an-existing-authenti" class="internal xref">Update an existing authentication method</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.8">
-                    <p id="section-toc.1-1.1.2.2.2.8.1"><a href="#section-1.2.8" class="auto internal xref">1.2.8</a>.  <a href="#name-initiate-browser-based-inte" class="internal xref">Initiate browser-based interaction for certain scenarios</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.9">
-                    <p id="section-toc.1-1.1.2.2.2.9.1"><a href="#section-1.2.9" class="auto internal xref">1.2.9</a>.  <a href="#name-discovering-custom-user-att" class="internal xref">Discovering custom user attributes</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2.2.10">
-                    <p id="section-toc.1-1.1.2.2.2.10.1"><a href="#section-1.2.10" class="auto internal xref">1.2.10</a>. <a href="#name-provide-different-ux-depend" class="internal xref">Provide different UX depending on a user's enrolled authenticators</a></p>
-</li>
-                </ul>
 </li>
             </ul>
 </li>
@@ -1210,7 +1173,7 @@ concerns with a browser-based approach, such as for native mobile or desktop app
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
 </li>
             </ul>
 </li>
@@ -1218,30 +1181,16 @@ concerns with a browser-based approach, such as for native mobile or desktop app
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-protocol-overview" class="internal xref">Protocol Overview</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-example-flows" class="internal xref">Example Flows</a></p>
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-authorization-grants" class="internal xref">Authorization Grants</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.1">
-                    <p id="section-toc.1-1.3.2.1.2.1.1"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-password-mfa" class="internal xref">Password + MFA</a></p>
+                    <p id="section-toc.1-1.3.2.1.2.1.1"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-one-time-passwords-otp" class="internal xref">One-Time Passwords (OTP)</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.2">
-                    <p id="section-toc.1-1.3.2.1.2.2.1"><a href="#section-3.1.2" class="auto internal xref">3.1.2</a>.  <a href="#name-passwordless" class="internal xref">Passwordless</a></p>
+                    <p id="section-toc.1-1.3.2.1.2.2.1"><a href="#section-3.1.2" class="auto internal xref">3.1.2</a>.  <a href="#name-out-of-band-authorization-o" class="internal xref">Out-of-Band Authorization (OOB)</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.3">
-                    <p id="section-toc.1-1.3.2.1.2.3.1"><a href="#section-3.1.3" class="auto internal xref">3.1.3</a>.  <a href="#name-re-authenticating-to-an-app" class="internal xref">Re-authenticating to an app a week later</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
-                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-authorization-grants" class="internal xref">Authorization Grants</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.1">
-                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-one-time-passwords-otp" class="internal xref">One-Time Passwords (OTP)</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
-                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-out-of-band-authorization-o" class="internal xref">Out-of-Band Authorization (OOB)</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.3">
-                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-recovery-code" class="internal xref">Recovery Code</a></p>
+                    <p id="section-toc.1-1.3.2.1.2.3.1"><a href="#section-3.1.3" class="auto internal xref">3.1.3</a>.  <a href="#name-recovery-code" class="internal xref">Recovery Code</a></p>
 </li>
                 </ul>
 </li>
@@ -1251,94 +1200,94 @@ concerns with a browser-based approach, such as for native mobile or desktop app
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-protocol-endpoints" class="internal xref">Protocol Endpoints</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-authorization-challenge-res" class="internal xref">Authorization Challenge Response</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-authorization-challenge-end" class="internal xref">Authorization Challenge Endpoint</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-authorization-initiation-re" class="internal xref">Authorization Initiation Request</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-authorization-challenge-req" class="internal xref">Authorization Challenge Request</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-authorization-request" class="internal xref">Authorization Request</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-authorization-challenge-resp" class="internal xref">Authorization Challenge Response</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.1">
-                    <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1" class="auto internal xref">6.2.1</a>.  <a href="#name-otp-challenge" class="internal xref">OTP Challenge</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.2">
-                    <p id="section-toc.1-1.6.2.2.2.2.1"><a href="#section-6.2.2" class="auto internal xref">6.2.2</a>.  <a href="#name-oob-challenge" class="internal xref">OOB Challenge</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.3">
-                    <p id="section-toc.1-1.6.2.2.2.3.1"><a href="#section-6.2.3" class="auto internal xref">6.2.3</a>.  <a href="#name-recovery-code-challenge" class="internal xref">Recovery Code Challenge</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.4">
-                    <p id="section-toc.1-1.6.2.2.2.4.1"><a href="#section-6.2.4" class="auto internal xref">6.2.4</a>.  <a href="#name-redirect-challenge" class="internal xref">Redirect Challenge</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-user-interaction" class="internal xref">User Interaction</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-otp-challenge-interaction" class="internal xref">OTP Challenge Interaction</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
-                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-oob-challenge-interaction" class="internal xref">OOB Challenge Interaction</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.3">
-                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="auto internal xref">6.3.3</a>.  <a href="#name-recovery-code-challenge-int" class="internal xref">Recovery Code Challenge Interaction</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.4">
-                    <p id="section-toc.1-1.6.2.3.2.4.1"><a href="#section-6.3.4" class="auto internal xref">6.3.4</a>.  <a href="#name-redirect-challenge-interact" class="internal xref">Redirect Challenge Interaction</a></p>
-</li>
-                </ul>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-authorization-response" class="internal xref">Authorization Response</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-authorization-challenge-res" class="internal xref">Authorization Challenge Response</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-token-request-grant-types" class="internal xref">Token Request Grant Types</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-authorization-challenge-end" class="internal xref">Authorization Challenge Endpoint</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-mfa-otp-grant" class="internal xref">MFA OTP Grant</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-authorization-challenge-req" class="internal xref">Authorization Challenge Request</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-mfa-oob-grant" class="internal xref">MFA OOB Grant</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-authorization-challenge-resp" class="internal xref">Authorization Challenge Response</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.1">
-                    <p id="section-toc.1-1.7.2.2.2.1.1"><a href="#section-7.2.1" class="auto internal xref">7.2.1</a>.  <a href="#name-token-error-response" class="internal xref">Token Error Response</a></p>
+                    <p id="section-toc.1-1.7.2.2.2.1.1"><a href="#section-7.2.1" class="auto internal xref">7.2.1</a>.  <a href="#name-otp-challenge" class="internal xref">OTP Challenge</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.2">
+                    <p id="section-toc.1-1.7.2.2.2.2.1"><a href="#section-7.2.2" class="auto internal xref">7.2.2</a>.  <a href="#name-oob-challenge" class="internal xref">OOB Challenge</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.3">
+                    <p id="section-toc.1-1.7.2.2.2.3.1"><a href="#section-7.2.3" class="auto internal xref">7.2.3</a>.  <a href="#name-recovery-code-challenge" class="internal xref">Recovery Code Challenge</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.4">
+                    <p id="section-toc.1-1.7.2.2.2.4.1"><a href="#section-7.2.4" class="auto internal xref">7.2.4</a>.  <a href="#name-redirect-challenge" class="internal xref">Redirect Challenge</a></p>
 </li>
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-recovery-code-grant" class="internal xref">Recovery Code Grant</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-user-interaction" class="internal xref">User Interaction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.1">
-                    <p id="section-toc.1-1.7.2.3.2.1.1"><a href="#section-7.3.1" class="auto internal xref">7.3.1</a>.  <a href="#name-access-token-response" class="internal xref">Access Token Response</a></p>
+                    <p id="section-toc.1-1.7.2.3.2.1.1"><a href="#section-7.3.1" class="auto internal xref">7.3.1</a>.  <a href="#name-otp-challenge-interaction" class="internal xref">OTP Challenge Interaction</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.2">
+                    <p id="section-toc.1-1.7.2.3.2.2.1"><a href="#section-7.3.2" class="auto internal xref">7.3.2</a>.  <a href="#name-oob-challenge-interaction" class="internal xref">OOB Challenge Interaction</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.3">
+                    <p id="section-toc.1-1.7.2.3.2.3.1"><a href="#section-7.3.3" class="auto internal xref">7.3.3</a>.  <a href="#name-recovery-code-challenge-int" class="internal xref">Recovery Code Challenge Interaction</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.4">
+                    <p id="section-toc.1-1.7.2.3.2.4.1"><a href="#section-7.3.4" class="auto internal xref">7.3.4</a>.  <a href="#name-redirect-challenge-interact" class="internal xref">Redirect Challenge Interaction</a></p>
 </li>
                 </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-redirect-grant" class="internal xref">Redirect Grant</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-otp-grant" class="internal xref">OTP Grant</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
-                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-oob-grant" class="internal xref">OOB Grant</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.7">
-                <p id="section-toc.1-1.7.2.7.1"><a href="#section-7.7" class="auto internal xref">7.7</a>.  <a href="#name-token-response" class="internal xref">Token Response</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-authorization-initiation-re" class="internal xref">Authorization Initiation Request</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-token-request-grant-types" class="internal xref">Token Request Grant Types</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-authorization-request" class="internal xref">Authorization Request</a></p>
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-mfa-otp-grant" class="internal xref">MFA OTP Grant</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-authorization-response" class="internal xref">Authorization Response</a></p>
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-mfa-oob-grant" class="internal xref">MFA OOB Grant</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2.2.1">
+                    <p id="section-toc.1-1.8.2.2.2.1.1"><a href="#section-8.2.1" class="auto internal xref">8.2.1</a>.  <a href="#name-token-error-response" class="internal xref">Token Error Response</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-recovery-code-grant" class="internal xref">Recovery Code Grant</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3.2.1">
+                    <p id="section-toc.1-1.8.2.3.2.1.1"><a href="#section-8.3.1" class="auto internal xref">8.3.1</a>.  <a href="#name-access-token-response" class="internal xref">Access Token Response</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-redirect-grant" class="internal xref">Redirect Grant</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
+                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-otp-grant" class="internal xref">OTP Grant</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-oob-grant" class="internal xref">OOB Grant</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.7">
+                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-device-session" class="internal xref">Device Session</a></p>
 </li>
             </ul>
 </li>
@@ -1366,49 +1315,95 @@ concerns with a browser-based approach, such as for native mobile or desktop app
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-old-notes" class="internal xref">Old Notes</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-client-receives-trigger-for" class="internal xref">Client receives trigger for authentication</a></p>
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-oauth-parameter-registratio" class="internal xref">OAuth Parameter Registration</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-checking-for-additional-req" class="internal xref">Checking for additional requirements</a></p>
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-oauth-uri-registration" class="internal xref">OAuth URI Registration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
+                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-oauth-extensions-error-regi" class="internal xref">OAuth Extensions Error Registration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.4">
+                <p id="section-toc.1-1.11.2.4.1"><a href="#section-11.4" class="auto internal xref">11.4</a>.  <a href="#name-authorization-server-metada" class="internal xref">Authorization Server Metadata</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-references" class="internal xref">References</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
-                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-oauth-parameter-registratio" class="internal xref">OAuth Parameter Registration</a></p>
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
-                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-oauth-uri-registration" class="internal xref">OAuth URI Registration</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
-                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="auto internal xref">12.3</a>.  <a href="#name-oauth-extensions-error-regi" class="internal xref">OAuth Extensions Error Registration</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.4">
-                <p id="section-toc.1-1.12.2.4.1"><a href="#section-12.4" class="auto internal xref">12.4</a>.  <a href="#name-authorization-server-metada" class="internal xref">Authorization Server Metadata</a></p>
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
-                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+                <p id="section-toc.1-1.13.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-password-mfa" class="internal xref">Password + MFA</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.1">
+                    <p id="section-toc.1-1.13.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-passwordless-otp" class="internal xref">Passwordless OTP</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
-                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.2">
+                    <p id="section-toc.1-1.13.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-re-authenticating-to-an-app" class="internal xref">Re-authenticating to an app a week later</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.3">
+                    <p id="section-toc.1-1.13.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-registration" class="internal xref">Registration</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.4">
+                    <p id="section-toc.1-1.13.2.1.2.4.1"><a href="#appendix-A.1.4" class="auto internal xref">A.1.4</a>.  <a href="#name-sign-in-with-only-email-ver" class="internal xref">Sign-in with only email verification</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.5">
+                    <p id="section-toc.1-1.13.2.1.2.5.1"><a href="#appendix-A.1.5" class="auto internal xref">A.1.5</a>.  <a href="#name-discover-supported-authenti" class="internal xref">Discover supported authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.6">
+                    <p id="section-toc.1-1.13.2.1.2.6.1"><a href="#appendix-A.1.6" class="auto internal xref">A.1.6</a>.  <a href="#name-discover-supported-account-" class="internal xref">Discover supported account recover authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.7">
+                    <p id="section-toc.1-1.13.2.1.2.7.1"><a href="#appendix-A.1.7" class="auto internal xref">A.1.7</a>.  <a href="#name-update-an-existing-authenti" class="internal xref">Update an existing authentication method</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.8">
+                    <p id="section-toc.1-1.13.2.1.2.8.1"><a href="#appendix-A.1.8" class="auto internal xref">A.1.8</a>.  <a href="#name-initiate-browser-based-inte" class="internal xref">Initiate browser-based interaction for certain scenarios</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.9">
+                    <p id="section-toc.1-1.13.2.1.2.9.1"><a href="#appendix-A.1.9" class="auto internal xref">A.1.9</a>.  <a href="#name-discovering-custom-user-att" class="internal xref">Discovering custom user attributes</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.10">
+                    <p id="section-toc.1-1.13.2.1.2.10.1"><a href="#appendix-A.1.10" class="auto internal xref">A.1.10</a>. <a href="#name-provide-different-ux-depend" class="internal xref">Provide different UX depending on a user's enrolled authenticators</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.11">
+                    <p id="section-toc.1-1.13.2.1.2.11.1"><a href="#appendix-A.1.11" class="auto internal xref">A.1.11</a>. <a href="#name-register-new-authentication" class="internal xref">Register new authentication methods</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.12">
+                    <p id="section-toc.1-1.13.2.1.2.12.1"><a href="#appendix-A.1.12" class="auto internal xref">A.1.12</a>. <a href="#name-user-registration" class="internal xref">User registration</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-old-notes" class="internal xref">Old Notes</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
+                <p id="section-toc.1-1.14.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-client-receives-trigger-for" class="internal xref">Client receives trigger for authentication</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
+                <p id="section-toc.1-1.14.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-checking-for-additional-req" class="internal xref">Checking for additional requirements</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1426,95 +1421,6 @@ concerns with a browser-based approach, such as for native mobile or desktop app
 <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-usage-and-applicability" class="section-name selfRef">Usage and Applicability</a>
         </h3>
 <p id="section-1.1-1">TODO: Mention the trust prerequisites for this to be useful. Absolutely not allowed for third-party apps. Designed for native apps, specifically first-party, when the AS and app are operated by the same entity, and the user understands them both as the same entity...<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="use-cases">
-<section id="section-1.2">
-        <h3 id="name-use-cases">
-<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
-        </h3>
-<p id="section-1.2-1">TODO: We may move these to the appendix, but outlining them in the document will also help guide developers to understand what they can (and cannot) expect to be able to do.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
-<p id="section-1.2-2">TODO: Registration flows may need to be a separate document.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
-<div id="sign-up-with-verification">
-<section id="section-1.2.1">
-          <h4 id="name-sign-up-with-verification">
-<a href="#section-1.2.1" class="section-number selfRef">1.2.1. </a><a href="#name-sign-up-with-verification" class="section-name selfRef">Sign-up with verification</a>
-          </h4>
-<p id="section-1.2.1-1">e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail during sign-up/account creation.<a href="#section-1.2.1-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="register-new-authentication-methods">
-<section id="section-1.2.2">
-          <h4 id="name-register-new-authentication">
-<a href="#section-1.2.2" class="section-number selfRef">1.2.2. </a><a href="#name-register-new-authentication" class="section-name selfRef">Register new authentication methods</a>
-          </h4>
-<p id="section-1.2.2-1">e.g. user selects password, provides phone for SMS codes, etc<a href="#section-1.2.2-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="sign-in-with-first-factor">
-<section id="section-1.2.3">
-          <h4 id="name-sign-in-with-first-factor">
-<a href="#section-1.2.3" class="section-number selfRef">1.2.3. </a><a href="#name-sign-in-with-first-factor" class="section-name selfRef">Sign-in with first factor</a>
-          </h4>
-<p id="section-1.2.3-1">e.g. username password<a href="#section-1.2.3-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="sign-in-with-additional-factor">
-<section id="section-1.2.4">
-          <h4 id="name-sign-in-with-additional-fac">
-<a href="#section-1.2.4" class="section-number selfRef">1.2.4. </a><a href="#name-sign-in-with-additional-fac" class="section-name selfRef">Sign-in with additional factor</a>
-          </h4>
-<p id="section-1.2.4-1">e.g. user already signed in with one factor (username/password), but now need to "step-up" to second factor (e.g. SMS code).<a href="#section-1.2.4-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="discover-supported-authentication-methods">
-<section id="section-1.2.5">
-          <h4 id="name-discover-supported-authenti">
-<a href="#section-1.2.5" class="section-number selfRef">1.2.5. </a><a href="#name-discover-supported-authenti" class="section-name selfRef">Discover supported authentication methods</a>
-          </h4>
-<p id="section-1.2.5-1">e.g. developer can query the authorisation server to determine what authentication methods are supported.<a href="#section-1.2.5-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="discover-supported-account-recover-authentication-methods">
-<section id="section-1.2.6">
-          <h4 id="name-discover-supported-account-">
-<a href="#section-1.2.6" class="section-number selfRef">1.2.6. </a><a href="#name-discover-supported-account-" class="section-name selfRef">Discover supported account recover authentication methods</a>
-          </h4>
-<p id="section-1.2.6-1">e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.<a href="#section-1.2.6-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="update-an-existing-authentication-method">
-<section id="section-1.2.7">
-          <h4 id="name-update-an-existing-authenti">
-<a href="#section-1.2.7" class="section-number selfRef">1.2.7. </a><a href="#name-update-an-existing-authenti" class="section-name selfRef">Update an existing authentication method</a>
-          </h4>
-<p id="section-1.2.7-1">e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.<a href="#section-1.2.7-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="initiate-browser-based-interaction-for-certain-scenarios">
-<section id="section-1.2.8">
-          <h4 id="name-initiate-browser-based-inte">
-<a href="#section-1.2.8" class="section-number selfRef">1.2.8. </a><a href="#name-initiate-browser-based-inte" class="section-name selfRef">Initiate browser-based interaction for certain scenarios</a>
-          </h4>
-<p id="section-1.2.8-1">e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).<a href="#section-1.2.8-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="discovering-custom-user-attributes">
-<section id="section-1.2.9">
-          <h4 id="name-discovering-custom-user-att">
-<a href="#section-1.2.9" class="section-number selfRef">1.2.9. </a><a href="#name-discovering-custom-user-att" class="section-name selfRef">Discovering custom user attributes</a>
-          </h4>
-<p id="section-1.2.9-1">e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?<a href="#section-1.2.9-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="provide-different-ux-depending-on-a-users-enrolled-authenticators">
-<section id="section-1.2.10">
-          <h4 id="name-provide-different-ux-depend">
-<a href="#section-1.2.10" class="section-number selfRef">1.2.10. </a><a href="#name-provide-different-ux-depend" class="section-name selfRef">Provide different UX depending on a user's enrolled authenticators</a>
-          </h4>
-<p id="section-1.2.10-1">An AS may support multiple different authenticators, and a user may have set up only one. A client will not know which a user has set up ahead of time. The AS needs to drive the UI in the client login process depending on the configuration of the user account.<a href="#section-1.2.10-1" class="pilcrow">¶</a></p>
-</section>
-</div>
 </section>
 </div>
 </section>
@@ -1566,143 +1472,80 @@ and "Token Endpoint" defined by <span>[<a href="#RFC6749" class="cite xref">RFC6
         <li id="section-3-1.8">The AS replies with the token response<a href="#section-3-1.8" class="pilcrow">¶</a>
 </li>
       </ol>
-<div id="example-flows">
-<section id="section-3.1">
-        <h3 id="name-example-flows">
-<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-example-flows" class="section-name selfRef">Example Flows</a>
-        </h3>
-<p id="section-3.1-1">TODO: Move these to an appendix<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<div id="password-mfa">
-<section id="section-3.1.1">
-          <h4 id="name-password-mfa">
-<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-password-mfa" class="section-name selfRef">Password + MFA</a>
-          </h4>
-<ul class="normal">
-<li class="normal" id="section-3.1.1-1.1">User enters username and password (/initiate login_hint= password=)<a href="#section-3.1.1-1.1" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.1-1.2">AS responds with <code>mfa_required</code><a href="#section-3.1.1-1.2" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.1-1.3">Client initiates MFA challenge (authorization challenge endpoint)<a href="#section-3.1.1-1.3" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.1-1.4">AS responds with details of MFA challenge<a href="#section-3.1.1-1.4" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.1-1.5">Client collects MFA from user (OTP, SMS code, etc)<a href="#section-3.1.1-1.5" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.1-1.6">Client makes token request (new mfa:otp/mfa:oob grant type)<a href="#section-3.1.1-1.6" class="pilcrow">¶</a>
-</li>
-          </ul>
-</section>
-</div>
-<div id="passwordless">
-<section id="section-3.1.2">
-          <h4 id="name-passwordless">
-<a href="#section-3.1.2" class="section-number selfRef">3.1.2. </a><a href="#name-passwordless" class="section-name selfRef">Passwordless</a>
-          </h4>
-<ul class="normal">
-<li class="normal" id="section-3.1.2-1.1">Client collects username and OTP from user<a href="#section-3.1.2-1.1" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.2-1.2">Client makes token request (new otp grant type)<a href="#section-3.1.2-1.2" class="pilcrow">¶</a>
-</li>
-          </ul>
-</section>
-</div>
-<div id="re-authenticating-to-an-app-a-week-later">
-<section id="section-3.1.3">
-          <h4 id="name-re-authenticating-to-an-app">
-<a href="#section-3.1.3" class="section-number selfRef">3.1.3. </a><a href="#name-re-authenticating-to-an-app" class="section-name selfRef">Re-authenticating to an app a week later</a>
-          </h4>
-<ul class="normal">
-<li class="normal" id="section-3.1.3-1.1">You log in to an app (in any way, redirect flow or direct)<a href="#section-3.1.3-1.1" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.3-1.2">App gets short lived access token and long lived refresh token<a href="#section-3.1.3-1.2" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.3-1.3">A week later, the user launches the app, access token is expired<a href="#section-3.1.3-1.3" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.3-1.4">App uses the refresh token, gets back an <code>mfa_required</code> error<a href="#section-3.1.3-1.4" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.3-1.5">App prompts and collects MFA from user (OTP or OOB)<a href="#section-3.1.3-1.5" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-3.1.3-1.6">App submits token request with grant_type=mfa_otp and mfa_token (which was already associated with the refresh token)<a href="#section-3.1.3-1.6" class="pilcrow">¶</a>
-</li>
-          </ul>
-</section>
-</div>
-</section>
-</div>
 <div id="authorization-grants">
-<section id="section-3.2">
+<section id="section-3.1">
         <h3 id="name-authorization-grants">
-<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-authorization-grants" class="section-name selfRef">Authorization Grants</a>
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-authorization-grants" class="section-name selfRef">Authorization Grants</a>
         </h3>
 <div id="one-time-passwords-otp">
-<section id="section-3.2.1">
+<section id="section-3.1.1">
           <h4 id="name-one-time-passwords-otp">
-<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-one-time-passwords-otp" class="section-name selfRef">One-Time Passwords (OTP)</a>
+<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-one-time-passwords-otp" class="section-name selfRef">One-Time Passwords (OTP)</a>
           </h4>
-<p id="section-3.2.1-1">The one-time password (OTP) credentials can be used as an
+<p id="section-3.1.1-1">The one-time password (OTP) credentials can be used as an
 authorization grant to obtain an access token.  An OTP is generated
 by a hardware device or a software application installed on a device
 such as a mobile phone.  These devices have an embedded secret which
 used as a seed for generating OTPs.  An OTP is single-use and proves
-control of the device.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.1-2">When used in addition to another grant type (such as resource owner
+control of the device.<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.1-2">When used in addition to another grant type (such as resource owner
 password credentials), one-time password credentials add an
-additional factor of authentication.<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.2.1-3">Even though this grant type requires direct client access to the
+additional factor of authentication.<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.1-3">Even though this grant type requires direct client access to the
 resource owner credentials, the resource owner credentials are used
 for a single request and are exchanged for an access token.
 Furthermore, the single-use nature of an OTP limits the impact of
 exposing a long-term password alone to the client when the resulting
-access token or refresh token are also short-lived.<a href="#section-3.2.1-3" class="pilcrow">¶</a></p>
-<p id="section-3.2.1-4">OTP methods include:<a href="#section-3.2.1-4" class="pilcrow">¶</a></p>
+access token or refresh token are also short-lived.<a href="#section-3.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1.1-4">OTP methods include:<a href="#section-3.1.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.1-5.1">Code generators such as Google Authenticator<a href="#section-3.2.1-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3.1.1-5.1">Code generators such as Google Authenticator<a href="#section-3.1.1-5.1" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="out-of-band-authorization-oob">
-<section id="section-3.2.2">
+<section id="section-3.1.2">
           <h4 id="name-out-of-band-authorization-o">
-<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-out-of-band-authorization-o" class="section-name selfRef">Out-of-Band Authorization (OOB)</a>
+<a href="#section-3.1.2" class="section-number selfRef">3.1.2. </a><a href="#name-out-of-band-authorization-o" class="section-name selfRef">Out-of-Band Authorization (OOB)</a>
           </h4>
-<p id="section-3.2.2-1">The out-of-band (OOB) authorization grant allows authorization to be
+<p id="section-3.1.2-1">The out-of-band (OOB) authorization grant allows authorization to be
 obtained via a secondary channel.  Once authorized, the grant can be
 used to obtain an access token.  Use of a secondary channel supports
-several use cases.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-2">The out-of-band authorization grant can be used with an out-of-band
+several use cases.<a href="#section-3.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-2">The out-of-band authorization grant can be used with an out-of-band
 authenticator to add an additional factor of authentication.  An out-
 of-band authenticator is a physical device that is uniquely
 addressable and can communicate with the authorization server over a
 secondary channel.  Common examples would be a mobile phone using SMS
 as a secondary channel, or a software application installed on a
-device using push notifications as a secondary channel.<a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-3">The out-of-band authorization grant can also facilitate more complex
+device using push notifications as a secondary channel.<a href="#section-3.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-3">The out-of-band authorization grant can also facilitate more complex
 authorization processes.  For example, out-of-band authorization can
 be used to perform multi-party authorization, in which two or more
-resource owners are needed in order to grant access.<a href="#section-3.2.2-3" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-4">OOB methods include:<a href="#section-3.2.2-4" class="pilcrow">¶</a></p>
+resource owners are needed in order to grant access.<a href="#section-3.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.1.2-4">OOB methods include:<a href="#section-3.1.2-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.2-5.1">One-time codes sent via email and SMS<a href="#section-3.2.2-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3.1.2-5.1">One-time codes sent via email and SMS<a href="#section-3.1.2-5.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.2-5.2">Display a code on the primary device, enter it on the secondary device (e.g. OAuth Device Flow)<a href="#section-3.2.2-5.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-3.1.2-5.2">Display a code on the primary device, enter it on the secondary device (e.g. OAuth Device Flow)<a href="#section-3.1.2-5.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.2-5.3">Acknowledge a push notification on a secondary device<a href="#section-3.2.2-5.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-3.1.2-5.3">Acknowledge a push notification on a secondary device<a href="#section-3.1.2-5.3" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3.2.2-5.4">Compare the codes displayed on two devices<a href="#section-3.2.2-5.4" class="pilcrow">¶</a>
+            <li class="normal" id="section-3.1.2-5.4">Compare the codes displayed on two devices<a href="#section-3.1.2-5.4" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
 </div>
 <div id="recovery-code">
-<section id="section-3.2.3">
+<section id="section-3.1.3">
           <h4 id="name-recovery-code">
-<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-recovery-code" class="section-name selfRef">Recovery Code</a>
+<a href="#section-3.1.3" class="section-number selfRef">3.1.3. </a><a href="#name-recovery-code" class="section-name selfRef">Recovery Code</a>
           </h4>
-<p id="section-3.2.3-1">The recovery code is numeric or character string from a set of
+<p id="section-3.1.3-1">The recovery code is numeric or character string from a set of
 secrets shared between the resource owner and the authorization
 server.  These secrets are typically used by the resource owner in
-the event another authenticator is lost or malfunctions.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+the event another authenticator is lost or malfunctions.<a href="#section-3.1.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1716,13 +1559,15 @@ the event another authenticator is lost or malfunctions.<a href="#section-3.2.3-
       </h2>
 <ul class="normal">
 <li class="normal" id="section-4-1.1">
-          <p id="section-4-1.1.1">Token endpoint<a href="#section-4-1.1.1" class="pilcrow">¶</a></p>
+          <p id="section-4-1.1.1">Authorization initiation endpoint<a href="#section-4-1.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4-1.1.2.1">This specification defines new grant types and new error responses<a href="#section-4-1.1.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4-1.1.2.1">A client initiates a login flow<a href="#section-4-1.1.2.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4-1.1.2.2">Adds <code>device_session</code> in token response<a href="#section-4-1.1.2.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-4-1.1.2.2">With or without information collected from the user (e.g. password)<a href="#section-4-1.1.2.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4-1.1.2.3">Note: Passwords are never sent to the token endpoint<a href="#section-4-1.1.2.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-4-1.1.2.3">May contain a <code>device_session</code><a href="#section-4-1.1.2.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4-1.1.2.4">Returns an <code>mfa_token</code><a href="#section-4-1.1.2.4" class="pilcrow">¶</a>
 </li>
           </ul>
 </li>
@@ -1734,25 +1579,25 @@ the event another authenticator is lost or malfunctions.<a href="#section-3.2.3-
           </ul>
 </li>
         <li class="normal" id="section-4-1.3">
-          <p id="section-4-1.3.1">Authorization initiation endpoint<a href="#section-4-1.3.1" class="pilcrow">¶</a></p>
+          <p id="section-4-1.3.1">Token endpoint<a href="#section-4-1.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4-1.3.2.1">A client initiates a login flow<a href="#section-4-1.3.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4-1.3.2.1">This specification defines new grant types and new error responses<a href="#section-4-1.3.2.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4-1.3.2.2">With or without information collected from the user (e.g. password)<a href="#section-4-1.3.2.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-4-1.3.2.2">Adds <code>device_session</code> in token response<a href="#section-4-1.3.2.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4-1.3.2.3">May contain a <code>device_session</code><a href="#section-4-1.3.2.3" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-4-1.3.2.4">Returns an <code>mfa_token</code><a href="#section-4-1.3.2.4" class="pilcrow">¶</a>
+            <li class="normal" id="section-4-1.3.2.3">Note: Passwords are never sent to the token endpoint<a href="#section-4-1.3.2.3" class="pilcrow">¶</a>
 </li>
           </ul>
 </li>
       </ul>
-<p id="section-4-2">Not every authorization grant type utilizes both endpoints.
+<p id="section-4-2">Not every authorization grant type utilizes all endpoints.
 Extension grant types <span class="bcp14">MAY</span> define additional endpoints as needed.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <p id="section-4-3">The token endpoint is used by the client to obtain an access token by
 presenting its authorization grant or refresh token, as described in
 Section 3.2 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">This specification adds additional grant types used at the token endpoint, as well as extends the token endpoint response to allow the authorization server to indicate that further authentication of the user is required.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-4">This specification adds additional grant types used at the token endpoint,
+as well as extends the token endpoint response to allow the authorization
+server to indicate that further authentication of the user is required.<a href="#section-4-4" class="pilcrow">¶</a></p>
 <p id="section-4-5">Extension Grant Types<a href="#section-4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4-6.1">grant_type=urn:ietf:params:oauth:grant-type:mfa-otp<a href="#section-4-6.1" class="pilcrow">¶</a>
@@ -1768,37 +1613,133 @@ Section 3.2 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>
       </ul>
 </section>
 </div>
-<div id="mfa-token-response">
+<div id="authorization-initiation">
 <section id="section-5">
-      <h2 id="name-authorization-challenge-res">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-authorization-challenge-res" class="section-name selfRef">Authorization Challenge Response</a>
+      <h2 id="name-authorization-initiation-re">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-authorization-initiation-re" class="section-name selfRef">Authorization Initiation Request</a>
       </h2>
-<p id="section-5-1">Upon any request to the token endpoint, the authorization server can
-respond with an authorization challenge instead of a successful access token response.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">An authorization challenge error response is a particular type of
+<p id="section-5-1">A client may wish to initiate an authorization flow by first prompting the user for their user identifier or other account information. The authorization initiation endpoint is a new endpoint to collect this login hint and direct the client with the next steps, whether that is to do an MFA flow, or perform an OAuth redirect-based flow.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">The authorization initiation endpoint is an optional feature that can be used to drive passwordless flows.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<div id="authorization-request">
+<section id="section-5.1">
+        <h3 id="name-authorization-request">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-authorization-request" class="section-name selfRef">Authorization Request</a>
+        </h3>
+<p id="section-5.1-1">The client makes a request to the authorization initiation endpoint by adding the
+following parameters using the "application/x-www-form-urlencoded"
+format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.1-2">
+          <dt id="section-5.1-2.1">"login_hint":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.2">
+            <p id="section-5.1-2.2.1"><span class="bcp14">OPTIONAL</span>. If the client has collected the user's username, email,
+phone number or other identifier, it can provide this in the request.<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.3">"password":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.4">
+            <p id="section-5.1-2.4.1"><span class="bcp14">OPTIONAL</span>. If the client has collected the user's password, it can provide
+it at this stage.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.5">"scope":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.6">
+            <p id="section-5.1-2.6.1"><span class="bcp14">OPTIONAL</span>. The OAuth scope defined in <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.7">"acr_values":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.8">
+            <p id="section-5.1-2.8.1"><span class="bcp14">OPTIONAL</span>. The acr_values requested by the client.<a href="#section-5.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.9">"device_session":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.10">
+            <p id="section-5.1-2.10.1"><span class="bcp14">OPTIONAL</span>. If the client has previously obtained a device session, described in <a href="#device-session" class="auto internal xref">Section 8.7</a>.<a href="#section-5.1-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-5.1-3">For example:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-4">
+<pre>
+POST /initiate HTTP/1.1
+Host: server.example.com
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+Content-Type: application/x-www-form-urlencoded
+
+login_hint=%2B1%20%28310%29%20123-4567&amp;scope=profile
+</pre><a href="#section-5.1-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="authorization-response">
+<section id="section-5.2">
+        <h3 id="name-authorization-response">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-authorization-response" class="section-name selfRef">Authorization Response</a>
+        </h3>
+<p id="section-5.2-1">The authorization server responds with an MFA token
+defined in <a href="#mfa-token-response" class="auto internal xref">Section 6</a>, or an authorization challenge response
+defined in <a href="#authorization-challenge-response" class="auto internal xref">Section 7.2</a>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">For example, the authorization server can reply with an MFA token,
+as described <a href="#mfa-token-response" class="auto internal xref">Section 6</a>:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.2-3">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+  "mfa_token": "uY29tL2F1dGhlbnRpY"
+}
+</pre><a href="#section-5.2-3" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2-4">Or, if the authorization server requires that this particular user
+go through a typical redirect flow, can respond with the redirect challenge,
+as described in <a href="#redirect-challenge" class="auto internal xref">Section 7.2.4</a>:<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.2-5">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+  "challenge_type": "redirect"
+}
+</pre><a href="#section-5.2-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="mfa-token-response">
+<section id="section-6">
+      <h2 id="name-authorization-challenge-res">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-authorization-challenge-res" class="section-name selfRef">Authorization Challenge Response</a>
+      </h2>
+<p id="section-6-1">Upon any request to the token endpoint, the authorization server can
+respond with an authorization challenge instead of a successful access token response.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">An authorization challenge error response is a particular type of
 error response as defined in Section 5.2 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> where
-the error code is set to the following value:<a href="#section-5-2" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-5-3">
-        <dt id="section-5-3.1">"mfa_required":</dt>
-        <dd style="margin-left: 1.5em" id="section-5-3.2">
-          <p id="section-5-3.2.1">The authorization grant is insufficiently authorized, but another
+the error code is set to the following value:<a href="#section-6-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-6-3">
+        <dt id="section-6-3.1">"mfa_required":</dt>
+        <dd style="margin-left: 1.5em" id="section-6-3.2">
+          <p id="section-6-3.2.1">The authorization grant is insufficiently authorized, but another
 access token request <span class="bcp14">MAY</span> succeed if an additional authorization
-grant is presented.<a href="#section-5-3.2.1" class="pilcrow">¶</a></p>
+grant is presented.<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<p id="section-5-4">In addition to the response parameters defined in Section 5.2 of
+<p id="section-6-4">In addition to the response parameters defined in Section 5.2 of
 OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following parameters <span class="bcp14">MUST</span> be included in the
-response when the error code is set to <code>mfa_required</code>:<a href="#section-5-4" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-5-5">
-        <dt id="section-5-5.1">"mfa_token":</dt>
-        <dd style="margin-left: 1.5em" id="section-5-5.2">
-          <p id="section-5-5.2.1">MFA token value associated with the ongoing authorization session.<a href="#section-5-5.2.1" class="pilcrow">¶</a></p>
+response when the error code is set to <code>mfa_required</code>:<a href="#section-6-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-6-5">
+        <dt id="section-6-5.1">"mfa_token":</dt>
+        <dd style="margin-left: 1.5em" id="section-6-5.2">
+          <p id="section-6-5.2.1">MFA token value associated with the ongoing authorization session.<a href="#section-6-5.2.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<p id="section-5-6">For example:<a href="#section-5-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5-7">
+<p id="section-6-6">For example:<a href="#section-6-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6-7">
 <pre>
 HTTP/1.1 403 Forbidden
 Content-Type: application/json;charset=UTF-8
@@ -1808,60 +1749,65 @@ Cache-Control: no-store
   "error": "mfa_required",
   "mfa_token": "uY29tL2F1dGhlbnRpY"
 }
-</pre><a href="#section-5-7" class="pilcrow">¶</a>
+</pre><a href="#section-6-7" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="authorization-challenge-endpoint">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-authorization-challenge-end">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-authorization-challenge-end" class="section-name selfRef">Authorization Challenge Endpoint</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-authorization-challenge-end" class="section-name selfRef">Authorization Challenge Endpoint</a>
       </h2>
-<p id="section-6-1">The authorization challenge endpoint is used by the client to obtain
-an authorization challenge by presenting an MFA token.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">Use of the authorization challenge endpoint is <span class="bcp14">OPTIONAL</span>; if a client
+<p id="section-7-1">The authorization challenge endpoint is used by the client to obtain
+an authorization challenge by presenting an MFA token.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">Use of the authorization challenge endpoint is <span class="bcp14">OPTIONAL</span>; if a client
 knows of a suitable authenticator through an out-of-band mechanism,
-it can obtain a strong authorization grant directly.<a href="#section-6-2" class="pilcrow">¶</a></p>
+it can obtain a strong authorization grant directly.<a href="#section-7-2" class="pilcrow">¶</a></p>
 <div id="authorization-challenge-request">
-<section id="section-6.1">
+<section id="section-7.1">
         <h3 id="name-authorization-challenge-req">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-authorization-challenge-req" class="section-name selfRef">Authorization Challenge Request</a>
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-authorization-challenge-req" class="section-name selfRef">Authorization Challenge Request</a>
         </h3>
-<p id="section-6.1-1">The client makes a request to the authorization challenge endpoint by
+<p id="section-7.1-1">The client makes a request to the authorization challenge endpoint by
 adding the following parameters using the "application/x-www-form-
 urlencoded" format with a character encoding of UTF-8 in the HTTP
-request body:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.1-2">
-          <dt id="section-6.1-2.1">"mfa_token":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.1-2.2">
-            <p id="section-6.1-2.2.1"><span class="bcp14">REQUIRED</span>.  The MFA token received from the authorization server in
-the authorization challenge error response.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+request body:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.1-2">
+          <dt id="section-7.1-2.1">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.2">
+            <p id="section-7.1-2.2.1"><span class="bcp14">REQUIRED</span>.  The MFA token received from the authorization server in
+the authorization challenge error response.<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-6.1-2.3">"challenge_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.1-2.4">
-            <p id="section-6.1-2.4.1"><span class="bcp14">OPTIONAL</span>.  List of authorization challenge type strings that the
+<dt id="section-7.1-2.3">"challenge_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.4">
+            <p id="section-7.1-2.4.1"><span class="bcp14">OPTIONAL</span>.  List of authorization challenge type strings that the
 client supports, expressed as a list of space-delimited, case-
-insensitive strings.<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+insensitive strings.<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-6.1-2.5">"authenticator_id":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.1-2.6">
-            <p id="section-6.1-2.6.1"><span class="bcp14">OPTIONAL</span>.  The identifier of the authenticator to challenge.  The
+<dt id="section-7.1-2.5">"authenticator_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.6">
+            <p id="section-7.1-2.6.1"><span class="bcp14">OPTIONAL</span>.  The identifier of the authenticator to challenge.  The
 authorization server <span class="bcp14">MUST</span> ensure that the authenticator is
-associated with the resource owner.<a href="#section-6.1-2.6.1" class="pilcrow">¶</a></p>
+associated with the resource owner.<a href="#section-7.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-6.1-2.7">"client_id":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.1-2.8">
-            <p id="section-6.1-2.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+<dt id="section-7.1-2.7">"device_session":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.8">
+            <p id="section-7.1-2.8.1"><span class="bcp14">OPTIONAL</span>. The device session, described in <a href="#device-session" class="auto internal xref">Section 8.7</a>.<a href="#section-7.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.1-2.9">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.1-2.10">
+            <p id="section-7.1-2.10.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
 authorization server as described in Section 3.2.1 of OAuth 2.0
-<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-6.1-2.8.1" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.1-2.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-6.1-3">For example, the client makes the following HTTP request:<a href="#section-6.1-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.1-4">
+<p id="section-7.1-3">For example, the client makes the following HTTP request:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.1-4">
 <pre>
 POST /challenge HTTP/1.1
 Host: server.example.com
@@ -1869,414 +1815,6 @@ Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
 Content-Type: application/x-www-form-urlencoded
 
 mfa_token=uY29tL2F1dGhlbnRpY&amp;challenge_type=otp%20oob
-</pre><a href="#section-6.1-4" class="pilcrow">¶</a>
-</div>
-<p id="section-6.1-5">The authorization server <span class="bcp14">MUST</span>:<a href="#section-6.1-5" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1-6.1">require client authentication for confidential clients or for any
-client that was issued client credentials (or with other
-authentication requirements),<a href="#section-6.1-6.1" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-6.1-6.2">authenticate the client if client authentication is included,<a href="#section-6.1-6.2" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-6.1-6.3">ensure that the MFA token was issued to the authenticated
-confidential client, or if the client is public, ensure that the
-token was issued to the <code>client_id</code> in the request,<a href="#section-6.1-6.3" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-6.1-6.4">verify that the MFA token is valid, and<a href="#section-6.1-6.4" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-6.1-6.5">restore the authorization session based on the state referenced by
-or encoded into the MFA token.<a href="#section-6.1-6.5" class="pilcrow">¶</a>
-</li>
-        </ul>
-</section>
-</div>
-<div id="authorization-challenge-response">
-<section id="section-6.2">
-        <h3 id="name-authorization-challenge-resp">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-authorization-challenge-resp" class="section-name selfRef">Authorization Challenge Response</a>
-        </h3>
-<p id="section-6.2-1">If the authorization challenge request is valid and authorized, the
-authorization server selects an authorization challenge, the response
-to which would satisfy the authorization session, and constructs the
-response by adding the following parameters to the entity-body of the
-HTTP response using the <code>application/json</code> format <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span> with a
-200 (OK) status code:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2-2">
-          <dt id="section-6.2-2.1">"challenge_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-2.2">
-            <p id="section-6.2-2.2.1"><span class="bcp14">REQUIRED</span>.  The type of the authorization challenge issued.  Value
-is case insensitive.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-</dl>
-<p id="section-6.2-3">All additional parameters are specified by the authorization
-challenge type. This document defines the <code>otp</code> type, the <code>oob</code> type,
-the <code>recovery-code</code>, and the <code>redirect</code> type.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">For example:<a href="#section-6.2-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2-5">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
-
-{
-  "challenge_type": "otp"
-}
-</pre><a href="#section-6.2-5" class="pilcrow">¶</a>
-</div>
-<p id="section-6.2-6">If the authorization challenge request failed, the authorization
-server responds with an error response as described in Section 5.2 of
-OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-6.2-6" class="pilcrow">¶</a></p>
-<p id="section-6.2-7">In addition to the error codes defined in Section 5.2 of OAuth 2.0
-<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following error codes are specified for use in
-authorization challenge endpoint responses:<a href="#section-6.2-7" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2-8">
-          <dt id="section-6.2-8.1">"invalid_authenticator":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-8.2">
-            <p id="section-6.2-8.2.1">The requested authenticator does not exist or is not associated
-with the resource owner.<a href="#section-6.2-8.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-6.2-8.3">"expired_token":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-8.4">
-            <p id="section-6.2-8.4.1">The provided MFA token is invalid, expired, revoked, or was issued
-to another client.  The client <span class="bcp14">MAY</span> initiate a new authorization
-session.<a href="#section-6.2-8.4.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-6.2-8.5">"unsupported_challenge_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-8.6">
-            <p id="section-6.2-8.6.1">The challenge types supported by the client are not supported by
-the authorization server or not available to the resource owner.<a href="#section-6.2-8.6.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-6.2-8.7">"association_required":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-8.8">
-            <p id="section-6.2-8.8.1">The resource owner is not associated with any authenticator.  The
-authorization session <span class="bcp14">MAY</span> be continued by completing authenticator
-association.<a href="#section-6.2-8.8.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-6.2-8.9">"server_error":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-8.10">
-            <p id="section-6.2-8.10.1">The authorization server encountered an unexpected condition that
-prevented it from fulfilling the request.<a href="#section-6.2-8.10.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-6.2-8.11">"bad_gateway":</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-8.12">
-            <p id="section-6.2-8.12.1">The authorization server received an invalid response from an
-upstream server it accessed in attempting to fulfull the request.
-This typically occurs when challenging an OOB authenticator and
-the gateway is down, for example SMS.<a href="#section-6.2-8.12.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-</dl>
-<div id="otp-challenge">
-<section id="section-6.2.1">
-          <h4 id="name-otp-challenge">
-<a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-otp-challenge" class="section-name selfRef">OTP Challenge</a>
-          </h4>
-<p id="section-6.2.1-1">If the authorization server requires an OTP credential as an
-additional authorization grant, it responds with an OTP authorization
-challenge type containing the following parameters:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2.1-2">
-            <dt id="section-6.2.1-2.1">"challenge_type":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.1-2.2">
-              <p id="section-6.2.1-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to <code>otp</code>.<a href="#section-6.2.1-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-</dl>
-<p id="section-6.2.1-3">No additional parameters are specified for the OTP authorization
-challenge type.<a href="#section-6.2.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.2.1-4">For example:<a href="#section-6.2.1-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.1-5">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
-
-{
-    "challenge_type": "otp"
-}
-</pre><a href="#section-6.2.1-5" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="oob-authorization-challenge">
-<section id="section-6.2.2">
-          <h4 id="name-oob-challenge">
-<a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-oob-challenge" class="section-name selfRef">OOB Challenge</a>
-          </h4>
-<p id="section-6.2.2-1">If the authorization server requires out-of-band authorization as an
-additional authorization grant, it generates a unique out-of-band
-transaction code that is valid for a limited time.  It then initiates
-an out-of-band authorization operation, the details of which are out
-of scope for this specification.  It then responds with an OOB
-authorization challenge type containing the following parameters:<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2.2-2">
-            <dt id="section-6.2.2-2.1">"challenge_type":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.2-2.2">
-              <p id="section-6.2.2-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to "oob".<a href="#section-6.2.2-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.2-2.3">"oob_code":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.2-2.4">
-              <p id="section-6.2.2-2.4.1"><span class="bcp14">REQUIRED</span>.  The out-of-band transaction code.  The out-of-band
-transaction code <span class="bcp14">MUST</span> expire shortly after it is issued to
-mitigate the risk of leaks.  A maximum out-of-band transaction
-code lifetime of 10 minutes is <span class="bcp14">RECOMMENDED</span>.
-TODO: Determine whether this is required or what benefit it provides if any.<a href="#section-6.2.2-2.4.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.2-2.5">"binding_code":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.2-2.6">
-              <p id="section-6.2.2-2.6.1"><span class="bcp14">OPTIONAL</span>.  The end-user verification code used to bind the
-authorization operation on the secondary channel with the primary
-channel.  <span class="bcp14">REQUIRED</span>, if the value of "binding_method" is set to
-"transfer" or "compare".<a href="#section-6.2.2-2.6.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.2-2.7">"binding_method":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.2-2.8">
-              <p id="section-6.2.2-2.8.1"><span class="bcp14">OPTIONAL</span>.  The method used to bind the authorization operation on
-the secondary channel with the primary channel.  If no value is
-provided, clients <span class="bcp14">MUST</span> use "none" as the default.  Values defined
-by this specification are:<a href="#section-6.2.2-2.8.1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2.2-2.8.2">
-                <dt id="section-6.2.2-2.8.2.1">"prompt":</dt>
-                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.2">
-                  <p id="section-6.2.2-2.8.2.2.1">The end user should be prompted to enter a code received during
-out-of-band authorization via the secondary channel into the
-client.  For example, the end user receives a code on their
-mobile phone (typically a 6-digit code) and types it into the
-client.<a href="#section-6.2.2-2.8.2.2.1" class="pilcrow">¶</a></p>
-</dd>
-                <dd class="break"></dd>
-<dt id="section-6.2.2-2.8.2.3">"transfer":</dt>
-                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.4">
-                  <p id="section-6.2.2-2.8.2.4.1">The client displays or otherwise communicates the
-"binding_code" to the end user and instructs them to enter it
-into or otherwise transfer it to the secondary channel.  For
-example, the end user may view the "binding_code" on the client
-and either type it into an app on their mobile phone or use a
-QR code to effect the transfer.<a href="#section-6.2.2-2.8.2.4.1" class="pilcrow">¶</a></p>
-</dd>
-                <dd class="break"></dd>
-<dt id="section-6.2.2-2.8.2.5">"compare":</dt>
-                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.6">
-                  <p id="section-6.2.2-2.8.2.6.1">The client displays the "binding_code" to the end user and
-instructs them to compare it to the code received during out-
-of-band authorization before confirming authorization via the
-secondary channel.<a href="#section-6.2.2-2.8.2.6.1" class="pilcrow">¶</a></p>
-</dd>
-                <dd class="break"></dd>
-<dt id="section-6.2.2-2.8.2.7">"none":</dt>
-                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.8">
-                  <p id="section-6.2.2-2.8.2.8.1">No binding is performed between the client on the primary
-channel and the out-of-band authorization operation via the
-secondary channel.<a href="#section-6.2.2-2.8.2.8.1" class="pilcrow">¶</a></p>
-</dd>
-              <dd class="break"></dd>
-</dl>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.2-2.9">"expires_in":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.2-2.10">
-              <p id="section-6.2.2-2.10.1"><span class="bcp14">OPTIONAL</span>.  The lifetime in seconds of the <code>oob_code</code>.<a href="#section-6.2.2-2.10.1" class="pilcrow">¶</a></p>
-</dd>
-            <dd class="break"></dd>
-<dt id="section-6.2.2-2.11">"interval":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.2-2.12">
-              <p id="section-6.2.2-2.12.1"><span class="bcp14">OPTIONAL</span>.  The minimum amount of time in seconds that the client
-<span class="bcp14">SHOULD</span> wait between polling requests to the token endpoint.  If no
-value is provided, clients <span class="bcp14">MUST</span> use 5 as the default.<a href="#section-6.2.2-2.12.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-</dl>
-<p id="section-6.2.2-3">For example:<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.2-4">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
-
-{
-   "challenge_type": "oob",
-   "oob_code": "GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
-   "binding_method": "prompt",
-   "expires_in": 300,
-   "interval": 5
-}
-</pre><a href="#section-6.2.2-4" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="recovery-code-challenge">
-<section id="section-6.2.3">
-          <h4 id="name-recovery-code-challenge">
-<a href="#section-6.2.3" class="section-number selfRef">6.2.3. </a><a href="#name-recovery-code-challenge" class="section-name selfRef">Recovery Code Challenge</a>
-          </h4>
-<p id="section-6.2.3-1">If the authorization server requires a recovery code as an
-authorization grant, it responds with a recovery code authorization
-challenge containing the following parameters:<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2.3-2">
-            <dt id="section-6.2.3-2.1">"challenge_type":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.3-2.2">
-              <p id="section-6.2.3-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to <code>recovery-code</code>.<a href="#section-6.2.3-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-</dl>
-<p id="section-6.2.3-3">No additional parameters are specified for the recovery code
-authorization challenge type.<a href="#section-6.2.3-3" class="pilcrow">¶</a></p>
-<p id="section-6.2.3-4">For example:<a href="#section-6.2.3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.3-5">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
-Pragma: no-cache
-
-{
-  "challenge_type": "recovery-code"
-}
-</pre><a href="#section-6.2.3-5" class="pilcrow">¶</a>
-</div>
-<p id="section-6.2.3-6">TODO: It is unclear why the AS would decide a recovery code is required,
-since that assumes the AS knows the user has lost their other MFA options.<a href="#section-6.2.3-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="redirect-challenge">
-<section id="section-6.2.4">
-          <h4 id="name-redirect-challenge">
-<a href="#section-6.2.4" class="section-number selfRef">6.2.4. </a><a href="#name-redirect-challenge" class="section-name selfRef">Redirect Challenge</a>
-          </h4>
-<p id="section-6.2.4-1">In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the <code>redirect</code> challenge type.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2.4-2">
-            <dt id="section-6.2.4-2.1">"challenge_type":</dt>
-            <dd style="margin-left: 1.5em" id="section-6.2.4-2.2">
-              <p id="section-6.2.4-2.2.1"><span class="bcp14">REQUIRED</span>. Value <span class="bcp14">MUST</span> be set to <code>redirect</code>.<a href="#section-6.2.4-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-</dl>
-<p id="section-6.2.4-3">The client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-6.2.4-3" class="pilcrow">¶</a></p>
-<p id="section-6.2.4-4">TODO: Should there be some connection to the authorization code flow that the client initiates next?<a href="#section-6.2.4-4" class="pilcrow">¶</a></p>
-<p id="section-6.2.4-5">This can be used to enable primary or secondary authentication with social providers or third party IdPs which require a browser redirect flow.<a href="#section-6.2.4-5" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="user-interaction">
-<section id="section-6.3">
-        <h3 id="name-user-interaction">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-user-interaction" class="section-name selfRef">User Interaction</a>
-        </h3>
-<div id="otp-challenge-interaction">
-<section id="section-6.3.1">
-          <h4 id="name-otp-challenge-interaction">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-otp-challenge-interaction" class="section-name selfRef">OTP Challenge Interaction</a>
-          </h4>
-<p id="section-6.3.1-1">After receiving an OTP challenge, the client prompts or otherwise
-interacts with the resource owner to obtain an OTP generated by a
-device in the possession of the resource owner.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="oob-challenge-interaction">
-<section id="section-6.3.2">
-          <h4 id="name-oob-challenge-interaction">
-<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-oob-challenge-interaction" class="section-name selfRef">OOB Challenge Interaction</a>
-          </h4>
-<p id="section-6.3.2-1">After receiving an out-of-band challenge, the client prompts or
-otherwise interacts with the resource owner to inform them of the
-ongoing authorization operation.  Any necessary actions by the
-resource owner or other party on the secondary channel are out of
-scope of this specification.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-2">For example, the client informs the user to expect to receive a
-verification code via SMS, and provides a form to enter the code.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="recovery-code-challenge-interaction">
-<section id="section-6.3.3">
-          <h4 id="name-recovery-code-challenge-int">
-<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-recovery-code-challenge-int" class="section-name selfRef">Recovery Code Challenge Interaction</a>
-          </h4>
-<p id="section-6.3.3-1">After receiving a recovery code challenge, the client prompts or
-otherwise interacts with the resource owner to obtain a recovery
-code.  Such codes are typically already in the resource owner's
-posession, having been previously distributed to the resource owner.<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.3-2">Recovery codes are typically necessary upon the resource owner
-realizing that other authenticators have been lost or are
-malfunctioning (for instance, when attempting to satisfy a non-
-recovery code authorization challenge).  In such an event, the client
-<span class="bcp14">SHOULD</span> provide the resource owner a means of directly entering a
-recovery flow.<a href="#section-6.3.3-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="redirect-challenge-interaction">
-<section id="section-6.3.4">
-          <h4 id="name-redirect-challenge-interact">
-<a href="#section-6.3.4" class="section-number selfRef">6.3.4. </a><a href="#name-redirect-challenge-interact" class="section-name selfRef">Redirect Challenge Interaction</a>
-          </h4>
-<p id="section-6.3.4-1">After receiving a redirect challenge, the client initiates an
-OAuth authorization code flow with the authorization server. The
-tokens are obtained with the traditional authorization code grant.<a href="#section-6.3.4-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-</section>
-</div>
-<div id="token-request-grant-types">
-<section id="section-7">
-      <h2 id="name-token-request-grant-types">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-token-request-grant-types" class="section-name selfRef">Token Request Grant Types</a>
-      </h2>
-<p id="section-7-1">This specification defines new grant types at the token endpoint,
-providing a way for a client to obtain an access token given any of
-the MFA challenges previously described.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<div id="mfa-otp-grant">
-<section id="section-7.1">
-        <h3 id="name-mfa-otp-grant">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-mfa-otp-grant" class="section-name selfRef">MFA OTP Grant</a>
-        </h3>
-<p id="section-7.1-1">The client makes a request to the token endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
-format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.1-2">
-          <dt id="section-7.1-2.1">"grant_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.1-2.2">
-            <p id="section-7.1-2.2.1"><span class="bcp14">REQUIRED</span>. <code>urn:ietf:params:oauth:grant-type:mfa-otp</code><a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-7.1-2.3">"otp":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.1-2.4">
-            <p id="section-7.1-2.4.1"><span class="bcp14">REQUIRED</span>. The one-time password generated by a device. e.g. 123456<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-7.1-2.5">"mfa_token":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.1-2.6">
-            <p id="section-7.1-2.6.1"><span class="bcp14">REQUIRED</span>. The MFA token, "mfa_token" from the prior authorization
-challenge error response<a href="#section-7.1-2.6.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-7.1-2.7">"client_id":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.1-2.8">
-            <p id="section-7.1-2.8.1"><span class="bcp14">REQUIRED</span> if the client is not authenticating with the
-authorization server.<a href="#section-7.1-2.8.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-</dl>
-<p id="section-7.1-3">For example:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.1-4">
-<pre>
-POST /token HTTP/1.1
-Host: server.example.com
-Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=urn:ietf:params:oauth:grant-type:mfa-otp
-&amp;otp=123456&amp;mfa_token=uY29tL2F1dGhlbnRpY
 </pre><a href="#section-7.1-4" class="pilcrow">¶</a>
 </div>
 <p id="section-7.1-5">The authorization server <span class="bcp14">MUST</span>:<a href="#section-7.1-5" class="pilcrow">¶</a></p>
@@ -2289,66 +1827,486 @@ authentication requirements),<a href="#section-7.1-6.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-6.3">ensure that the MFA token was issued to the authenticated
 confidential client, or if the client is public, ensure that the
-token was issued to <code>client_id</code> in the request,<a href="#section-7.1-6.3" class="pilcrow">¶</a>
+token was issued to the <code>client_id</code> in the request,<a href="#section-7.1-6.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.1-6.4">verify that the MFA token is valid,<a href="#section-7.1-6.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-7.1-6.4">verify that the MFA token is valid, and<a href="#section-7.1-6.4" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-6.5">restore the authorization session based on the state referenced by
-or encoded into the MFA token, and<a href="#section-7.1-6.5" class="pilcrow">¶</a>
+or encoded into the MFA token.<a href="#section-7.1-6.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.1-6.6">validate the one-time password credentials using its existing OTP
-validation algorithm.<a href="#section-7.1-6.6" class="pilcrow">¶</a>
+        </ul>
+</section>
+</div>
+<div id="authorization-challenge-response">
+<section id="section-7.2">
+        <h3 id="name-authorization-challenge-resp">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-authorization-challenge-resp" class="section-name selfRef">Authorization Challenge Response</a>
+        </h3>
+<p id="section-7.2-1">If the authorization challenge request is valid and authorized, the
+authorization server selects an authorization challenge, the response
+to which would satisfy the authorization session, and constructs the
+response by adding the following parameters to the entity-body of the
+HTTP response using the <code>application/json</code> format <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span> with a
+200 (OK) status code:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2-2">
+          <dt id="section-7.2-2.1">"challenge_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.2">
+            <p id="section-7.2-2.2.1"><span class="bcp14">REQUIRED</span>.  The type of the authorization challenge issued.  Value
+is case insensitive.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-7.2-3">All additional parameters are specified by the authorization
+challenge type. This document defines the <code>otp</code> type, the <code>oob</code> type,
+the <code>recovery-code</code>, and the <code>redirect</code> type.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">For example:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.2-5">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+  "challenge_type": "otp"
+}
+</pre><a href="#section-7.2-5" class="pilcrow">¶</a>
+</div>
+<p id="section-7.2-6">If the authorization challenge request failed, the authorization
+server responds with an error response as described in Section 5.2 of
+OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+<p id="section-7.2-7">In addition to the error codes defined in Section 5.2 of OAuth 2.0
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following error codes are specified for use in
+authorization challenge endpoint responses:<a href="#section-7.2-7" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2-8">
+          <dt id="section-7.2-8.1">"invalid_authenticator":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-8.2">
+            <p id="section-7.2-8.2.1">The requested authenticator does not exist or is not associated
+with the resource owner.<a href="#section-7.2-8.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-8.3">"expired_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-8.4">
+            <p id="section-7.2-8.4.1">The provided MFA token is invalid, expired, revoked, or was issued
+to another client.  The client <span class="bcp14">MAY</span> initiate a new authorization
+session.<a href="#section-7.2-8.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-8.5">"unsupported_challenge_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-8.6">
+            <p id="section-7.2-8.6.1">The challenge types supported by the client are not supported by
+the authorization server or not available to the resource owner.<a href="#section-7.2-8.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-8.7">"association_required":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-8.8">
+            <p id="section-7.2-8.8.1">The resource owner is not associated with any authenticator.  The
+authorization session <span class="bcp14">MAY</span> be continued by completing authenticator
+association.<a href="#section-7.2-8.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-8.9">"server_error":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-8.10">
+            <p id="section-7.2-8.10.1">The authorization server encountered an unexpected condition that
+prevented it from fulfilling the request.<a href="#section-7.2-8.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-8.11">"bad_gateway":</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-8.12">
+            <p id="section-7.2-8.12.1">The authorization server received an invalid response from an
+upstream server it accessed in attempting to fulfull the request.
+This typically occurs when challenging an OOB authenticator and
+the gateway is down, for example SMS.<a href="#section-7.2-8.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<div id="otp-challenge">
+<section id="section-7.2.1">
+          <h4 id="name-otp-challenge">
+<a href="#section-7.2.1" class="section-number selfRef">7.2.1. </a><a href="#name-otp-challenge" class="section-name selfRef">OTP Challenge</a>
+          </h4>
+<p id="section-7.2.1-1">If the authorization server requires an OTP credential as an
+additional authorization grant, it responds with an OTP authorization
+challenge type containing the following parameters:<a href="#section-7.2.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2.1-2">
+            <dt id="section-7.2.1-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.1-2.2">
+              <p id="section-7.2.1-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to <code>otp</code>.<a href="#section-7.2.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-7.2.1-3">No additional parameters are specified for the OTP authorization
+challenge type.<a href="#section-7.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.2.1-4">For example:<a href="#section-7.2.1-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.2.1-5">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+    "challenge_type": "otp"
+}
+</pre><a href="#section-7.2.1-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="oob-authorization-challenge">
+<section id="section-7.2.2">
+          <h4 id="name-oob-challenge">
+<a href="#section-7.2.2" class="section-number selfRef">7.2.2. </a><a href="#name-oob-challenge" class="section-name selfRef">OOB Challenge</a>
+          </h4>
+<p id="section-7.2.2-1">If the authorization server requires out-of-band authorization as an
+additional authorization grant, it generates a unique out-of-band
+transaction code that is valid for a limited time.  It then initiates
+an out-of-band authorization operation, the details of which are out
+of scope for this specification.  It then responds with an OOB
+authorization challenge type containing the following parameters:<a href="#section-7.2.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2.2-2">
+            <dt id="section-7.2.2-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.2-2.2">
+              <p id="section-7.2.2-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to "oob".<a href="#section-7.2.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.2-2.3">"oob_code":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.2-2.4">
+              <p id="section-7.2.2-2.4.1"><span class="bcp14">REQUIRED</span>.  The out-of-band transaction code.  The out-of-band
+transaction code <span class="bcp14">MUST</span> expire shortly after it is issued to
+mitigate the risk of leaks.  A maximum out-of-band transaction
+code lifetime of 10 minutes is <span class="bcp14">RECOMMENDED</span>.
+TODO: Determine whether this is required or what benefit it provides if any.<a href="#section-7.2.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.2-2.5">"binding_code":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.2-2.6">
+              <p id="section-7.2.2-2.6.1"><span class="bcp14">OPTIONAL</span>.  The end-user verification code used to bind the
+authorization operation on the secondary channel with the primary
+channel.  <span class="bcp14">REQUIRED</span>, if the value of "binding_method" is set to
+"transfer" or "compare".<a href="#section-7.2.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.2-2.7">"binding_method":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.2-2.8">
+              <p id="section-7.2.2-2.8.1"><span class="bcp14">OPTIONAL</span>.  The method used to bind the authorization operation on
+the secondary channel with the primary channel.  If no value is
+provided, clients <span class="bcp14">MUST</span> use "none" as the default.  Values defined
+by this specification are:<a href="#section-7.2.2-2.8.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2.2-2.8.2">
+                <dt id="section-7.2.2-2.8.2.1">"prompt":</dt>
+                <dd style="margin-left: 1.5em" id="section-7.2.2-2.8.2.2">
+                  <p id="section-7.2.2-2.8.2.2.1">The end user should be prompted to enter a code received during
+out-of-band authorization via the secondary channel into the
+client.  For example, the end user receives a code on their
+mobile phone (typically a 6-digit code) and types it into the
+client.<a href="#section-7.2.2-2.8.2.2.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+<dt id="section-7.2.2-2.8.2.3">"transfer":</dt>
+                <dd style="margin-left: 1.5em" id="section-7.2.2-2.8.2.4">
+                  <p id="section-7.2.2-2.8.2.4.1">The client displays or otherwise communicates the
+"binding_code" to the end user and instructs them to enter it
+into or otherwise transfer it to the secondary channel.  For
+example, the end user may view the "binding_code" on the client
+and either type it into an app on their mobile phone or use a
+QR code to effect the transfer.<a href="#section-7.2.2-2.8.2.4.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+<dt id="section-7.2.2-2.8.2.5">"compare":</dt>
+                <dd style="margin-left: 1.5em" id="section-7.2.2-2.8.2.6">
+                  <p id="section-7.2.2-2.8.2.6.1">The client displays the "binding_code" to the end user and
+instructs them to compare it to the code received during out-
+of-band authorization before confirming authorization via the
+secondary channel.<a href="#section-7.2.2-2.8.2.6.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+<dt id="section-7.2.2-2.8.2.7">"none":</dt>
+                <dd style="margin-left: 1.5em" id="section-7.2.2-2.8.2.8">
+                  <p id="section-7.2.2-2.8.2.8.1">No binding is performed between the client on the primary
+channel and the out-of-band authorization operation via the
+secondary channel.<a href="#section-7.2.2-2.8.2.8.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+</dl>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.2-2.9">"expires_in":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.2-2.10">
+              <p id="section-7.2.2-2.10.1"><span class="bcp14">OPTIONAL</span>.  The lifetime in seconds of the <code>oob_code</code>.<a href="#section-7.2.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-7.2.2-2.11">"interval":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.2-2.12">
+              <p id="section-7.2.2-2.12.1"><span class="bcp14">OPTIONAL</span>.  The minimum amount of time in seconds that the client
+<span class="bcp14">SHOULD</span> wait between polling requests to the token endpoint.  If no
+value is provided, clients <span class="bcp14">MUST</span> use 5 as the default.<a href="#section-7.2.2-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-7.2.2-3">For example:<a href="#section-7.2.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.2.2-4">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+   "challenge_type": "oob",
+   "oob_code": "GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
+   "binding_method": "prompt",
+   "expires_in": 300,
+   "interval": 5
+}
+</pre><a href="#section-7.2.2-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="recovery-code-challenge">
+<section id="section-7.2.3">
+          <h4 id="name-recovery-code-challenge">
+<a href="#section-7.2.3" class="section-number selfRef">7.2.3. </a><a href="#name-recovery-code-challenge" class="section-name selfRef">Recovery Code Challenge</a>
+          </h4>
+<p id="section-7.2.3-1">If the authorization server requires a recovery code as an
+authorization grant, it responds with a recovery code authorization
+challenge containing the following parameters:<a href="#section-7.2.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2.3-2">
+            <dt id="section-7.2.3-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.3-2.2">
+              <p id="section-7.2.3-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to <code>recovery-code</code>.<a href="#section-7.2.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-7.2.3-3">No additional parameters are specified for the recovery code
+authorization challenge type.<a href="#section-7.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-4">For example:<a href="#section-7.2.3-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.2.3-5">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+  "challenge_type": "recovery-code"
+}
+</pre><a href="#section-7.2.3-5" class="pilcrow">¶</a>
+</div>
+<p id="section-7.2.3-6">While this is likely to be an uncommon challenge response,
+the AS may decide a recovery code is required, for example if
+it is known that the user has lost their other MFA options.<a href="#section-7.2.3-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="redirect-challenge">
+<section id="section-7.2.4">
+          <h4 id="name-redirect-challenge">
+<a href="#section-7.2.4" class="section-number selfRef">7.2.4. </a><a href="#name-redirect-challenge" class="section-name selfRef">Redirect Challenge</a>
+          </h4>
+<p id="section-7.2.4-1">In the case where the authorization server wishes to interact with the user itself, limiting the client's interaction with the user, it can return the <code>redirect</code> challenge type.<a href="#section-7.2.4-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2.4-2">
+            <dt id="section-7.2.4-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-7.2.4-2.2">
+              <p id="section-7.2.4-2.2.1"><span class="bcp14">REQUIRED</span>. Value <span class="bcp14">MUST</span> be set to <code>redirect</code>.<a href="#section-7.2.4-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-7.2.4-3">The client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-7.2.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.2.4-4">For example:<a href="#section-7.2.4-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.2.4-5">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+
+{
+  "challenge_type": "redirect"
+}
+</pre><a href="#section-7.2.4-5" class="pilcrow">¶</a>
+</div>
+<p id="section-7.2.4-6">TODO: Should there be some connection to the authorization code flow that the client initiates next?<a href="#section-7.2.4-6" class="pilcrow">¶</a></p>
+<p id="section-7.2.4-7">This can be used to enable primary or secondary authentication with social providers or third party IdPs which require a browser redirect flow.<a href="#section-7.2.4-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="user-interaction">
+<section id="section-7.3">
+        <h3 id="name-user-interaction">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-user-interaction" class="section-name selfRef">User Interaction</a>
+        </h3>
+<div id="otp-challenge-interaction">
+<section id="section-7.3.1">
+          <h4 id="name-otp-challenge-interaction">
+<a href="#section-7.3.1" class="section-number selfRef">7.3.1. </a><a href="#name-otp-challenge-interaction" class="section-name selfRef">OTP Challenge Interaction</a>
+          </h4>
+<p id="section-7.3.1-1">After receiving an OTP challenge, the client prompts or otherwise
+interacts with the resource owner to obtain an OTP generated by a
+device in the possession of the resource owner.<a href="#section-7.3.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="oob-challenge-interaction">
+<section id="section-7.3.2">
+          <h4 id="name-oob-challenge-interaction">
+<a href="#section-7.3.2" class="section-number selfRef">7.3.2. </a><a href="#name-oob-challenge-interaction" class="section-name selfRef">OOB Challenge Interaction</a>
+          </h4>
+<p id="section-7.3.2-1">After receiving an out-of-band challenge, the client prompts or
+otherwise interacts with the resource owner to inform them of the
+ongoing authorization operation.  Any necessary actions by the
+resource owner or other party on the secondary channel are out of
+scope of this specification.<a href="#section-7.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.3.2-2">For example, the client informs the user to expect to receive a
+verification code via SMS, and provides a form to enter the code.<a href="#section-7.3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="recovery-code-challenge-interaction">
+<section id="section-7.3.3">
+          <h4 id="name-recovery-code-challenge-int">
+<a href="#section-7.3.3" class="section-number selfRef">7.3.3. </a><a href="#name-recovery-code-challenge-int" class="section-name selfRef">Recovery Code Challenge Interaction</a>
+          </h4>
+<p id="section-7.3.3-1">After receiving a recovery code challenge, the client prompts or
+otherwise interacts with the resource owner to obtain a recovery
+code.  Such codes are typically already in the resource owner's
+posession, having been previously distributed to the resource owner.<a href="#section-7.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3.3-2">Recovery codes are typically necessary upon the resource owner
+realizing that other authenticators have been lost or are
+malfunctioning (for instance, when attempting to satisfy a non-
+recovery code authorization challenge).  In such an event, the client
+<span class="bcp14">SHOULD</span> provide the resource owner a means of directly entering a
+recovery flow.<a href="#section-7.3.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="redirect-challenge-interaction">
+<section id="section-7.3.4">
+          <h4 id="name-redirect-challenge-interact">
+<a href="#section-7.3.4" class="section-number selfRef">7.3.4. </a><a href="#name-redirect-challenge-interact" class="section-name selfRef">Redirect Challenge Interaction</a>
+          </h4>
+<p id="section-7.3.4-1">After receiving a redirect challenge, the client initiates an
+OAuth authorization code flow with the authorization server. The
+tokens are obtained with the traditional authorization code grant.<a href="#section-7.3.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="token-request-grant-types">
+<section id="section-8">
+      <h2 id="name-token-request-grant-types">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-token-request-grant-types" class="section-name selfRef">Token Request Grant Types</a>
+      </h2>
+<p id="section-8-1">This specification defines new grant types at the token endpoint,
+providing a way for a client to obtain an access token given any of
+the MFA challenges previously described.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div id="mfa-otp-grant">
+<section id="section-8.1">
+        <h3 id="name-mfa-otp-grant">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-mfa-otp-grant" class="section-name selfRef">MFA OTP Grant</a>
+        </h3>
+<p id="section-8.1-1">The client makes a request to the token endpoint by adding the
+following parameters using the "application/x-www-form-urlencoded"
+format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.1-2">
+          <dt id="section-8.1-2.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-2.2">
+            <p id="section-8.1-2.2.1"><span class="bcp14">REQUIRED</span>. <code>urn:ietf:params:oauth:grant-type:mfa-otp</code><a href="#section-8.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.1-2.3">"otp":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-2.4">
+            <p id="section-8.1-2.4.1"><span class="bcp14">REQUIRED</span>. The one-time password generated by a device. e.g. 123456<a href="#section-8.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.1-2.5">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-2.6">
+            <p id="section-8.1-2.6.1"><span class="bcp14">REQUIRED</span>. The MFA token, "mfa_token" from the prior authorization
+challenge error response<a href="#section-8.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.1-2.7">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-2.8">
+            <p id="section-8.1-2.8.1"><span class="bcp14">REQUIRED</span> if the client is not authenticating with the
+authorization server.<a href="#section-8.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-8.1-3">For example:<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-8.1-4">
+<pre>
+POST /token HTTP/1.1
+Host: server.example.com
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:mfa-otp
+&amp;otp=123456&amp;mfa_token=uY29tL2F1dGhlbnRpY
+</pre><a href="#section-8.1-4" class="pilcrow">¶</a>
+</div>
+<p id="section-8.1-5">The authorization server <span class="bcp14">MUST</span>:<a href="#section-8.1-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.1-6.1">require client authentication for confidential clients or for any
+client that was issued client credentials (or with other
+authentication requirements),<a href="#section-8.1-6.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.1-6.2">authenticate the client if client authentication is included,<a href="#section-8.1-6.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.1-6.3">ensure that the MFA token was issued to the authenticated
+confidential client, or if the client is public, ensure that the
+token was issued to <code>client_id</code> in the request,<a href="#section-8.1-6.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.1-6.4">verify that the MFA token is valid,<a href="#section-8.1-6.4" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.1-6.5">restore the authorization session based on the state referenced by
+or encoded into the MFA token, and<a href="#section-8.1-6.5" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.1-6.6">validate the one-time password credentials using its existing OTP
+validation algorithm.<a href="#section-8.1-6.6" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
 </div>
 <div id="mfa-oob-grant">
-<section id="section-7.2">
+<section id="section-8.2">
         <h3 id="name-mfa-oob-grant">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-mfa-oob-grant" class="section-name selfRef">MFA OOB Grant</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-mfa-oob-grant" class="section-name selfRef">MFA OOB Grant</a>
         </h3>
-<p id="section-7.2-1">The client makes a request to the token endpoint by adding the
+<p id="section-8.2-1">The client makes a request to the token endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
-format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.2-2">
-          <dt id="section-7.2-2.1">"grant_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.2-2.2">
-            <p id="section-7.2-2.2.1"><span class="bcp14">REQUIRED</span>. <code>urn:ietf:params:oauth:grant-type:mfa-oob</code><a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.2-2">
+          <dt id="section-8.2-2.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.2">
+            <p id="section-8.2-2.2.1"><span class="bcp14">REQUIRED</span>. <code>urn:ietf:params:oauth:grant-type:mfa-oob</code><a href="#section-8.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.2-2.3">"oob_code":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.2-2.4">
-            <p id="section-7.2-2.4.1"><span class="bcp14">REQUIRED</span>.  The out-of-band transaction code, <code>oob_code</code> from the
-authorization challenge, defined in <a href="#oob-authorization-challenge" class="auto internal xref">Section 6.2.2</a><a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
+<dt id="section-8.2-2.3">"oob_code":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.4">
+            <p id="section-8.2-2.4.1"><span class="bcp14">REQUIRED</span>.  The out-of-band transaction code, <code>oob_code</code> from the
+authorization challenge, defined in <a href="#oob-authorization-challenge" class="auto internal xref">Section 7.2.2</a><a href="#section-8.2-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.2-2.5">"binding_code":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.2-2.6">
-            <p id="section-7.2-2.6.1"><span class="bcp14">REQUIRED</span>, if the binding method of the authorization challenge
- is set to "prompt".<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
+<dt id="section-8.2-2.5">"binding_code":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.6">
+            <p id="section-8.2-2.6.1"><span class="bcp14">REQUIRED</span>, if the binding method of the authorization challenge
+ is set to "prompt".<a href="#section-8.2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.2-2.7">"mfa_token":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.2-2.8">
-            <p id="section-7.2-2.8.1"><span class="bcp14">REQUIRED</span>.  The MFA token, "mfa_token" from the prior authorization
-challenge error response, defined in <a href="#mfa-token-response" class="auto internal xref">Section 5</a>.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+<dt id="section-8.2-2.7">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.8">
+            <p id="section-8.2-2.8.1"><span class="bcp14">REQUIRED</span>.  The MFA token, "mfa_token" from the prior authorization
+challenge error response, defined in <a href="#mfa-token-response" class="auto internal xref">Section 6</a>.<a href="#section-8.2-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.2-2.9">"client_id":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.2-2.10">
-            <p id="section-7.2-2.10.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+<dt id="section-8.2-2.9">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.10">
+            <p id="section-8.2-2.10.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
 authorization server as described in Section 3.2.1 of OAuth 2.0
-<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.2-2.10.1" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.2-2.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-7.2-3">If the client type is confidential or the client was issued client
+<p id="section-8.2-3">If the client type is confidential or the client was issued client
 credentials (or assigned other authentication requirements), the
 client <span class="bcp14">MUST</span> authenticate with the authorization server as described
-in Section 3.2.1 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<p id="section-7.2-4">For example, the client makes the following HTTP request using
-transport-layer security (with extra line breaks for display purposes only):<a href="#section-7.2-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.2-5">
+in Section 3.2.1 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">For example, the client makes the following HTTP request using
+transport-layer security (with extra line breaks for display purposes only):<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-8.2-5">
 <pre>
 POST /token HTTP/1.1
 Host: server.example.com
@@ -2358,133 +2316,133 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=urn:ietf:params:oauth:grant-type:mfa-oob
 &amp;oob_code=GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS
 &amp;binding_code=123456&amp;mfa_token=uY29tL2F1dGhlbnRpY
-</pre><a href="#section-7.2-5" class="pilcrow">¶</a>
+</pre><a href="#section-8.2-5" class="pilcrow">¶</a>
 </div>
-<p id="section-7.2-6">The authorization server <span class="bcp14">MUST</span>:<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+<p id="section-8.2-6">The authorization server <span class="bcp14">MUST</span>:<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2-7.1">require client authentication for confidential clients or for any
+<li class="normal" id="section-8.2-7.1">require client authentication for confidential clients or for any
 client that was issued client credentials (or with other
-authentication requirements),<a href="#section-7.2-7.1" class="pilcrow">¶</a>
+authentication requirements),<a href="#section-8.2-7.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.2-7.2">authenticate the client if client authentication is included,<a href="#section-7.2-7.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.2-7.2">authenticate the client if client authentication is included,<a href="#section-8.2-7.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.2-7.3">ensure that the MFA token was issued to the authenticated
+          <li class="normal" id="section-8.2-7.3">ensure that the MFA token was issued to the authenticated
 confidential client, or if the client is public, ensure that the
-token was issued to <code>client_id</code> in the request,<a href="#section-7.2-7.3" class="pilcrow">¶</a>
+token was issued to <code>client_id</code> in the request,<a href="#section-8.2-7.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.2-7.4">verify that the MFA token is valid,<a href="#section-7.2-7.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.2-7.4">verify that the MFA token is valid,<a href="#section-8.2-7.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.2-7.5">restore the authorization session based on the state referenced by
-or encoded into the MFA token,<a href="#section-7.2-7.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.2-7.5">restore the authorization session based on the state referenced by
+or encoded into the MFA token,<a href="#section-8.2-7.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.2-7.6">validate the out-of-band transaction code using its existing OOB
-validation algorithm, and<a href="#section-7.2-7.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.2-7.6">validate the out-of-band transaction code using its existing OOB
+validation algorithm, and<a href="#section-8.2-7.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.2-7.7">if required, validate the binding code using its existing OOB
-validation algorithm.<a href="#section-7.2-7.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.2-7.7">if required, validate the binding code using its existing OOB
+validation algorithm.<a href="#section-8.2-7.7" class="pilcrow">¶</a>
 </li>
         </ul>
 <div id="token-error-response">
-<section id="section-7.2.1">
+<section id="section-8.2.1">
           <h4 id="name-token-error-response">
-<a href="#section-7.2.1" class="section-number selfRef">7.2.1. </a><a href="#name-token-error-response" class="section-name selfRef">Token Error Response</a>
+<a href="#section-8.2.1" class="section-number selfRef">8.2.1. </a><a href="#name-token-error-response" class="section-name selfRef">Token Error Response</a>
           </h4>
-<p id="section-7.2.1-1">In addition to the error codes defined in Section 5.2 of OAuth 2.0
+<p id="section-8.2.1-1">In addition to the error codes defined in Section 5.2 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following error codes are specific for the out-of-band
-authorization grant in token endpoint responses:<a href="#section-7.2.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.2.1-2">
-            <dt id="section-7.2.1-2.1">"authorization_pending":</dt>
-            <dd style="margin-left: 1.5em" id="section-7.2.1-2.2">
-              <p id="section-7.2.1-2.2.1">The authorization request is still pending as the out-of-band
+authorization grant in token endpoint responses:<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.2.1-2">
+            <dt id="section-8.2.1-2.1">"authorization_pending":</dt>
+            <dd style="margin-left: 1.5em" id="section-8.2.1-2.2">
+              <p id="section-8.2.1-2.2.1">The authorization request is still pending as the out-of-band
 authorization operation has not yet completed.  The client <span class="bcp14">SHOULD</span>
 repeat the access token request to the token endpoint (a process
 known as polling).  Before each new request, the client <span class="bcp14">MUST</span> wait
 at least the number of seconds specified by the <code>interval</code>
 parameter of the authorization challenge (see Section X), or 5
 seconds if none was provided, and respect any increase in the
-polling interval required by the <code>slow_down</code> error.<a href="#section-7.2.1-2.2.1" class="pilcrow">¶</a></p>
+polling interval required by the <code>slow_down</code> error.<a href="#section-8.2.1-2.2.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-7.2.1-2.3">"slow_down":</dt>
-            <dd style="margin-left: 1.5em" id="section-7.2.1-2.4">
-              <p id="section-7.2.1-2.4.1">A variant of "authorization_pending", the authorization request is
+<dt id="section-8.2.1-2.3">"slow_down":</dt>
+            <dd style="margin-left: 1.5em" id="section-8.2.1-2.4">
+              <p id="section-8.2.1-2.4.1">A variant of "authorization_pending", the authorization request is
 still pending and polling should continue, but the interval <span class="bcp14">MUST</span>
-be increased by 5 seconds for this and all subsequent requests.<a href="#section-7.2.1-2.4.1" class="pilcrow">¶</a></p>
+be increased by 5 seconds for this and all subsequent requests.<a href="#section-8.2.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-7.2.1-2.5">"access_denied":</dt>
-            <dd style="margin-left: 1.5em" id="section-7.2.1-2.6">
-              <p id="section-7.2.1-2.6.1">The authorization request was denied.<a href="#section-7.2.1-2.6.1" class="pilcrow">¶</a></p>
+<dt id="section-8.2.1-2.5">"access_denied":</dt>
+            <dd style="margin-left: 1.5em" id="section-8.2.1-2.6">
+              <p id="section-8.2.1-2.6.1">The authorization request was denied.<a href="#section-8.2.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
-<dt id="section-7.2.1-2.7">"expired_token":</dt>
-            <dd style="margin-left: 1.5em" id="section-7.2.1-2.8">
-              <p id="section-7.2.1-2.8.1">The "oob_code" or "mfa_token" has expired, and the authorization
+<dt id="section-8.2.1-2.7">"expired_token":</dt>
+            <dd style="margin-left: 1.5em" id="section-8.2.1-2.8">
+              <p id="section-8.2.1-2.8.1">The "oob_code" or "mfa_token" has expired, and the authorization
 session has concluded.  The client <span class="bcp14">MAY</span> commence a new
 authorization session but <span class="bcp14">SHOULD</span> wait for user interaction before
-restarting to avoid unnecessary polling.<a href="#section-7.2.1-2.8.1" class="pilcrow">¶</a></p>
+restarting to avoid unnecessary polling.<a href="#section-8.2.1-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 </dl>
-<p id="section-7.2.1-3">The <code>authorization_pending</code> and <code>slow_down</code> error codes define
+<p id="section-8.2.1-3">The <code>authorization_pending</code> and <code>slow_down</code> error codes define
 particularly unique behavior, as they indicate that the OAuth client
 should continue to poll the token endpoint by repeating the token
 request (implementing the precise behavior defined above).  If the
 client receives an error response with any other error code, it <span class="bcp14">MUST</span>
 stop polling and <span class="bcp14">SHOULD</span> react accordingly, for example, by displaying
-an error to the user.<a href="#section-7.2.1-3" class="pilcrow">¶</a></p>
-<p id="section-7.2.1-4">On encountering a connection timeout, clients <span class="bcp14">MUST</span> unilaterally
+an error to the user.<a href="#section-8.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-4">On encountering a connection timeout, clients <span class="bcp14">MUST</span> unilaterally
 reduce their polling frequency before retrying.  The use of an
 exponential backoff algorithm to achieve this, such as doubling the
-polling interval on each such connection timeout, is <span class="bcp14">RECOMMENDED</span>.<a href="#section-7.2.1-4" class="pilcrow">¶</a></p>
-<p id="section-7.2.1-5">The error codes and client behavior specified in this section are
+polling interval on each such connection timeout, is <span class="bcp14">RECOMMENDED</span>.<a href="#section-8.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-5">The error codes and client behavior specified in this section are
 intentionally identical to those defined by OAuth 2.0 Device
-Authorization Grant <span>[<a href="#RFC8628" class="cite xref">RFC8628</a>]</span>.<a href="#section-7.2.1-5" class="pilcrow">¶</a></p>
+Authorization Grant <span>[<a href="#RFC8628" class="cite xref">RFC8628</a>]</span>.<a href="#section-8.2.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="recovery-code-grant">
-<section id="section-7.3">
+<section id="section-8.3">
         <h3 id="name-recovery-code-grant">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-recovery-code-grant" class="section-name selfRef">Recovery Code Grant</a>
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-recovery-code-grant" class="section-name selfRef">Recovery Code Grant</a>
         </h3>
-<p id="section-7.3-1">The client makes a request to the token endpoint by adding the
+<p id="section-8.3-1">The client makes a request to the token endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
-format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.3-2">
-          <dt id="section-7.3-2.1">"grant_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.3-2.2">
-            <p id="section-7.3-2.2.1"><span class="bcp14">REQUIRED</span>.  <code>urn:ietf:params:oauth:grant-type:mfa-recovery-code</code><a href="#section-7.3-2.2.1" class="pilcrow">¶</a></p>
+format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.3-2">
+          <dt id="section-8.3-2.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-2.2">
+            <p id="section-8.3-2.2.1"><span class="bcp14">REQUIRED</span>.  <code>urn:ietf:params:oauth:grant-type:mfa-recovery-code</code><a href="#section-8.3-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.3-2.3">"recovery_code":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.3-2.4">
-            <p id="section-7.3-2.4.1"><span class="bcp14">REQUIRED</span>.  The recovery code.<a href="#section-7.3-2.4.1" class="pilcrow">¶</a></p>
+<dt id="section-8.3-2.3">"recovery_code":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-2.4">
+            <p id="section-8.3-2.4.1"><span class="bcp14">REQUIRED</span>.  The recovery code.<a href="#section-8.3-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.3-2.5">"mfa_token":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.3-2.6">
-            <p id="section-7.3-2.6.1"><span class="bcp14">REQUIRED</span>.  The MFA token, "mfa_token" from the prior authorization
-challenge error response, defined in <a href="#mfa-token-response" class="auto internal xref">Section 5</a>.<a href="#section-7.3-2.6.1" class="pilcrow">¶</a></p>
+<dt id="section-8.3-2.5">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-2.6">
+            <p id="section-8.3-2.6.1"><span class="bcp14">REQUIRED</span>.  The MFA token, "mfa_token" from the prior authorization
+challenge error response, defined in <a href="#mfa-token-response" class="auto internal xref">Section 6</a>.<a href="#section-8.3-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.3-2.7">"client_id":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.3-2.8">
-            <p id="section-7.3-2.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+<dt id="section-8.3-2.7">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-2.8">
+            <p id="section-8.3-2.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
 authorization server as described in Section 3.2.1 of OAuth 2.0
-<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.3-2.8.1" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.3-2.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-7.3-3">If the client type is confidential or the client was issued client
+<p id="section-8.3-3">If the client type is confidential or the client was issued client
 credentials (or assigned other authentication requirements), the
 client <span class="bcp14">MUST</span> authenticate with the authorization server as described
-in Section 3.2.1 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.3-3" class="pilcrow">¶</a></p>
-<p id="section-7.3-4">For example, the client makes the following HTTP request using
+in Section 3.2.1 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.3-3" class="pilcrow">¶</a></p>
+<p id="section-8.3-4">For example, the client makes the following HTTP request using
 transport-layer security (with extra line breaks for display purposes
-only):<a href="#section-7.3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.3-5">
+only):<a href="#section-8.3-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-8.3-5">
 <pre>
 POST /token HTTP/1.1
 Host: server.example.com
@@ -2493,197 +2451,125 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=urn:ietf:params:oauth:grant-type:mfa-recovery-code
 &amp;recovery_code=WDJB-MJHT&amp;mfa_token=uY29tL2F1dGhlbnRpY
-</pre><a href="#section-7.3-5" class="pilcrow">¶</a>
+</pre><a href="#section-8.3-5" class="pilcrow">¶</a>
 </div>
-<p id="section-7.3-6">The authorization server <span class="bcp14">MUST</span>:<a href="#section-7.3-6" class="pilcrow">¶</a></p>
+<p id="section-8.3-6">The authorization server <span class="bcp14">MUST</span>:<a href="#section-8.3-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.3-7.1">require client authentication for confidential clients or for any
+<li class="normal" id="section-8.3-7.1">require client authentication for confidential clients or for any
 client that was issued client credentials (or with other
-authentication requirements),<a href="#section-7.3-7.1" class="pilcrow">¶</a>
+authentication requirements),<a href="#section-8.3-7.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.3-7.2">authenticate the client if client authentication is included,<a href="#section-7.3-7.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.3-7.2">authenticate the client if client authentication is included,<a href="#section-8.3-7.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.3-7.3">ensure that the MFA token was issued to the authenticated
+          <li class="normal" id="section-8.3-7.3">ensure that the MFA token was issued to the authenticated
 confidential client, or if the client is public, ensure that the
-token was issued to <code>client_id</code> in the request,<a href="#section-7.3-7.3" class="pilcrow">¶</a>
+token was issued to <code>client_id</code> in the request,<a href="#section-8.3-7.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.3-7.4">verify that the MFA token is valid,<a href="#section-7.3-7.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.3-7.4">verify that the MFA token is valid,<a href="#section-8.3-7.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.3-7.5">restore the authorization session based on the state referenced by
-or encoded into the MFA token, and<a href="#section-7.3-7.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.3-7.5">restore the authorization session based on the state referenced by
+or encoded into the MFA token, and<a href="#section-8.3-7.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.3-7.6">validate the recovery code using its existing recovery code
-validation algorithm.<a href="#section-7.3-7.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.3-7.6">validate the recovery code using its existing recovery code
+validation algorithm.<a href="#section-8.3-7.6" class="pilcrow">¶</a>
 </li>
         </ul>
 <div id="access-token-response">
-<section id="section-7.3.1">
+<section id="section-8.3.1">
           <h4 id="name-access-token-response">
-<a href="#section-7.3.1" class="section-number selfRef">7.3.1. </a><a href="#name-access-token-response" class="section-name selfRef">Access Token Response</a>
+<a href="#section-8.3.1" class="section-number selfRef">8.3.1. </a><a href="#name-access-token-response" class="section-name selfRef">Access Token Response</a>
           </h4>
-<p id="section-7.3.1-1">In addition to the parameters defined in Section 5.1 of OAuth 2.0
+<p id="section-8.3.1-1">In addition to the parameters defined in Section 5.1 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following additional parameters are specified for the
-recovery code grant:<a href="#section-7.3.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.3.1-2">
-            <dt id="section-7.3.1-2.1">"recovery_code":</dt>
-            <dd style="margin-left: 1.5em" id="section-7.3.1-2.2">
-              <p id="section-7.3.1-2.2.1"><span class="bcp14">OPTIONAL</span>.  A newly issued recovery code, in which case the client
+recovery code grant:<a href="#section-8.3.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.3.1-2">
+            <dt id="section-8.3.1-2.1">"recovery_code":</dt>
+            <dd style="margin-left: 1.5em" id="section-8.3.1-2.2">
+              <p id="section-8.3.1-2.2.1"><span class="bcp14">OPTIONAL</span>.  A newly issued recovery code, in which case the client
 <span class="bcp14">MUST</span> discard the old recovery code and replace it with the new
-recovery code.<a href="#section-7.3.1-2.2.1" class="pilcrow">¶</a></p>
+recovery code.<a href="#section-8.3.1-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 </dl>
-<p id="section-7.3.1-3">TODO: Do most systems currently give the user new recovery codes during this flow?<a href="#section-7.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-8.3.1-3">TODO: Do most systems currently give the user new recovery codes during this flow?<a href="#section-8.3.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="redirect-grant">
-<section id="section-7.4">
+<section id="section-8.4">
         <h3 id="name-redirect-grant">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-redirect-grant" class="section-name selfRef">Redirect Grant</a>
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-redirect-grant" class="section-name selfRef">Redirect Grant</a>
         </h3>
-<p id="section-7.4-1">No changes are made to the authorization code flow after the client
-receives a redirect challenge.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-8.4-1">No changes are made to the authorization code flow after the client
+receives a redirect challenge.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="otp-grant">
-<section id="section-7.5">
+<section id="section-8.5">
         <h3 id="name-otp-grant">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-otp-grant" class="section-name selfRef">OTP Grant</a>
+<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-otp-grant" class="section-name selfRef">OTP Grant</a>
         </h3>
-<p id="section-7.5-1">TODO: OTP only, not in response to an MFA challenge.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">The client makes a request to the token endpoint by adding the
+<p id="section-8.5-1">TODO: OTP only, not in response to an MFA challenge.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+<p id="section-8.5-2">The client makes a request to the token endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
-format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-7.5-2" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.5-3">
-          <dt id="section-7.5-3.1">"grant_type":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.5-3.2">
-            <p id="section-7.5-3.2.1"><span class="bcp14">REQUIRED</span>.  <code>urn:ietf:params:oauth:grant-type:otp</code><a href="#section-7.5-3.2.1" class="pilcrow">¶</a></p>
+format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-8.5-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.5-3">
+          <dt id="section-8.5-3.1">"grant_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.5-3.2">
+            <p id="section-8.5-3.2.1"><span class="bcp14">REQUIRED</span>.  <code>urn:ietf:params:oauth:grant-type:otp</code><a href="#section-8.5-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.5-3.3">"username":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.5-3.4">
-            <p id="section-7.5-3.4.1"><span class="bcp14">REQUIRED</span>. The resource owner username.<a href="#section-7.5-3.4.1" class="pilcrow">¶</a></p>
+<dt id="section-8.5-3.3">"username":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.5-3.4">
+            <p id="section-8.5-3.4.1"><span class="bcp14">REQUIRED</span>. The resource owner username.<a href="#section-8.5-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.5-3.5">"otp":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.5-3.6">
-            <p id="section-7.5-3.6.1"><span class="bcp14">REQUIRED</span>. The one-time password generated by a device.<a href="#section-7.5-3.6.1" class="pilcrow">¶</a></p>
+<dt id="section-8.5-3.5">"otp":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.5-3.6">
+            <p id="section-8.5-3.6.1"><span class="bcp14">REQUIRED</span>. The one-time password generated by a device.<a href="#section-8.5-3.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.5-3.7">"client_id":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.5-3.8">
-            <p id="section-7.5-3.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+<dt id="section-8.5-3.7">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.5-3.8">
+            <p id="section-8.5-3.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
 authorization server as described in Section 3.2.1 of OAuth 2.0
-<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.5-3.8.1" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.5-3.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-7.5-3.9">"device_session":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.5-3.10">
-            <p id="section-7.5-3.10.1"><span class="bcp14">OPTIONAL</span>. The <code>device_session</code> if the client has one.<a href="#section-7.5-3.10.1" class="pilcrow">¶</a></p>
+<dt id="section-8.5-3.9">"device_session":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.5-3.10">
+            <p id="section-8.5-3.10.1"><span class="bcp14">OPTIONAL</span>. The <code>device_session</code> if the client has one.<a href="#section-8.5-3.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="oob-grant">
-<section id="section-7.6">
+<section id="section-8.6">
         <h3 id="name-oob-grant">
-<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-oob-grant" class="section-name selfRef">OOB Grant</a>
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-oob-grant" class="section-name selfRef">OOB Grant</a>
         </h3>
-<p id="section-7.6-1">TODO: OOB only, not in response to an MFA challenge. Looks almost just like the MFA+OOB grant, just without the mfa_token.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<p id="section-8.6-1">TODO: OOB only, not in response to an MFA challenge. Looks almost just like the MFA+OOB grant, just without the mfa_token.<a href="#section-8.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="token-response">
-<section id="section-7.7">
-        <h3 id="name-token-response">
-<a href="#section-7.7" class="section-number selfRef">7.7. </a><a href="#name-token-response" class="section-name selfRef">Token Response</a>
+<div id="device-session">
+<section id="section-8.7">
+        <h3 id="name-device-session">
+<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-device-session" class="section-name selfRef">Device Session</a>
         </h3>
-<p id="section-7.7-1">In addition to the parameters defined in Section 5.1 of OAuth 2.0
+<p id="section-8.7-1">In addition to the parameters defined in Section 5.1 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following additional parameters are specified for
-any grant type defined by or extended from this specification.<a href="#section-7.7-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-7.7-2">
-          <dt id="section-7.7-2.1">"device_session":</dt>
-          <dd style="margin-left: 1.5em" id="section-7.7-2.2">
-            <p id="section-7.7-2.2.1"><span class="bcp14">OPTIONAL</span>.  The device session contains relevant data to the device and the current user authenticated with the device.<a href="#section-7.7-2.2.1" class="pilcrow">¶</a></p>
+the token response for any grant type defined by or extended from this specification.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.7-2">
+          <dt id="section-8.7-2.1">"device_session":</dt>
+          <dd style="margin-left: 1.5em" id="section-8.7-2.2">
+            <p id="section-8.7-2.2.1"><span class="bcp14">OPTIONAL</span>.  The device session contains relevant data to the device and the current user authenticated with the device.<a href="#section-8.7-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-7.7-3">The device session is completely opaque to the client, and as such the AS <span class="bcp14">MUST</span> adequately protect the value such as using a JWE if the AS is not maintaining state on the backend.<a href="#section-7.7-3" class="pilcrow">¶</a></p>
-<p id="section-7.7-4">The device session can be used by the client on a subsequent authorization initiation request, described in <a href="#authorization-initiation" class="auto internal xref">Section 8</a>.<a href="#section-7.7-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="authorization-initiation">
-<section id="section-8">
-      <h2 id="name-authorization-initiation-re">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-authorization-initiation-re" class="section-name selfRef">Authorization Initiation Request</a>
-      </h2>
-<p id="section-8-1">A client may wish to initiate an authorization flow by first prompting the user for their user identifier or other account information. The authorization initiation endpoint is a new endpoint to collect this login hint and direct the client with the next steps, whether that is to do an MFA flow, or perform an OAuth redirect-based flow.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<div id="authorization-request">
-<section id="section-8.1">
-        <h3 id="name-authorization-request">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-authorization-request" class="section-name selfRef">Authorization Request</a>
-        </h3>
-<p id="section-8.1-1">The client makes a request to the authorization initiation endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
-format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-8.1-2">
-          <dt id="section-8.1-2.1">"login_hint":</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.2">
-            <p id="section-8.1-2.2.1"><span class="bcp14">OPTIONAL</span>. If the client has collected the user's username, email,
-phone number or other identifier, it can provide this in the request.<a href="#section-8.1-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-2.3">"password":</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.4">
-            <p id="section-8.1-2.4.1"><span class="bcp14">OPTIONAL</span>. If the client has collected the user's password, it can provide
-it at this stage.<a href="#section-8.1-2.4.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.1-2.5">"scope":</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.6">
-            <p id="section-8.1-2.6.1"><span class="bcp14">OPTIONAL</span>. The OAuth scope defined in <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.1-2.6.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-</dl>
-<p id="section-8.1-3">For example:<a href="#section-8.1-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8.1-4">
-<pre>
-POST /initiate HTTP/1.1
-Host: server.example.com
-Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-Content-Type: application/x-www-form-urlencoded
-
-login_hint=%2B1%20%28310%29%20123-4567&amp;scope=profile
-</pre><a href="#section-8.1-4" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="authorization-response">
-<section id="section-8.2">
-        <h3 id="name-authorization-response">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-authorization-response" class="section-name selfRef">Authorization Response</a>
-        </h3>
-<p id="section-8.2-1">The authorization server responds with one of the authorization challenge responses
-defined in <a href="#authorization-challenge-response" class="auto internal xref">Section 6.2</a>.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">For example:<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8.2-3">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Cache-Control: no-store
-
-{
-  "oob_code":"GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
-  "binding_method":"prompt",
-  "expires_in":300,
-  "interval":5
-}
-</pre><a href="#section-8.2-3" class="pilcrow">¶</a>
-</div>
+<p id="section-8.7-3">The device session is completely opaque to the client, and as such the AS <span class="bcp14">MUST</span> adequately protect the value such as using a JWE if the AS is not maintaining state on the backend.<a href="#section-8.7-3" class="pilcrow">¶</a></p>
+<p id="section-8.7-4">The device session can be used by the client on a subsequent authorization initiation request, described in <a href="#authorization-initiation" class="auto internal xref">Section 5</a>, or in an authorization challenge request, described in <a href="#authorization-challenge-request" class="auto internal xref">Section 7.1</a>.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2717,7 +2603,7 @@ that tells the client they need to get the user to re-authenticate or provide an
         <h3 id="name-phishing">
 <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-phishing" class="section-name selfRef">Phishing</a>
         </h3>
-<p id="section-10.2-1">TODO: Describe the phishing risk this opens up.<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+<p id="section-10.2-1">TODO: Describe the phishing risk this opens up since the client is collecting and providing all the user's information to the authorization server. The AS <span class="bcp14">MAY</span> decide to require the user go through a redirect flow at any stage of the process based on its own risk assessment.<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="client-authentication">
@@ -2725,7 +2611,7 @@ that tells the client they need to get the user to re-authenticate or provide an
         <h3 id="name-client-authentication">
 <a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-client-authentication" class="section-name selfRef">Client Authentication</a>
         </h3>
-<p id="section-10.3-1">TODO: Describe the lack of client authentication possible because this is expected to be deployed by native apps. Maybe mention alternatives to client authentication such as App Attestation, or using a risk engine to analyze other aspects of the request from the client.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
+<p id="section-10.3-1">TODO: Describe the likely lack of client authentication because this is expected to be deployed by native apps. Maybe mention alternatives to client authentication such as App Attestation, or using a risk engine to analyze other aspects of the request from the client.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="leaking-information">
@@ -2746,62 +2632,34 @@ that tells the client they need to get the user to re-authenticate or provide an
 <ul class="normal">
 <li class="normal" id="section-10.5-3.1">rate limiting<a href="#section-10.5-3.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-10.5-3.2">use notification-based methods only as a secondary factor<a href="#section-10.5-3.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-10.5-3.2">use notification-based methods only as a secondary factor or when using a previously issued device_session<a href="#section-10.5-3.2" class="pilcrow">¶</a>
 </li>
         </ul>
-</section>
-</div>
-</section>
-</div>
-<div id="old-notes">
-<section id="section-11">
-      <h2 id="name-old-notes">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-old-notes" class="section-name selfRef">Old Notes</a>
-      </h2>
-<div id="client-receives-trigger-for-authentication">
-<section id="section-11.1">
-        <h3 id="name-client-receives-trigger-for">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-client-receives-trigger-for" class="section-name selfRef">Client receives trigger for authentication</a>
-        </h3>
-<p id="section-11.1-1">TODO: The client may receive a trigger from the resource server to initiate an authentication, possibly with a hint from the resource server in the form of an acr value, indicating it needs to initiate and authentications.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
-<p id="section-11.1-2">TBD: May need to reference the existing step-up authentication draft instead<a href="#section-11.1-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="checking-for-additional-requirements">
-<section id="section-11.2">
-        <h3 id="name-checking-for-additional-req">
-<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-checking-for-additional-req" class="section-name selfRef">Checking for additional requirements</a>
-        </h3>
-<p id="section-11.2-1">If the initial set of information provided by the client is correct, the AS
-<span class="bcp14">MAY</span> choose to either respond immediately with a successful token response,
-or prompt the client for an additional challenge.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
-<p id="section-11.2-2">For example, the AS could first require the client prompt the user for a one-time-code they
-received via email, and then in a second step, ask the client to prompt the user<a href="#section-11.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-12">
+<section id="section-11">
       <h2 id="name-iana-considerations">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <div id="oauth-parameter-registration">
-<section id="section-12.1">
+<section id="section-11.1">
         <h3 id="name-oauth-parameter-registratio">
-<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-oauth-parameter-registratio" class="section-name selfRef">OAuth Parameter Registration</a>
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-oauth-parameter-registratio" class="section-name selfRef">OAuth Parameter Registration</a>
         </h3>
-<p id="section-12.1-1">TODO<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-1">TODO<a href="#section-11.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="oauth-uri-registration">
-<section id="section-12.2">
+<section id="section-11.2">
         <h3 id="name-oauth-uri-registration">
-<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-oauth-uri-registration" class="section-name selfRef">OAuth URI Registration</a>
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-oauth-uri-registration" class="section-name selfRef">OAuth URI Registration</a>
         </h3>
-<p id="section-12.2-1">This specification registers the following values in the IANA "OAuth URI"
-registry (IANA.OAuth.Parameters) established by <span>[<a href="#RFC6755" class="cite xref">RFC6755</a>]</span>.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-12.2-2">
+<p id="section-11.2-1">This specification registers the following values in the IANA "OAuth URI"
+registry (IANA.OAuth.Parameters) established by <span>[<a href="#RFC6755" class="cite xref">RFC6755</a>]</span>.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-11.2-2">
 <pre>
 URN: `urn:ietf:params:oauth:grant-type:...`
 Common Name: ...
@@ -2822,49 +2680,49 @@ URN: `urn:ietf:params:oauth:grant-type:...`
 Common Name: ...
 Change Controller: IESG
 Specification Document:
-</pre><a href="#section-12.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-11.2-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="oauth-extensions-error-registration">
-<section id="section-12.3">
+<section id="section-11.3">
         <h3 id="name-oauth-extensions-error-regi">
-<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-oauth-extensions-error-regi" class="section-name selfRef">OAuth Extensions Error Registration</a>
+<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-oauth-extensions-error-regi" class="section-name selfRef">OAuth Extensions Error Registration</a>
         </h3>
-<p id="section-12.3-1">This specification registers the following values in the IANA "OAuth
+<p id="section-11.3-1">This specification registers the following values in the IANA "OAuth
 Extensions Error Registry" registry (IANA.OAuth.Parameters)
-established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-12.3-2">
+established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-11.3-2">
 <pre>
 Name: ...
-</pre><a href="#section-12.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-11.3-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="authorization-server-metadata">
-<section id="section-12.4">
+<section id="section-11.4">
         <h3 id="name-authorization-server-metada">
-<a href="#section-12.4" class="section-number selfRef">12.4. </a><a href="#name-authorization-server-metada" class="section-name selfRef">Authorization Server Metadata</a>
+<a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-authorization-server-metada" class="section-name selfRef">Authorization Server Metadata</a>
         </h3>
-<p id="section-12.4-1">This specification defines two new endpoints at the authorization server.
-TODO: Need to register these in the Authorization Server Metadata document too.<a href="#section-12.4-1" class="pilcrow">¶</a></p>
+<p id="section-11.4-1">This specification defines two new endpoints at the authorization server.
+TODO: Need to register these in the Authorization Server Metadata document too.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.4-2.1">authorization initiation endpoint<a href="#section-12.4-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-11.4-2.1">authorization initiation endpoint<a href="#section-11.4-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-12.4-2.2">authorization challenge endpoint<a href="#section-12.4-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.4-2.2">authorization challenge endpoint<a href="#section-11.4-2.2" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
 </div>
 </section>
 </div>
-<section id="section-13">
+<section id="section-12">
       <h2 id="name-references">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
-<section id="section-13.1">
+<section id="section-12.1">
         <h3 id="name-normative-references">
-<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
@@ -2893,9 +2751,9 @@ TODO: Need to register these in the Authorization Server Metadata document too.<
 <dd class="break"></dd>
 </dl>
 </section>
-<section id="section-13.2">
+<section id="section-12.2">
         <h3 id="name-informative-references">
-<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC8628">[RFC8628]</dt>
@@ -2905,16 +2763,212 @@ TODO: Need to register these in the Authorization Server Metadata document too.<
 </dl>
 </section>
 </section>
-<div id="acknowledgments">
+<div id="use-cases">
 <section id="appendix-A">
-      <h2 id="name-acknowledgments">
-<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      <h2 id="name-use-cases">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">TODO: Outlining these in the document will also help guide developers to understand what they can (and cannot) expect to be able to do. For each use case, briefly describe the expected outcome, and outline each step and which part of the spec accomplishes each step.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<div id="password-mfa">
+<section id="appendix-A.1">
+        <h3 id="name-password-mfa">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-password-mfa" class="section-name selfRef">Password + MFA</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-A.1-1.1">User enters username and password (/initiate login_hint= password=)<a href="#appendix-A.1-1.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="appendix-A.1-1.2">AS responds with <code>mfa_required</code><a href="#appendix-A.1-1.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="appendix-A.1-1.3">Client initiates MFA challenge (authorization challenge endpoint)<a href="#appendix-A.1-1.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="appendix-A.1-1.4">AS responds with details of MFA challenge<a href="#appendix-A.1-1.4" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="appendix-A.1-1.5">Client collects MFA from user (OTP, SMS code, etc)<a href="#appendix-A.1-1.5" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="appendix-A.1-1.6">Client makes token request (new mfa-otp/mfa-oob grant type)<a href="#appendix-A.1-1.6" class="pilcrow">¶</a>
+</li>
+        </ul>
+<div id="passwordless-otp">
+<section id="appendix-A.1.1">
+          <h4 id="name-passwordless-otp">
+<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-passwordless-otp" class="section-name selfRef">Passwordless OTP</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="appendix-A.1.1-1.1">Client collects username and OTP from user<a href="#appendix-A.1.1-1.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.1-1.2">Client makes token request (new otp grant type)<a href="#appendix-A.1.1-1.2" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+<div id="re-authenticating-to-an-app-a-week-later">
+<section id="appendix-A.1.2">
+          <h4 id="name-re-authenticating-to-an-app">
+<a href="#appendix-A.1.2" class="section-number selfRef">A.1.2. </a><a href="#name-re-authenticating-to-an-app" class="section-name selfRef">Re-authenticating to an app a week later</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="appendix-A.1.2-1.1">You log in to an app (in any way, redirect flow or direct)<a href="#appendix-A.1.2-1.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.2-1.2">App gets short lived access token and long lived refresh token<a href="#appendix-A.1.2-1.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.2-1.3">A week later, the user launches the app, access token is expired<a href="#appendix-A.1.2-1.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.2-1.4">App uses the refresh token, gets back an <code>mfa_required</code> error<a href="#appendix-A.1.2-1.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.2-1.5">App prompts and collects MFA from user (OTP or OOB)<a href="#appendix-A.1.2-1.5" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.2-1.6">App submits token request with grant_type=mfa_otp and mfa_token (which was already associated with the refresh token)<a href="#appendix-A.1.2-1.6" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+<div id="registration">
+<section id="appendix-A.1.3">
+          <h4 id="name-registration">
+<a href="#appendix-A.1.3" class="section-number selfRef">A.1.3. </a><a href="#name-registration" class="section-name selfRef">Registration</a>
+          </h4>
+<ul class="normal">
+<li class="normal" id="appendix-A.1.3-1.1">Client asks for user's email, starts a flow (/initiate login_hint=email@example.com)<a href="#appendix-A.1.3-1.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.2">AS responds with <code>{"challenge_type":"oob","oob_code":"...",etc}</code><a href="#appendix-A.1.3-1.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.3">Client collects OOB code from user<a href="#appendix-A.1.3-1.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.4">Client makes token request<a href="#appendix-A.1.3-1.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.5">Client receives an access token and device_session<a href="#appendix-A.1.3-1.5" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.6">Client collects the user's name, updates their profile using the access token<a href="#appendix-A.1.3-1.6" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.7">Client asks for the user's phone number<a href="#appendix-A.1.3-1.7" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.8">Client starts a new flow (/initiate login_hint=+1phone device_session=X)<a href="#appendix-A.1.3-1.8" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.9">AS recognizes existing device_session, responds with <code>{"challenge_type":"oob","oob_code":"...",etc}</code><a href="#appendix-A.1.3-1.9" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.10">Client collects OOB code from user<a href="#appendix-A.1.3-1.10" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.11">Client makes token request<a href="#appendix-A.1.3-1.11" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-A.1.3-1.12">Client receives an access token, now associated with a new account with both a verified email and phone number<a href="#appendix-A.1.3-1.12" class="pilcrow">¶</a>
+</li>
+          </ul>
+</section>
+</div>
+<div id="sign-in-with-only-email-verification">
+<section id="appendix-A.1.4">
+          <h4 id="name-sign-in-with-only-email-ver">
+<a href="#appendix-A.1.4" class="section-number selfRef">A.1.4. </a><a href="#name-sign-in-with-only-email-ver" class="section-name selfRef">Sign-in with only email verification</a>
+          </h4>
+<p id="appendix-A.1.4-1">e.g. user provides e-mail, is sent a verification code, and then uses the verification code to prove they control the e-mail. Can also be used for registration.<a href="#appendix-A.1.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discover-supported-authentication-methods">
+<section id="appendix-A.1.5">
+          <h4 id="name-discover-supported-authenti">
+<a href="#appendix-A.1.5" class="section-number selfRef">A.1.5. </a><a href="#name-discover-supported-authenti" class="section-name selfRef">Discover supported authentication methods</a>
+          </h4>
+<p id="appendix-A.1.5-1">e.g. developer can query the authorisation server to determine what authentication methods are supported.<a href="#appendix-A.1.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discover-supported-account-recover-authentication-methods">
+<section id="appendix-A.1.6">
+          <h4 id="name-discover-supported-account-">
+<a href="#appendix-A.1.6" class="section-number selfRef">A.1.6. </a><a href="#name-discover-supported-account-" class="section-name selfRef">Discover supported account recover authentication methods</a>
+          </h4>
+<p id="appendix-A.1.6-1">e.g. developer can query the authorisation server to determine what authentication methods are used for account recovery if one of the methods are lost.<a href="#appendix-A.1.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="update-an-existing-authentication-method">
+<section id="appendix-A.1.7">
+          <h4 id="name-update-an-existing-authenti">
+<a href="#appendix-A.1.7" class="section-number selfRef">A.1.7. </a><a href="#name-update-an-existing-authenti" class="section-name selfRef">Update an existing authentication method</a>
+          </h4>
+<p id="appendix-A.1.7-1">e.g. the authorisation server may require the user to update a password or provide a new phone number, key or alternative e-mail address if it believes the existing mechanism is no longer trustworthy.<a href="#appendix-A.1.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="initiate-browser-based-interaction-for-certain-scenarios">
+<section id="appendix-A.1.8">
+          <h4 id="name-initiate-browser-based-inte">
+<a href="#appendix-A.1.8" class="section-number selfRef">A.1.8. </a><a href="#name-initiate-browser-based-inte" class="section-name selfRef">Initiate browser-based interaction for certain scenarios</a>
+          </h4>
+<p id="appendix-A.1.8-1">e.g. some scenarios don't benefit from a native implementation and may be more efficiently or securely implemented through the browser (e.g. error scenarios, password recovery, identity verification, social sign-in).<a href="#appendix-A.1.8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discovering-custom-user-attributes">
+<section id="appendix-A.1.9">
+          <h4 id="name-discovering-custom-user-att">
+<a href="#appendix-A.1.9" class="section-number selfRef">A.1.9. </a><a href="#name-discovering-custom-user-att" class="section-name selfRef">Discovering custom user attributes</a>
+          </h4>
+<p id="appendix-A.1.9-1">e.g. Ability to know mandatory and optional custom attributes configured on the authorisation server (can this be achieve through AS metadata instead of as part of the protocol)?<a href="#appendix-A.1.9-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="provide-different-ux-depending-on-a-users-enrolled-authenticators">
+<section id="appendix-A.1.10">
+          <h4 id="name-provide-different-ux-depend">
+<a href="#appendix-A.1.10" class="section-number selfRef">A.1.10. </a><a href="#name-provide-different-ux-depend" class="section-name selfRef">Provide different UX depending on a user's enrolled authenticators</a>
+          </h4>
+<p id="appendix-A.1.10-1">An AS may support multiple different authenticators, and a user may have set up only one. A client will not know which a user has set up ahead of time. The AS needs to drive the UI in the client login process depending on the configuration of the user account.<a href="#appendix-A.1.10-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="register-new-authentication-methods">
+<section id="appendix-A.1.11">
+          <h4 id="name-register-new-authentication">
+<a href="#appendix-A.1.11" class="section-number selfRef">A.1.11. </a><a href="#name-register-new-authentication" class="section-name selfRef">Register new authentication methods</a>
+          </h4>
+<p id="appendix-A.1.11-1">e.g. user selects password, provides phone for SMS codes, etc<a href="#appendix-A.1.11-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="user-registration">
+<section id="appendix-A.1.12">
+          <h4 id="name-user-registration">
+<a href="#appendix-A.1.12" class="section-number selfRef">A.1.12. </a><a href="#name-user-registration" class="section-name selfRef">User registration</a>
+          </h4>
+<p id="appendix-A.1.12-1">e.g. user enters a new email, completes the email challenge, the AS creates a new account for them, then wants to enroll additional factors such as SMS<a href="#appendix-A.1.12-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="old-notes">
+<section id="appendix-B">
+      <h2 id="name-old-notes">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-old-notes" class="section-name selfRef">Old Notes</a>
+      </h2>
+<div id="client-receives-trigger-for-authentication">
+<section id="appendix-B.1">
+        <h3 id="name-client-receives-trigger-for">
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-client-receives-trigger-for" class="section-name selfRef">Client receives trigger for authentication</a>
+        </h3>
+<p id="appendix-B.1-1">TODO: The client may receive a trigger from the resource server to initiate an authentication, possibly with a hint from the resource server in the form of an acr value, indicating it needs to initiate and authentications.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-2">TBD: May need to reference the existing step-up authentication draft instead<a href="#appendix-B.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="checking-for-additional-requirements">
+<section id="appendix-B.2">
+        <h3 id="name-checking-for-additional-req">
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-checking-for-additional-req" class="section-name selfRef">Checking for additional requirements</a>
+        </h3>
+<p id="appendix-B.2-1">If the initial set of information provided by the client is correct, the AS
+<span class="bcp14">MAY</span> choose to either respond immediately with a successful token response,
+or prompt the client for an additional challenge.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-2">For example, the AS could first require the client prompt the user for a one-time-code they
+received via email, and then in a second step, ask the client to prompt the user<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-C">
+      <h2 id="name-acknowledgments">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-C-1">TODO acknowledge.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-D">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
