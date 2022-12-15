@@ -453,19 +453,16 @@ Table of Contents
    error response as defined in Section 5.2 of OAuth 2.0 [RFC6749] where
    the error code is set to the following value:
 
-   mfa_required
-
-     The authorization grant is insufficiently authorized, but another
-     access token request MAY succeed if an additional authorization
-     grant is presented.
+   "mfa_required":  The authorization grant is insufficiently
+      authorized, but another access token request MAY succeed if an
+      additional authorization grant is presented.
 
    In addition to the response parameters defined in Section 5.2 of
    OAuth 2.0 [RFC6749], the following parameters MUST be included in the
    response when the error code is set to mfa_required:
 
-   mfa_token
-
-     MFA token value associated with the ongoing authorization session.
+   "mfa_token":  MFA token value associated with the ongoing
+      authorization session.
 
    For example:
 
@@ -494,24 +491,21 @@ Table of Contents
    urlencoded" format with a character encoding of UTF-8 in the HTTP
    request body:
 
-  `mfa_token`
-      REQUIRED.  The MFA token received from the authorization server in
-      the authorization challenge error response.
+   "mfa_token":  REQUIRED.  The MFA token received from the
+      authorization server in the authorization challenge error
+      response.
 
-  `challenge_type`
-      OPTIONAL.  List of authorization challenge type strings that the
-      client supports, expressed as a list of space-delimited, case-
-      insensitive strings.
+   "challenge_type":  OPTIONAL.  List of authorization challenge type
+      strings that the client supports, expressed as a list of space-
+      delimited, case- insensitive strings.
 
-  `authenticator_id`
-      OPTIONAL.  The identifier of the authenticator to challenge.  The
-      authorization server MUST ensure that the authenticator is
-      associated with the resource owner.
+   "authenticator_id":  OPTIONAL.  The identifier of the authenticator
+      to challenge.  The authorization server MUST ensure that the
+      authenticator is associated with the resource owner.
 
-  `client_id`
-      REQUIRED, if the client is not authenticating with the
+   "client_id":  REQUIRED, if the client is not authenticating with the
       authorization server as described in Section 3.2.1 of OAuth 2.0
-      {{RFC6749}}.
+      [RFC6749].
 
    For example, the client makes the following HTTP request:
 
@@ -548,10 +542,8 @@ Table of Contents
    HTTP response using the application/json format [RFC8259] with a 200
    (OK) status code:
 
-   `challenge_type`
-
-       REQUIRED.  The type of the authorization challenge issued.  Value
-       is case insensitive.
+   "challenge_type":  REQUIRED.  The type of the authorization challenge
+      issued.  Value is case insensitive.
 
    All additional parameters are specified by the authorization
    challenge type.  This document defines the otp type, the oob type,
@@ -575,33 +567,28 @@ Table of Contents
    [RFC6749], the following error codes are specified for use in
    authorization challenge endpoint responses:
 
-   invalid_authenticator
-     The requested authenticator does not exist or is not associated
-     with the resource owner.
+   "invalid_authenticator":  The requested authenticator does not exist
+      or is not associated with the resource owner.
 
-   expired_token
-     The provided MFA token is invalid, expired, revoked, or was issued
-     to another client.  The client MAY initiate a new authorization
-     session.
+   "expired_token":  The provided MFA token is invalid, expired,
+      revoked, or was issued to another client.  The client MAY initiate
+      a new authorization session.
 
-   unsupported_challenge_type
-     The challenge types supported by the client are not supported by
-     the authorization server or not available to the resource owner.
+   "unsupported_challenge_type":  The challenge types supported by the
+      client are not supported by the authorization server or not
+      available to the resource owner.
 
-   association_required
-     The resource owner is not associated with any authenticator.  The
-     authorization session MAY be continued by completing authenticator
-     association.
+   "association_required":  The resource owner is not associated with
+      any authenticator.  The authorization session MAY be continued by
+      completing authenticator association.
 
-   server_error
-     The authorization server encountered an unexpected condition that
-     prevented it from fulfilling the request.
+   "server_error":  The authorization server encountered an unexpected
+      condition that prevented it from fulfilling the request.
 
-   bad_gateway
-     The authorization server received an invalid response from an
-     upstream server it accessed in attempting to fulfull the request.
-     This typically occurs when challenging an OOB authenticator and
-     the gateway is down, for example SMS.
+   "bad_gateway":  The authorization server received an invalid response
+      from an upstream server it accessed in attempting to fulfull the
+      request.  This typically occurs when challenging an OOB
+      authenticator and the gateway is down, for example SMS.
 
 6.2.1.  OTP Challenge
 
@@ -609,8 +596,7 @@ Table of Contents
    additional authorization grant, it responds with an OTP authorization
    challenge type containing the following parameters:
 
-   `challenge_type`
-     REQUIRED.  Value MUST be set to `otp`.
+   "challenge_type":  REQUIRED.  Value MUST be set to otp.
 
    No additional parameters are specified for the OTP authorization
    challenge type.

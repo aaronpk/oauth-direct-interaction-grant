@@ -1792,25 +1792,27 @@ respond with an authorization challenge instead of a successful access token res
 <p id="section-5-2">An authorization challenge error response is a particular type of
 error response as defined in Section 5.2 of OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> where
 the error code is set to the following value:<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3"><code>mfa_required</code><a href="#section-5-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5-4">
-<pre>
-  The authorization grant is insufficiently authorized, but another
-  access token request MAY succeed if an additional authorization
-  grant is presented.
-</pre><a href="#section-5-4" class="pilcrow">¶</a>
-</div>
-<p id="section-5-5">In addition to the response parameters defined in Section 5.2 of
+<span class="break"></span><dl class="dlParallel" id="section-5-3">
+        <dt id="section-5-3.1">"mfa_required":</dt>
+        <dd style="margin-left: 1.5em" id="section-5-3.2">
+          <p id="section-5-3.2.1">The authorization grant is insufficiently authorized, but another
+access token request <span class="bcp14">MAY</span> succeed if an additional authorization
+grant is presented.<a href="#section-5-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-5-4">In addition to the response parameters defined in Section 5.2 of
 OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following parameters <span class="bcp14">MUST</span> be included in the
-response when the error code is set to <code>mfa_required</code>:<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6"><code>mfa_token</code><a href="#section-5-6" class="pilcrow">¶</a></p>
+response when the error code is set to <code>mfa_required</code>:<a href="#section-5-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5-5">
+        <dt id="section-5-5.1">"mfa_token":</dt>
+        <dd style="margin-left: 1.5em" id="section-5-5.2">
+          <p id="section-5-5.2.1">MFA token value associated with the ongoing authorization session.<a href="#section-5-5.2.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-5-6">For example:<a href="#section-5-6" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-7">
-<pre>
-  MFA token value associated with the ongoing authorization session.
-</pre><a href="#section-5-7" class="pilcrow">¶</a>
-</div>
-<p id="section-5-8">For example:<a href="#section-5-8" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5-9">
 <pre>
 HTTP/1.1 403 Forbidden
 Content-Type: application/json;charset=UTF-8
@@ -1820,7 +1822,7 @@ Cache-Control: no-store
   "error": "mfa_required",
   "mfa_token": "uY29tL2F1dGhlbnRpY"
 }
-</pre><a href="#section-5-9" class="pilcrow">¶</a>
+</pre><a href="#section-5-7" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -1843,28 +1845,35 @@ it can obtain a strong authorization grant directly.<a href="#section-6-2" class
 adding the following parameters using the "application/x-www-form-
 urlencoded" format with a character encoding of UTF-8 in the HTTP
 request body:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.1-2">
-<pre>
-`mfa_token`
-    REQUIRED.  The MFA token received from the authorization server in
-    the authorization challenge error response.
-
-`challenge_type`
-    OPTIONAL.  List of authorization challenge type strings that the
-    client supports, expressed as a list of space-delimited, case-
-    insensitive strings.
-
-`authenticator_id`
-    OPTIONAL.  The identifier of the authenticator to challenge.  The
-    authorization server MUST ensure that the authenticator is
-    associated with the resource owner.
-
-`client_id`
-    REQUIRED, if the client is not authenticating with the
-    authorization server as described in Section 3.2.1 of OAuth 2.0
-    {{RFC6749}}.
-</pre><a href="#section-6.1-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.1-2">
+          <dt id="section-6.1-2.1">"mfa_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.1-2.2">
+            <p id="section-6.1-2.2.1"><span class="bcp14">REQUIRED</span>.  The MFA token received from the authorization server in
+the authorization challenge error response.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.1-2.3">"challenge_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.1-2.4">
+            <p id="section-6.1-2.4.1"><span class="bcp14">OPTIONAL</span>.  List of authorization challenge type strings that the
+client supports, expressed as a list of space-delimited, case-
+insensitive strings.<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.1-2.5">"authenticator_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.1-2.6">
+            <p id="section-6.1-2.6.1"><span class="bcp14">OPTIONAL</span>.  The identifier of the authenticator to challenge.  The
+authorization server <span class="bcp14">MUST</span> ensure that the authenticator is
+associated with the resource owner.<a href="#section-6.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.1-2.7">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.1-2.8">
+            <p id="section-6.1-2.8.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+authorization server as described in Section 3.2.1 of OAuth 2.0
+<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-6.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 <p id="section-6.1-3">For example, the client makes the following HTTP request:<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-6.1-4">
 <pre>
@@ -1907,14 +1916,14 @@ to which would satisfy the authorization session, and constructs the
 response by adding the following parameters to the entity-body of the
 HTTP response using the <code>application/json</code> format <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span> with a
 200 (OK) status code:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2-2">
-<pre>
-`challenge_type`
-
-    REQUIRED.  The type of the authorization challenge issued.  Value
-    is case insensitive.
-</pre><a href="#section-6.2-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.2-2">
+          <dt id="section-6.2-2.1">"challenge_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-2.2">
+            <p id="section-6.2-2.2.1"><span class="bcp14">REQUIRED</span>.  The type of the authorization challenge issued.  Value
+is case insensitive.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 <p id="section-6.2-3">All additional parameters are specified by the authorization
 challenge type. This document defines the <code>otp</code> type, the <code>oob</code> type,
 and the <code>recovery-code</code> type.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
@@ -1936,37 +1945,48 @@ OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a hre
 <p id="section-6.2-7">In addition to the error codes defined in Section 5.2 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, the following error codes are specified for use in
 authorization challenge endpoint responses:<a href="#section-6.2-7" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2-8">
-<pre>
-invalid_authenticator
-  The requested authenticator does not exist or is not associated
-  with the resource owner.
-
-expired_token
-  The provided MFA token is invalid, expired, revoked, or was issued
-  to another client.  The client MAY initiate a new authorization
-  session.
-
-unsupported_challenge_type
-  The challenge types supported by the client are not supported by
-  the authorization server or not available to the resource owner.
-
-association_required
-  The resource owner is not associated with any authenticator.  The
-  authorization session MAY be continued by completing authenticator
-  association.
-
-server_error
-  The authorization server encountered an unexpected condition that
-  prevented it from fulfilling the request.
-
-bad_gateway
-  The authorization server received an invalid response from an
-  upstream server it accessed in attempting to fulfull the request.
-  This typically occurs when challenging an OOB authenticator and
-  the gateway is down, for example SMS.
-</pre><a href="#section-6.2-8" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.2-8">
+          <dt id="section-6.2-8.1">"invalid_authenticator":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-8.2">
+            <p id="section-6.2-8.2.1">The requested authenticator does not exist or is not associated
+with the resource owner.<a href="#section-6.2-8.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-8.3">"expired_token":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-8.4">
+            <p id="section-6.2-8.4.1">The provided MFA token is invalid, expired, revoked, or was issued
+to another client.  The client <span class="bcp14">MAY</span> initiate a new authorization
+session.<a href="#section-6.2-8.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-8.5">"unsupported_challenge_type":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-8.6">
+            <p id="section-6.2-8.6.1">The challenge types supported by the client are not supported by
+the authorization server or not available to the resource owner.<a href="#section-6.2-8.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-8.7">"association_required":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-8.8">
+            <p id="section-6.2-8.8.1">The resource owner is not associated with any authenticator.  The
+authorization session <span class="bcp14">MAY</span> be continued by completing authenticator
+association.<a href="#section-6.2-8.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-8.9">"server_error":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-8.10">
+            <p id="section-6.2-8.10.1">The authorization server encountered an unexpected condition that
+prevented it from fulfilling the request.<a href="#section-6.2-8.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-8.11">"bad_gateway":</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-8.12">
+            <p id="section-6.2-8.12.1">The authorization server received an invalid response from an
+upstream server it accessed in attempting to fulfull the request.
+This typically occurs when challenging an OOB authenticator and
+the gateway is down, for example SMS.<a href="#section-6.2-8.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
 <div id="otp-challenge">
 <section id="section-6.2.1">
           <h4 id="name-otp-challenge">
@@ -1975,12 +1995,13 @@ bad_gateway
 <p id="section-6.2.1-1">If the authorization server requires an OTP credential as an
 additional authorization grant, it responds with an OTP authorization
 challenge type containing the following parameters:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.1-2">
-<pre>
-`challenge_type`
-  REQUIRED.  Value MUST be set to `otp`.
-</pre><a href="#section-6.2.1-2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.2.1-2">
+            <dt id="section-6.2.1-2.1">"challenge_type":</dt>
+            <dd style="margin-left: 1.5em" id="section-6.2.1-2.2">
+              <p id="section-6.2.1-2.2.1"><span class="bcp14">REQUIRED</span>.  Value <span class="bcp14">MUST</span> be set to <code>otp</code>.<a href="#section-6.2.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
 <p id="section-6.2.1-3">No additional parameters are specified for the OTP authorization
 challenge type.<a href="#section-6.2.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.2.1-4">For example:<a href="#section-6.2.1-4" class="pilcrow">¶</a></p>
