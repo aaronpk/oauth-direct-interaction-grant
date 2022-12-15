@@ -194,14 +194,14 @@ Extension Grant Types
 
 
 
-# Authorization Initiation Request {#authorization-initiation}
+# Authorization Initiation {#authorization-initiation}
 
 A client may wish to initiate an authorization flow by first prompting the user for their user identifier or other account information. The authorization initiation endpoint is a new endpoint to collect this login hint and direct the client with the next steps, whether that is to do an MFA flow, or perform an OAuth redirect-based flow.
 
 The authorization initiation endpoint is an optional feature that can be used to drive passwordless flows.
 
 
-## Authorization Request
+## Authorization Initiation Request
 
 The client makes a request to the authorization initiation endpoint by adding the
 following parameters using the "application/x-www-form-urlencoded"
@@ -234,7 +234,7 @@ For example:
     login_hint=%2B1%20%28310%29%20123-4567&scope=profile
 
 
-## Authorization Response
+## Authorization Initiation Response
 
 The authorization server responds with an MFA token
 defined in {{mfa-token-response}}, or an authorization challenge response
@@ -311,8 +311,7 @@ it can obtain a strong authorization grant directly.
 ## Authorization Challenge Request {#authorization-challenge-request}
 
 The client makes a request to the authorization challenge endpoint by
-adding the following parameters using the "application/x-www-form-
-urlencoded" format with a character encoding of UTF-8 in the HTTP
+adding the following parameters using the "application/x-www-form-urlencoded" format with a character encoding of UTF-8 in the HTTP
 request body:
 
 "mfa_token":
@@ -321,8 +320,7 @@ request body:
 
 "challenge_type":
 : OPTIONAL.  List of authorization challenge type strings that the
-  client supports, expressed as a list of space-delimited, case-
-  insensitive strings.
+  client supports, expressed as a list of space-delimited, case-insensitive strings.
 
 "authenticator_id":
 : OPTIONAL.  The identifier of the authenticator to challenge.  The
@@ -376,6 +374,8 @@ HTTP response using the `application/json` format {{RFC8259}} with a
 "challenge_type":
 : REQUIRED.  The type of the authorization challenge issued.  Value
   is case insensitive.
+
+TODO: Maybe add "alternative_challenge_types" or allow the whole response to be an array in case the AS wants to let the client choose. Or we decide that the client indicating its preference in the request is enough flexibility.
 
 All additional parameters are specified by the authorization
 challenge type. This document defines the `otp` type, the `oob` type,
