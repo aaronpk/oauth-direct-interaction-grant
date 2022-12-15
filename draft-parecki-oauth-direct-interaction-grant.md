@@ -468,31 +468,31 @@ authorization challenge type containing the following parameters:
   provided, clients MUST use "none" as the default.  Values defined
   by this specification are:
 
-      "prompt":
-      :  The end user should be prompted to enter a code received during
-         out-of-band authorization via the secondary channel into the
-         client.  For example, the end user receives a code on their
-         mobile phone (typically a 6-digit code) and types it into the
-         client.
+     "prompt":
+     :  The end user should be prompted to enter a code received during
+        out-of-band authorization via the secondary channel into the
+        client.  For example, the end user receives a code on their
+        mobile phone (typically a 6-digit code) and types it into the
+        client.
 
-      "transfer":
-      :  The client displays or otherwise communicates the
-         "binding_code" to the end user and instructs them to enter it
-         into or otherwise transfer it to the secondary channel.  For
-         example, the end user may view the "binding_code" on the client
-         and either type it into an app on their mobile phone or use a
-         QR code to effect the transfer.
+     "transfer":
+     :  The client displays or otherwise communicates the
+        "binding_code" to the end user and instructs them to enter it
+        into or otherwise transfer it to the secondary channel.  For
+        example, the end user may view the "binding_code" on the client
+        and either type it into an app on their mobile phone or use a
+        QR code to effect the transfer.
 
-      "compare":
-      :  The client displays the "binding_code" to the end user and
-         instructs them to compare it to the code received during out-
-         of-band authorization before confirming authorization via the
-         secondary channel.
+     "compare":
+     :  The client displays the "binding_code" to the end user and
+        instructs them to compare it to the code received during out-
+        of-band authorization before confirming authorization via the
+        secondary channel.
 
-      "none":
-      :  No binding is performed between the client on the primary
-         channel and the out-of-band authorization operation via the
-         secondary channel.
+     "none":
+     :  No binding is performed between the client on the primary
+        channel and the out-of-band authorization operation via the
+        secondary channel.
 
 "expires_in":
 : OPTIONAL.  The lifetime in seconds of the `oob_code`.
