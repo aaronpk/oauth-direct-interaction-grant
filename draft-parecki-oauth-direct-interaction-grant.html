@@ -2044,35 +2044,42 @@ channel.  <span class="bcp14">REQUIRED</span>, if the value of "binding_method" 
 the secondary channel with the primary channel.  If no value is
 provided, clients <span class="bcp14">MUST</span> use "none" as the default.  Values defined
 by this specification are:<a href="#section-6.2.2-2.8.1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.2.2-2.8.2">
-<pre>
-"prompt":
-:  The end user should be prompted to enter a code received during
-   out-of-band authorization via the secondary channel into the
-   client.  For example, the end user receives a code on their
-   mobile phone (typically a 6-digit code) and types it into the
-   client.
-
-"transfer":
-:  The client displays or otherwise communicates the
-   "binding_code" to the end user and instructs them to enter it
-   into or otherwise transfer it to the secondary channel.  For
-   example, the end user may view the "binding_code" on the client
-   and either type it into an app on their mobile phone or use a
-   QR code to effect the transfer.
-
-"compare":
-:  The client displays the "binding_code" to the end user and
-   instructs them to compare it to the code received during out-
-   of-band authorization before confirming authorization via the
-   secondary channel.
-
-"none":
-:  No binding is performed between the client on the primary
-   channel and the out-of-band authorization operation via the
-   secondary channel.
-</pre><a href="#section-6.2.2-2.8.2" class="pilcrow">¶</a>
-</div>
+<span class="break"></span><dl class="dlParallel" id="section-6.2.2-2.8.2">
+                <dt id="section-6.2.2-2.8.2.1">"prompt":</dt>
+                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.2">
+                  <p id="section-6.2.2-2.8.2.2.1">The end user should be prompted to enter a code received during
+out-of-band authorization via the secondary channel into the
+client.  For example, the end user receives a code on their
+mobile phone (typically a 6-digit code) and types it into the
+client.<a href="#section-6.2.2-2.8.2.2.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+<dt id="section-6.2.2-2.8.2.3">"transfer":</dt>
+                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.4">
+                  <p id="section-6.2.2-2.8.2.4.1">The client displays or otherwise communicates the
+"binding_code" to the end user and instructs them to enter it
+into or otherwise transfer it to the secondary channel.  For
+example, the end user may view the "binding_code" on the client
+and either type it into an app on their mobile phone or use a
+QR code to effect the transfer.<a href="#section-6.2.2-2.8.2.4.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+<dt id="section-6.2.2-2.8.2.5">"compare":</dt>
+                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.6">
+                  <p id="section-6.2.2-2.8.2.6.1">The client displays the "binding_code" to the end user and
+instructs them to compare it to the code received during out-
+of-band authorization before confirming authorization via the
+secondary channel.<a href="#section-6.2.2-2.8.2.6.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+<dt id="section-6.2.2-2.8.2.7">"none":</dt>
+                <dd style="margin-left: 1.5em" id="section-6.2.2-2.8.2.8">
+                  <p id="section-6.2.2-2.8.2.8.1">No binding is performed between the client on the primary
+channel and the out-of-band authorization operation via the
+secondary channel.<a href="#section-6.2.2-2.8.2.8.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+</dl>
 </dd>
             <dd class="break"></dd>
 <dt id="section-6.2.2-2.9">"expires_in":</dt>
