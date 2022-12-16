@@ -1,5 +1,5 @@
 ---
-title: "OAuth 2.0 Direct Interaction Grant"
+title: "OAuth 2.0 Direct Interaction Grants"
 category: std
 
 docname: draft-parecki-oauth-direct-interaction-grant-latest
