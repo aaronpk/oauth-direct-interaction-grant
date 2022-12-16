@@ -161,6 +161,20 @@ server.  These secrets are typically used by the resource owner in
 the event another authenticator is lost or malfunctions.
 
 
+## Challenge Types {#challenge-types}
+
+This document defines several challenge type strings which are used
+by the client to indicate the supported challenge types and by the
+authorization server to instruct the client which challenge type to use.
+
+* `otp` defined in {{otp-authorization-challenge}}
+* `oob` defined in {{oob-authorization-challenge}}
+* `recovery-code` defined in {{recovery-code-challenge}}
+* `redirect` defined in {{redirect-challenge}}
+
+Other specifications may extend this document with additional challenge types.
+
+
 # Protocol Endpoints
 
 * Authorization initiation endpoint
@@ -221,20 +235,35 @@ format with a character encoding of UTF-8 in the HTTP request body:
 "scope":
 : OPTIONAL. The OAuth scope defined in {{RFC6749}}.
 
+"challenge_type":
+: OPTIONAL.  List of authorization challenge type strings that the
+  client supports, expressed as a list of space-delimited, case-insensitive strings,
+  as defined in {{challenge-types}}.
+
 "acr_values":
 : OPTIONAL. The acr_values requested by the client.
 
 "device_session":
 : OPTIONAL. If the client has previously obtained a device session, described in {{device-session}}.
 
-For example:
+"client_id":
+: REQUIRED if the client is not authenticating with the
+  authorization server.
+
+For example, the client makes the following request to initiate a flow
+given the user's phone number, line breaks shown for illustration purposes only:
 
     POST /initiate HTTP/1.1
     Host: server.example.com
     Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
     Content-Type: application/x-www-form-urlencoded
 
-    login_hint=%2B1%20%28310%29%20123-4567&scope=profile
+    login_hint=%2B1-310-123-4567&scope=profile
+    &challenge_type=oob%20otp
+
+The client SHOULD include the `challenge_type` parameter with the list of all the challenge
+types the client is capable of handling. This allows the AS to add new challenge types in the future
+without sending a challenge type to a client that it might not be able to handle.
 
 
 ## Authorization Initiation Response
@@ -323,7 +352,8 @@ request body:
 
 "challenge_type":
 : OPTIONAL.  List of authorization challenge type strings that the
-  client supports, expressed as a list of space-delimited, case-insensitive strings.
+  client supports, expressed as a list of space-delimited, case-insensitive strings,
+  defined in {{challenge-types}}.
 
 "authenticator_id":
 : OPTIONAL.  The identifier of the authenticator to challenge.  The
@@ -334,7 +364,7 @@ request body:
 : OPTIONAL. The device session, described in {{device-session}}.
 
 "client_id":
-: REQUIRED, if the client is not authenticating with the
+: REQUIRED if the client is not authenticating with the
   authorization server as described in Section 3.2.1 of OAuth 2.0
   {{RFC6749}}.
 
@@ -376,13 +406,12 @@ HTTP response using the `application/json` format {{RFC8259}} with a
 
 "challenge_type":
 : REQUIRED.  The type of the authorization challenge issued.  Value
-  is case insensitive.
+  is case insensitive. Defined in {{challenge-types}}.
 
 TODO: Maybe add "alternative_challenge_types" or allow the whole response to be an array in case the AS wants to let the client choose. Or we decide that the client indicating its preference in the request is enough flexibility.
 
 All additional parameters are specified by the authorization
-challenge type. This document defines the `otp` type, the `oob` type,
-the `recovery-code`, and the `redirect` type.
+challenge type.
 
 For example:
 
@@ -431,7 +460,7 @@ authorization challenge endpoint responses:
   the gateway is down, for example SMS.
 
 
-### OTP Challenge
+### OTP Challenge {#otp-authorization-challenge}
 
 If the authorization server requires an OTP credential as an
 additional authorization grant, it responds with an OTP authorization
@@ -476,13 +505,13 @@ authorization challenge type containing the following parameters:
 "binding_code":
 : OPTIONAL.  The end-user verification code used to bind the
   authorization operation on the secondary channel with the primary
-  channel.  REQUIRED, if the value of "binding_method" is set to
-  "transfer" or "compare".
+  channel.  REQUIRED, if the value of `binding_method` is set to
+  `transfer` or `compare`.
 
 "binding_method":
 : OPTIONAL.  The method used to bind the authorization operation on
   the secondary channel with the primary channel.  If no value is
-  provided, clients MUST use "none" as the default.  Values defined
+  provided, clients MUST use `none` as the default.  Values defined
   by this specification are:
 
      "prompt":
@@ -534,7 +563,7 @@ For example:
     }
 
 
-### Recovery Code Challenge
+### Recovery Code Challenge {#recovery-code-challenge}
 
 If the authorization server requires a recovery code as an
 authorization grant, it responds with a recovery code authorization
@@ -568,7 +597,7 @@ In the case where the authorization server wishes to interact with the user itse
 "challenge_type":
 : REQUIRED. Value MUST be set to `redirect`.
 
-The client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to {{RFC6749}} and {{RFC7636}}.
+The client is expected to initiate a traditional OAuth Authorization Code flow to the authorization server with PKCE according to {{RFC6749}} and {{RFC7636}}.
 
 For example:
 
@@ -584,6 +613,7 @@ TODO: Should there be some connection to the authorization code flow that the cl
 
 This can be used to enable primary or secondary authentication with social providers or third party IdPs which require a browser redirect flow.
 
+TODO: The AS may want to include more information back to the client here, such as an indicator of which external IdP the authorization server should use. For example if the AS wants the user to go through a "Sign in with Google" flow (the AS would be the OAuth client to Google in that flow).
 
 
 ## User Interaction
@@ -687,7 +717,7 @@ The authorization server MUST:
 ## MFA OOB Grant
 
 The client makes a request to the token endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
+following parameters using the `application/x-www-form-urlencoded`
 format with a character encoding of UTF-8 in the HTTP request body:
 
 "grant_type":
@@ -937,6 +967,7 @@ that tells the client they need to get the user to re-authenticate or provide an
 
 (No normative changes are required beyond what has already been described in the draft at this point.)
 
+TODO: Determine whether this could be used for an app with offline access wanting to challenge the user. E.g. an app doing monthly transfers between bank accounts, wanting to get the user to acknowledge an MFA challenge before proceeding with the transfer.
 
 
 # Security Considerations
@@ -1059,6 +1090,8 @@ TODO: Outlining these in the document will also help guide developers to underst
 
 ## Registration
 
+This example describes how you can use the mechanisms defined in this draft to create a complete user registration flow starting with an email address. In this example, it is the AS policy to allow these challenges to be sent to email and phone number that were previously unrecognized, and creating the user account on the fly.
+
 * Client asks for user's email, starts a flow (/initiate login_hint=email@example.com)
 * AS responds with `{"challenge_type":"oob","oob_code":"...",etc}`
 * Client collects OOB code from user
@@ -1070,7 +1103,7 @@ TODO: Outlining these in the document will also help guide developers to underst
 * AS recognizes existing device_session, responds with `{"challenge_type":"oob","oob_code":"...",etc}`
 * Client collects OOB code from user
 * Client makes token request
-* Client receives an access token, now associated with a new account with both a verified email and phone number
+* Client receives an access token, now associated with the account with both a verified email and phone number
 
 
 ## Sign-in with only email verification
