@@ -10,7 +10,7 @@ Expires: 19 June 2023                                       P. Kasselman
                                                         16 December 2022
 
 
-                   OAuth 2.0 Direct Interaction Grant
+                  OAuth 2.0 Direct Interaction Grants
           draft-parecki-oauth-direct-interaction-grant-latest
 
 Abstract
