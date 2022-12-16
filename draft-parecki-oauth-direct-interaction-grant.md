@@ -24,6 +24,9 @@ author:
   - fullname: Aaron Parecki
     organization: Okta
     email: aaron@parecki.com
+  - fullname: Jared Hanson
+    organization: Okta
+    email: jared.hanson@okta.com
   - fullname: Pieter Kasselman
     organization: Microsoft
     email: pieter.kasselman@microsoft.com
