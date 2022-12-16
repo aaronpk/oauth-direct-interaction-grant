@@ -6,6 +6,7 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>OAuth 2.0 Direct Interaction Grant</title>
 <meta content="Aaron Parecki" name="author">
+<meta content="Jared Hanson" name="author">
 <meta content="Pieter Kasselman" name="author">
 <meta content="
        This document extends the OAuth 2.0 Authorization Framework   with
@@ -405,7 +406,7 @@ dl > dd > dl {
   margin-top: 0.5em;
   margin-bottom: 0;
 }
-dl .break {
+:is(dd, span).break {
   display: none;
 }
 
@@ -1050,8 +1051,8 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <td class="right">December 2022</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Parecki &amp; Kasselman</td>
-<td class="center">Expires 18 June 2023</td>
+<td class="left">Parecki, et al.</td>
+<td class="center">Expires 19 June 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,16 +1065,20 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-parecki-oauth-direct-interaction-grant-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-12-15" class="published">15 December 2022</time>
+<time datetime="2022-12-16" class="published">16 December 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-06-18">18 June 2023</time></dd>
+<dd class="expires"><time datetime="2023-06-19">19 June 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">A. Parecki</div>
+<div class="org">Okta</div>
+</div>
+<div class="author">
+      <div class="author-name">J. Hanson</div>
 <div class="org">Okta</div>
 </div>
 <div class="author">
@@ -1132,7 +1137,7 @@ concerns with a redirect-based approach, such as for native mobile or desktop ap
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 June 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 June 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1193,6 +1198,9 @@ concerns with a redirect-based approach, such as for native mobile or desktop ap
                     <p id="section-toc.1-1.3.2.1.2.3.1"><a href="#section-3.1.3" class="auto internal xref">3.1.3</a>.  <a href="#name-recovery-code" class="internal xref">Recovery Code</a></p>
 </li>
                 </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-challenge-types" class="internal xref">Challenge Types</a></p>
 </li>
             </ul>
 </li>
@@ -1548,6 +1556,31 @@ the event another authenticator is lost or malfunctions.<a href="#section-3.1.3-
 </div>
 </section>
 </div>
+<div id="challenge-types">
+<section id="section-3.2">
+        <h3 id="name-challenge-types">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-challenge-types" class="section-name selfRef">Challenge Types</a>
+        </h3>
+<p id="section-3.2-1">This document defines several challenge type strings which are used
+by the client to indicate the supported challenge types and by the
+authorization server to instruct the client which challenge type to use.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.1">
+            <code>otp</code> defined in <a href="#otp-authorization-challenge" class="auto internal xref">Section 7.2.1</a><a href="#section-3.2-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.2-2.2">
+            <code>oob</code> defined in <a href="#oob-authorization-challenge" class="auto internal xref">Section 7.2.2</a><a href="#section-3.2-2.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.2-2.3">
+            <code>recovery-code</code> defined in <a href="#recovery-code-challenge" class="auto internal xref">Section 7.2.3</a><a href="#section-3.2-2.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.2-2.4">
+            <code>redirect</code> defined in <a href="#redirect-challenge" class="auto internal xref">Section 7.2.4</a><a href="#section-3.2-2.4" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-3.2-3">Other specifications may extend this document with additional challenge types.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="protocol-endpoints">
@@ -1644,18 +1677,32 @@ it at this stage.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
             <p id="section-5.1-2.6.1"><span class="bcp14">OPTIONAL</span>. The OAuth scope defined in <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.1-2.7">"acr_values":</dt>
+<dt id="section-5.1-2.7">"challenge_type":</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.8">
-            <p id="section-5.1-2.8.1"><span class="bcp14">OPTIONAL</span>. The acr_values requested by the client.<a href="#section-5.1-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-2.8.1"><span class="bcp14">OPTIONAL</span>.  List of authorization challenge type strings that the
+client supports, expressed as a list of space-delimited, case-insensitive strings,
+as defined in <a href="#challenge-types" class="auto internal xref">Section 3.2</a>.<a href="#section-5.1-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.1-2.9">"device_session":</dt>
+<dt id="section-5.1-2.9">"acr_values":</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.10">
-            <p id="section-5.1-2.10.1"><span class="bcp14">OPTIONAL</span>. If the client has previously obtained a device session, described in <a href="#device-session" class="auto internal xref">Section 8.7</a>.<a href="#section-5.1-2.10.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-2.10.1"><span class="bcp14">OPTIONAL</span>. The acr_values requested by the client.<a href="#section-5.1-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.11">"device_session":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.12">
+            <p id="section-5.1-2.12.1"><span class="bcp14">OPTIONAL</span>. If the client has previously obtained a device session, described in <a href="#device-session" class="auto internal xref">Section 8.7</a>.<a href="#section-5.1-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-2.13">"client_id":</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-2.14">
+            <p id="section-5.1-2.14.1"><span class="bcp14">REQUIRED</span> if the client is not authenticating with the
+authorization server.<a href="#section-5.1-2.14.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-5.1-3">For example:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">For example, the client makes the following request to initiate a flow
+given the user's phone number, line breaks shown for illustration purposes only:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.1-4">
 <pre>
 POST /initiate HTTP/1.1
@@ -1663,9 +1710,13 @@ Host: server.example.com
 Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
 Content-Type: application/x-www-form-urlencoded
 
-login_hint=%2B1%20%28310%29%20123-4567&amp;scope=profile
+login_hint=%2B1-310-123-4567&amp;scope=profile
+&amp;challenge_type=oob%20otp
 </pre><a href="#section-5.1-4" class="pilcrow">¶</a>
 </div>
+<p id="section-5.1-5">The client <span class="bcp14">SHOULD</span> include the <code>challenge_type</code> parameter with the list of all the challenge
+types the client is capable of handling. This allows the AS to add new challenge types in the future
+without sending a challenge type to a client that it might not be able to handle.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authorization-initiation-response">
@@ -1779,7 +1830,8 @@ the authorization challenge error response.<a href="#section-7.1-2.2.1" class="p
 <dt id="section-7.1-2.3">"challenge_type":</dt>
           <dd style="margin-left: 1.5em" id="section-7.1-2.4">
             <p id="section-7.1-2.4.1"><span class="bcp14">OPTIONAL</span>.  List of authorization challenge type strings that the
-client supports, expressed as a list of space-delimited, case-insensitive strings.<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
+client supports, expressed as a list of space-delimited, case-insensitive strings,
+defined in <a href="#challenge-types" class="auto internal xref">Section 3.2</a>.<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-7.1-2.5">"authenticator_id":</dt>
@@ -1796,7 +1848,7 @@ associated with the resource owner.<a href="#section-7.1-2.6.1" class="pilcrow">
           <dd class="break"></dd>
 <dt id="section-7.1-2.9">"client_id":</dt>
           <dd style="margin-left: 1.5em" id="section-7.1-2.10">
-            <p id="section-7.1-2.10.1"><span class="bcp14">REQUIRED</span>, if the client is not authenticating with the
+            <p id="section-7.1-2.10.1"><span class="bcp14">REQUIRED</span> if the client is not authenticating with the
 authorization server as described in Section 3.2.1 of OAuth 2.0
 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.1-2.10.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1848,14 +1900,13 @@ HTTP response using the <code>application/json</code> format <span>[<a href="#RF
           <dt id="section-7.2-2.1">"challenge_type":</dt>
           <dd style="margin-left: 1.5em" id="section-7.2-2.2">
             <p id="section-7.2-2.2.1"><span class="bcp14">REQUIRED</span>.  The type of the authorization challenge issued.  Value
-is case insensitive.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+is case insensitive. Defined in <a href="#challenge-types" class="auto internal xref">Section 3.2</a>.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 <p id="section-7.2-3">TODO: Maybe add "alternative_challenge_types" or allow the whole response to be an array in case the AS wants to let the client choose. Or we decide that the client indicating its preference in the request is enough flexibility.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <p id="section-7.2-4">All additional parameters are specified by the authorization
-challenge type. This document defines the <code>otp</code> type, the <code>oob</code> type,
-the <code>recovery-code</code>, and the <code>redirect</code> type.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+challenge type.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
 <p id="section-7.2-5">For example:<a href="#section-7.2-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-7.2-6">
 <pre>
@@ -1916,7 +1967,7 @@ the gateway is down, for example SMS.<a href="#section-7.2-9.12.1" class="pilcro
 </dd>
         <dd class="break"></dd>
 </dl>
-<div id="otp-challenge">
+<div id="otp-authorization-challenge">
 <section id="section-7.2.1">
           <h4 id="name-otp-challenge">
 <a href="#section-7.2.1" class="section-number selfRef">7.2.1. </a><a href="#name-otp-challenge" class="section-name selfRef">OTP Challenge</a>
@@ -1977,15 +2028,15 @@ TODO: Determine whether this is required or what benefit it provides if any.<a h
             <dd style="margin-left: 1.5em" id="section-7.2.2-2.6">
               <p id="section-7.2.2-2.6.1"><span class="bcp14">OPTIONAL</span>.  The end-user verification code used to bind the
 authorization operation on the secondary channel with the primary
-channel.  <span class="bcp14">REQUIRED</span>, if the value of "binding_method" is set to
-"transfer" or "compare".<a href="#section-7.2.2-2.6.1" class="pilcrow">¶</a></p>
+channel.  <span class="bcp14">REQUIRED</span>, if the value of <code>binding_method</code> is set to
+<code>transfer</code> or <code>compare</code>.<a href="#section-7.2.2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-7.2.2-2.7">"binding_method":</dt>
             <dd style="margin-left: 1.5em" id="section-7.2.2-2.8">
               <p id="section-7.2.2-2.8.1"><span class="bcp14">OPTIONAL</span>.  The method used to bind the authorization operation on
 the secondary channel with the primary channel.  If no value is
-provided, clients <span class="bcp14">MUST</span> use "none" as the default.  Values defined
+provided, clients <span class="bcp14">MUST</span> use <code>none</code> as the default.  Values defined
 by this specification are:<a href="#section-7.2.2-2.8.1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-7.2.2-2.8.2">
                 <dt id="section-7.2.2-2.8.2.1">"prompt":</dt>
@@ -2103,7 +2154,7 @@ it is known that the user has lost their other MFA options.<a href="#section-7.2
 </dd>
           <dd class="break"></dd>
 </dl>
-<p id="section-7.2.4-3">The client is expected to initiate a traditional OAuth Authorization Code flow with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-7.2.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.2.4-3">The client is expected to initiate a traditional OAuth Authorization Code flow to the authorization server with PKCE according to <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> and <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-7.2.4-3" class="pilcrow">¶</a></p>
 <p id="section-7.2.4-4">For example:<a href="#section-7.2.4-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-7.2.4-5">
 <pre>
@@ -2118,6 +2169,7 @@ Cache-Control: no-store
 </div>
 <p id="section-7.2.4-6">TODO: Should there be some connection to the authorization code flow that the client initiates next?<a href="#section-7.2.4-6" class="pilcrow">¶</a></p>
 <p id="section-7.2.4-7">This can be used to enable primary or secondary authentication with social providers or third party IdPs which require a browser redirect flow.<a href="#section-7.2.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.2.4-8">TODO: The AS may want to include more information back to the client here, such as an indicator of which external IdP the authorization server should use. For example if the AS wants the user to go through a "Sign in with Google" flow (the AS would be the OAuth client to Google in that flow).<a href="#section-7.2.4-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2263,7 +2315,7 @@ validation algorithm.<a href="#section-8.1-6.6" class="pilcrow">¶</a>
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-mfa-oob-grant" class="section-name selfRef">MFA OOB Grant</a>
         </h3>
 <p id="section-8.2-1">The client makes a request to the token endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
+following parameters using the <code>application/x-www-form-urlencoded</code>
 format with a character encoding of UTF-8 in the HTTP request body:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-8.2-2">
           <dt id="section-8.2-2.1">"grant_type":</dt>
@@ -2579,6 +2631,7 @@ the token response for any grant type defined by or extended from this specifica
 <p id="section-9-1">TODO: Describe how the AS could return a challenge to the client on the normal refresh token request
 that tells the client they need to get the user to re-authenticate or provide an MFA token.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">(No normative changes are required beyond what has already been described in the draft at this point.)<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-3">TODO: Determine whether this could be used for an app with offline access wanting to challenge the user. E.g. an app doing monthly transfers between bank accounts, wanting to get the user to acknowledge an MFA challenge before proceeding with the transfer.<a href="#section-9-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -2826,30 +2879,31 @@ TODO: Need to register these in the Authorization Server Metadata document too.<
         <h3 id="name-registration">
 <a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a href="#name-registration" class="section-name selfRef">Registration</a>
         </h3>
+<p id="appendix-A.4-1">This example describes how you can use the mechanisms defined in this draft to create a complete user registration flow starting with an email address. In this example, it is the AS policy to allow these challenges to be sent to email and phone number that were previously unrecognized, and creating the user account on the fly.<a href="#appendix-A.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-A.4-1.1">Client asks for user's email, starts a flow (/initiate login_hint=email@example.com)<a href="#appendix-A.4-1.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-A.4-2.1">Client asks for user's email, starts a flow (/initiate login_hint=email@example.com)<a href="#appendix-A.4-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.2">AS responds with <code>{"challenge_type":"oob","oob_code":"...",etc}</code><a href="#appendix-A.4-1.2" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.2">AS responds with <code>{"challenge_type":"oob","oob_code":"...",etc}</code><a href="#appendix-A.4-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.3">Client collects OOB code from user<a href="#appendix-A.4-1.3" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.3">Client collects OOB code from user<a href="#appendix-A.4-2.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.4">Client makes token request<a href="#appendix-A.4-1.4" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.4">Client makes token request<a href="#appendix-A.4-2.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.5">Client receives an access token and device_session<a href="#appendix-A.4-1.5" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.5">Client receives an access token and device_session<a href="#appendix-A.4-2.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.6">Client collects the user's name, updates their profile using the access token<a href="#appendix-A.4-1.6" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.6">Client collects the user's name, updates their profile using the access token<a href="#appendix-A.4-2.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.7">Client asks for the user's phone number<a href="#appendix-A.4-1.7" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.7">Client asks for the user's phone number<a href="#appendix-A.4-2.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.8">Client starts a new flow (/initiate login_hint=+1phone device_session=X)<a href="#appendix-A.4-1.8" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.8">Client starts a new flow (/initiate login_hint=+1phone device_session=X)<a href="#appendix-A.4-2.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.9">AS recognizes existing device_session, responds with <code>{"challenge_type":"oob","oob_code":"...",etc}</code><a href="#appendix-A.4-1.9" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.9">AS recognizes existing device_session, responds with <code>{"challenge_type":"oob","oob_code":"...",etc}</code><a href="#appendix-A.4-2.9" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.10">Client collects OOB code from user<a href="#appendix-A.4-1.10" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.10">Client collects OOB code from user<a href="#appendix-A.4-2.10" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.11">Client makes token request<a href="#appendix-A.4-1.11" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.11">Client makes token request<a href="#appendix-A.4-2.11" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="appendix-A.4-1.12">Client receives an access token, now associated with a new account with both a verified email and phone number<a href="#appendix-A.4-1.12" class="pilcrow">¶</a>
+          <li class="normal" id="appendix-A.4-2.12">Client receives an access token, now associated with the account with both a verified email and phone number<a href="#appendix-A.4-2.12" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
@@ -2975,6 +3029,14 @@ received via email, and then in a second step, ask the client to prompt the user
 <div class="email">
 <span>Email:</span>
 <a href="mailto:aaron@parecki.com" class="email">aaron@parecki.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Jared Hanson</span></div>
+<div dir="auto" class="left"><span class="org">Okta</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:jared.hanson@okta.com" class="email">jared.hanson@okta.com</a>
 </div>
 </address>
 <address class="vcard">
