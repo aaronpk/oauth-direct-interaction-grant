@@ -86,7 +86,100 @@ TODO: Replace RFC6749 references with OAuth 2.1
 
 
 # Protocol Overview
+The direct interaction grant may be initiated by the client or the authorization server. 
 
+##Native Client Initiated Direct Interaction Grant
+The client may initiate the direct interaction grant as part of a 
+sign-up flow, or as a result of an interaction with a resource provider
+that requires a stp-up authentication (TODO: add reference to step-up auth)
+
+The client initiated direct interaction is shown below:
+~~~ ascii-art
+                                                +-------------------+
+                                                |   Authorization   |
+                          (B)Authorization      |      Server       |
+             +----------+    Initiation Request |+-----------------+|
+(A)Client+---|  Native  |---------------------->||  Authorization  ||
+   Start |   |  Client  |                       ||   Initiation    ||
+   Flow  +-->|          |<----------------------||    Endpoint     ||
+             |          | (C)Authorization      |+-----------------+|
+             |          |    Initiation Response|                   |       
+             |          |                       |                   |
+             |          | (D)Authorization      |+-----------------+|             
+             |          |    Challenge Request  ||  Authorization  ||
+             |          |---------------------->||    Challenge    ||
+             |          |                       ||    Endpoint     ||
+             |          |<----------------------|+-----------------+|
+             |          | (E) Authorization     |                   |
+             |          |     Challenge Response|                   |             
+             |          |                       |                   |
+(F)User  +---|          |                       |                   |
+  Action |   |          |                       |                   |
+         +-->|          | (G) Authorization     |                   |
+             |          |     Grant             |+-----------------+|
+             |          |---------------------->||      Token      ||
+             |          |                       ||     Endpoint    ||             
+             |          |<----------------------||                 ||
+             |          | (H) Access Token      |+-----------------+|
+             |          |                       |                   |
+             +----------+                       +-------------------+  
+~~~
+Figure: Native Client Initiated Direct Interaction Grant
+
+- (A) The native client collects a user identifier and initiates the flow in response to a resource provider or as part of a sign-up flow.
+- (B) The native client sends an Authorization Initiating Request to the Authorization Initiation Endpoint, indicating the user identifer ("login_hint"), list of client supported authentication mechanisms ("challenge_type") and desired authentication contexts ("acr_values").
+- (C) The Authorization Intiation Endpoint responds with an MFA Token ("mfa_token") in the Authorization Initiation Response.
+- (D Optional) The native client presents the MFA Token ("mfa_token"), supported authentication methods for which it requires a challenge and an authenticator ID to identify the specific authenticator device.
+- (E Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
+- (F) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
+- (G) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
+- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue a Authorization Server Challenge to initiate a [Authorization Server Initiated Direct Interaction Grant](#Authorization Server Initiated Direct Interaction Grant). This will result in steps (D) through (G) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client. 
+
+##Authorization Server Initiated Direct Interaction Grant
+The Authorization Server may initiate the direct interaction grant whenever the client access the Token Endpoint. This allows the Authroization Server to request additional authentication methods to be presented before issuing an access token.
+
+The authorization server initiated direct interaction is shown below:
+~~~ ascii-art
+                                                +-------------------+
+                                                |   Authorization   |
+                          (A)Authorization      |      Server       |
+             +----------+    Grant              |+-----------------+|
+             |  Native  |---------------------->||     Token       ||
+             |  Client  |                       ||    Endpoint     ||
+             |          |<----------------------||                 ||
+             |          | (B)Authorization      |+-----------------+|
+             |          |    Server Challenge   |                   |       
+             |          |                       |                   |
+             |          | (C)Authorization      |+-----------------+|             
+             |          |    Challenge Request  ||  Authorization  ||
+             |          |---------------------->||    Challenge    ||
+             |          |                       ||    Endpoint     ||
+             |          |<----------------------|+-----------------+|
+             |          | (D) Authorization     |                   |
+             |          |     Challenge Response|                   |             
+             |          |                       |                   |
+(E)User  +---|          |                       |                   |
+  Action |   |          |                       |                   |
+         +-->|          | (F) Authorization     |                   |
+             |          |     Grant             |+-----------------+|
+             |          |---------------------->||      Token      ||
+             |          |                       ||     Endpoint    ||             
+             |          |<----------------------||                 ||
+             |          | (G) Access Token      |+-----------------+|
+             |          |                       |                   |
+             +----------+                       +-------------------+  
+~~~
+Figure: Authorization Server Initiated Direct Interaction Grant
+
+- (A) The native client access the Token Endpoint, as part of performing an Authorization Grant to retrieve a token. 
+- (B) The Authorization Server determines that additional requirements needs to met before issueing the token, and issues an Authorization Server Challenge, along with an MFA Token ("mfa_token").
+- (C Optional) The native client presents the MFA Token ("mfa_token"), supported authentication methods for which it requires a challenge and an authenticator ID to identify the specific authenticator device.
+- (D Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
+- (E) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
+- (F) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
+- (G) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue another Authorization Server Challenge. This will result in steps (A) through (F) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client. 
+
+TODO: Add text to explain below, move it earlier in the section/document, or remove it.
 
 1. The client prompts the user and collects their user identifier (e.g. email address)
 2. The client sends the user identifier to the AS, along with any hint it may have received about the authentication level required
@@ -160,6 +253,9 @@ secrets shared between the resource owner and the authorization
 server.  These secrets are typically used by the resource owner in
 the event another authenticator is lost or malfunctions.
 
+### FIDO passkey
+
+TODO: Add description of FIDO passkey.
 
 ## Challenge Types {#challenge-types}
 
@@ -202,13 +298,14 @@ server to indicate that further authentication of the user is required.
 
 Extension Grant Types
 
+TODO: Clarify difference between mfa-otp and otp
+
 * grant_type=urn:ietf:params:oauth:grant-type:mfa-otp
 * grant_type=urn:ietf:params:oauth:grant-type:mfa-oob
 * grant_type=urn:ietf:params:oauth:grant-type:mfa-recovery-code
 * grant_type=urn:ietf:params:oauth:grant-type:otp
 * grant_type=urn:ietf:params:oauth:grant-type:oob
-
-
+* grant_type=urn:ietf:params:oauth:grant-type:fido-passkey
 
 
 # Authorization Initiation {#authorization-initiation}
@@ -234,6 +331,8 @@ format with a character encoding of UTF-8 in the HTTP request body:
 
 "scope":
 : OPTIONAL. The OAuth scope defined in {{RFC6749}}.
+
+QUESTION: It feels like we are really defining authentication methods here. Can we replace "challenge_type" with "amr" or "amr_values"? 
 
 "challenge_type":
 : OPTIONAL.  List of authorization challenge type strings that the
@@ -295,9 +394,10 @@ as described in {{redirect-challenge}}:
       "challenge_type": "redirect"
     }
 
-
+TODO: Add JWT representation of MFA token.
 
 # Authorization Challenge Response {#mfa-token-response}
+QUESTION: Can this headeing be changed to something like Authorization Server Challenge? There is another Authorization Challenge Response sub-heading, which I found a bit confusing.
 
 Upon any request to the token endpoint, the authorization server can
 respond with an authorization challenge instead of a successful access token response.
@@ -358,7 +458,7 @@ request body:
 "authenticator_id":
 : OPTIONAL.  The identifier of the authenticator to challenge.  The
   authorization server MUST ensure that the authenticator is
-  associated with the resource owner.
+  associated with the resource owner. QUESTION: is this only one authenticator ID, even if the user may have different authenticators for different challenge types? Which one should be included if there is more than one?
 
 "device_session":
 : OPTIONAL. The device session, described in {{device-session}}.
@@ -495,6 +595,8 @@ authorization challenge type containing the following parameters:
 "challenge_type":
 : REQUIRED.  Value MUST be set to "oob".
 
+QUESTION: Why is the oob_code sent back to the client? Does it risk bypassing the OOB channel by having the OOB code leak as it is being passed back to the client (in addition to also being sent to the users phone). Should the code only be sent via the out-of-band process? If it needs to be displayed for comparison purposes, should that be a different parameter so the client knows when to display the code (e.g. display_oob_code)?
+
 "oob_code":
 : REQUIRED.  The out-of-band transaction code.  The out-of-band
   transaction code MUST expire shortly after it is issued to
@@ -589,6 +691,7 @@ While this is likely to be an uncommon challenge response,
 the AS may decide a recovery code is required, for example if
 it is known that the user has lost their other MFA options.
 
+QUESTION: what is expected of the client if the challenge is "recvery code"? Should there be an optional parameter directing the user to an interactive flow for recovery? Can the AS signal information about the recovery flow (e.g. request a specific recovery code - mothers maiden name for instance)?
 
 ### Redirect Challenge {#redirect-challenge}
 
@@ -615,6 +718,8 @@ This can be used to enable primary or secondary authentication with social provi
 
 TODO: The AS may want to include more information back to the client here, such as an indicator of which external IdP the authorization server should use. For example if the AS wants the user to go through a "Sign in with Google" flow (the AS would be the OAuth client to Google in that flow).
 
+### FIDO passkey Challenge {#fido-passkey-challenge}
+TODO: Describe FIDO passkey challenge.
 
 ## User Interaction
 
@@ -655,6 +760,8 @@ After receiving a redirect challenge, the client initiates an
 OAuth authorization code flow with the authorization server. The
 tokens are obtained with the traditional authorization code grant.
 
+### FIDO passkey Interaction
+TODO: Define passkey interaction.
 
 # Token Request Grant Types
 
@@ -939,12 +1046,12 @@ format with a character encoding of UTF-8 in the HTTP request body:
 
 TODO: OOB only, not in response to an MFA challenge. Looks almost just like the MFA+OOB grant, just without the mfa_token.
 
-
-
-
+## FIDO passkey Grant
+TODO: Define passkey grant.
 
 
 ## Device Session {#device-session}
+QUESTION: do we need device session as a seperate parameter, or can it be replaced by MFA token?
 
 In addition to the parameters defined in Section 5.1 of OAuth 2.0
 {{RFC6749}}, the following additional parameters are specified for
