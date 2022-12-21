@@ -314,7 +314,7 @@ The authorization initiation endpoint is an optional feature that can be used to
 ## Authorization Initiation Request
 
 The client makes a request to the authorization initiation endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
+following parameters using the `application/x-www-form-urlencoded
 format with a character encoding of UTF-8 in the HTTP request body:
 
 "login_hint":
@@ -763,7 +763,7 @@ the MFA challenges previously described.
 ## MFA OTP Grant
 
 The client makes a request to the token endpoint by adding the
-following parameters using the "application/x-www-form-urlencoded"
+following parameters using the `application/x-www-form-urlencoded`
 format with a character encoding of UTF-8 in the HTTP request body:
 
 "grant_type":
