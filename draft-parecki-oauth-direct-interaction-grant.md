@@ -380,8 +380,7 @@ For example, the client makes the following HTTP request:
 
 The authorization server MUST:
 
-* require client authentication for confidential clients or for any
-  client that was issued client credentials (or with other
+* require client authentication for confidential clients (or with other
   authentication requirements),
 
 * authenticate the client if client authentication is included,
@@ -695,8 +694,7 @@ For example:
 
 The authorization server MUST:
 
-   *  require client authentication for confidential clients or for any
-      client that was issued client credentials (or with other
+   *  require client authentication for confidential clients (or with other
       authentication requirements),
 
    *  authenticate the client if client authentication is included,
@@ -759,8 +757,7 @@ transport-layer security (with extra line breaks for display purposes only):
 
 The authorization server MUST:
 
-* require client authentication for confidential clients or for any
-  client that was issued client credentials (or with other
+* require client authentication for confidential clients (or with other
   authentication requirements),
 
 * authenticate the client if client authentication is included,
@@ -869,8 +866,7 @@ only):
 
 The authorization server MUST:
 
-* require client authentication for confidential clients or for any
-  client that was issued client credentials (or with other
+* require client authentication for confidential clients (or with other
   authentication requirements),
 
 * authenticate the client if client authentication is included,
