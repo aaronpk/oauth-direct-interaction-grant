@@ -137,7 +137,7 @@ Figure: Native Client Initiated Direct Interaction Grant
 - (E Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
 - (F) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
 - (G) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
-- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue a Authorization Server Challenge to initiate a [Authorization Server Initiated Direct Interaction Grant](#Authorization Server Initiated Direct Interaction Grant). This will result in steps (D) through (G) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client. 
+- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue a Authorization Server Challenge to initiate a [Authorization Server Initiated Direct Interaction Grant](#Authorization Server Initiated Direct Interaction Grant). This will result in steps (D) through (G) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client.
 
 ## Authorization Server Initiated Direct Interaction Grant
 
@@ -183,7 +183,7 @@ Figure: Authorization Server Initiated Direct Interaction Grant
 - (D Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
 - (E) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
 - (F) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
-- (G) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue another Authorization Server Challenge. This will result in steps (A) through (F) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client. 
+- (G) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue another Authorization Server Challenge. This will result in steps (A) through (F) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client.
 
 TODO: Add text to explain below, move it earlier in the section/document, or remove it.
 
