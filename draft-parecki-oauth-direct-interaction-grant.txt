@@ -274,7 +274,8 @@ Table of Contents
 
    *  (H) If the Authorization Server needs to satisfy additional
       conditions to satisfy an "acr" context, it may issue an
-      Authorization Server Challenge to initiate a Section 3.2.  This
+      Authorization Server Challenge to initiate a Authorization Server
+      Initiated Direct Interaction Grant described in Section 3.2.  This
       will result in steps (D) through (G) being repeated.  Once the
       Authorization server ensures that all conditions are satisfied, it
       returns and Access Token to the client.
