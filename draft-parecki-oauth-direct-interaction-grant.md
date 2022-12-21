@@ -137,7 +137,7 @@ Figure: Native Client Initiated Direct Interaction Grant
 - (E Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
 - (F) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
 - (G) The native client sends the collected information and additional parameters received in step (E) to obtain a token from the Token Endpoint.
-- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue an Authorization Server Challenge to initiate a {{as-initiated-interaction}}. This will result in steps (D) through (G) being repeated. Once the Authorization server ensures that all conditions are satisfied, it returns and Access Token to the client.
+- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue an Authorization Server Challenge to initiate a Authorization Server Initiated Direct Interaction Grant described in {{as-initiated-interaction}}. This will result in steps (D) through (G) being repeated. Once the Authorization server ensures that all conditions are satisfied, it returns and Access Token to the client.
 
 ## Authorization Server Initiated Direct Interaction Grant {#as-initiated-interaction}
 
