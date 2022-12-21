@@ -126,7 +126,7 @@ The client-initiated direct interaction is shown below:
              |          |<----------------------||                 ||
              |          | (H) Access Token      |+-----------------+|
              |          |                       |                   |
-             +----------+                       +-------------------+  
+             +----------+                       +-------------------+
 ~~~
 Figure: Native Client Initiated Direct Interaction Grant
 
@@ -173,7 +173,7 @@ The authorization-server-initiated direct interaction is shown below:
              |          |<----------------------||                 ||
              |          | (G) Access Token      |+-----------------+|
              |          |                       |                   |
-             +----------+                       +-------------------+  
+             +----------+                       +-------------------+
 ~~~
 Figure: Authorization Server Initiated Direct Interaction Grant
 
