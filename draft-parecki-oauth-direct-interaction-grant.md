@@ -84,6 +84,8 @@ and "Token Endpoint" defined by {{RFC6749}}.
 
 TODO: Replace RFC6749 references with OAuth 2.1
 
+TODO: List terms defined in this specification.
+
 
 # Protocol Overview
 
