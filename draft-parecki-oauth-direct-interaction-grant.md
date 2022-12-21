@@ -90,12 +90,14 @@ TODO: List terms defined in this specification.
 # Protocol Overview
 The direct interaction grant may be initiated by the client or the authorization server. 
 
-##Native Client Initiated Direct Interaction Grant
+## Native Client Initiated Direct Interaction Grant
+
 The client may initiate the direct interaction grant as part of a 
 sign-up flow, or as a result of an interaction with a resource provider
-that requires a stp-up authentication (TODO: add reference to step-up auth)
+that requires a step-up authentication (TODO: add reference to step-up auth)
 
-The client initiated direct interaction is shown below:
+The client-initiated direct interaction is shown below:
+
 ~~~ ascii-art
                                                 +-------------------+
                                                 |   Authorization   |
@@ -105,22 +107,22 @@ The client initiated direct interaction is shown below:
    Start |   |  Client  |                       ||   Initiation    ||
    Flow  +-->|          |<----------------------||    Endpoint     ||
              |          | (C)Authorization      |+-----------------+|
-             |          |    Initiation Response|                   |       
+             |          |    Initiation Response|                   |
              |          |                       |                   |
-             |          | (D)Authorization      |+-----------------+|             
+             |          | (D)Authorization      |+-----------------+|
              |          |    Challenge Request  ||  Authorization  ||
              |          |---------------------->||    Challenge    ||
              |          |                       ||    Endpoint     ||
              |          |<----------------------|+-----------------+|
              |          | (E) Authorization     |                   |
-             |          |     Challenge Response|                   |             
+             |          |     Challenge Response|                   |
              |          |                       |                   |
 (F)User  +---|          |                       |                   |
   Action |   |          |                       |                   |
          +-->|          | (G) Authorization     |                   |
              |          |     Grant             |+-----------------+|
              |          |---------------------->||      Token      ||
-             |          |                       ||     Endpoint    ||             
+             |          |                       ||     Endpoint    ||
              |          |<----------------------||                 ||
              |          | (H) Access Token      |+-----------------+|
              |          |                       |                   |
@@ -137,10 +139,12 @@ Figure: Native Client Initiated Direct Interaction Grant
 - (G) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
 - (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue a Authorization Server Challenge to initiate a [Authorization Server Initiated Direct Interaction Grant](#Authorization Server Initiated Direct Interaction Grant). This will result in steps (D) through (G) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client. 
 
-##Authorization Server Initiated Direct Interaction Grant
+## Authorization Server Initiated Direct Interaction Grant
+
 The Authorization Server may initiate the direct interaction grant whenever the client access the Token Endpoint. This allows the Authroization Server to request additional authentication methods to be presented before issuing an access token.
 
-The authorization server initiated direct interaction is shown below:
+The authorization-server-initiated direct interaction is shown below:
+
 ~~~ ascii-art
                                                 +-------------------+
                                                 |   Authorization   |
@@ -150,22 +154,22 @@ The authorization server initiated direct interaction is shown below:
              |  Client  |                       ||    Endpoint     ||
              |          |<----------------------||                 ||
              |          | (B)Authorization      |+-----------------+|
-             |          |    Server Challenge   |                   |       
+             |          |    Server Challenge   |                   |
              |          |                       |                   |
-             |          | (C)Authorization      |+-----------------+|             
+             |          | (C)Authorization      |+-----------------+|
              |          |    Challenge Request  ||  Authorization  ||
              |          |---------------------->||    Challenge    ||
              |          |                       ||    Endpoint     ||
              |          |<----------------------|+-----------------+|
              |          | (D) Authorization     |                   |
-             |          |     Challenge Response|                   |             
+             |          |     Challenge Response|                   |
              |          |                       |                   |
 (E)User  +---|          |                       |                   |
   Action |   |          |                       |                   |
          +-->|          | (F) Authorization     |                   |
              |          |     Grant             |+-----------------+|
              |          |---------------------->||      Token      ||
-             |          |                       ||     Endpoint    ||             
+             |          |                       ||     Endpoint    ||
              |          |<----------------------||                 ||
              |          | (G) Access Token      |+-----------------+|
              |          |                       |                   |
