@@ -104,7 +104,7 @@ The client-initiated direct interaction is shown below:
                           (B)Authorization      |      Server       |
              +----------+    Initiation Request |+-----------------+|
 (A)Client+---|  Native  |---------------------->||  Authorization  ||
-   Start |   |  Client  |                       ||   Initiation    ||
+   Starts|   |  Client  |                       ||   Initiation    ||
    Flow  +-->|          |<----------------------||    Endpoint     ||
              |          | (C)Authorization      |+-----------------+|
              |          |    Initiation Response|                   |
@@ -130,18 +130,18 @@ The client-initiated direct interaction is shown below:
 ~~~
 Figure: Native Client Initiated Direct Interaction Grant
 
-- (A) The native client collects a user identifier and initiates the flow in response to a resource provider or as part of a sign-up flow.
-- (B) The native client sends an Authorization Initiating Request to the Authorization Initiation Endpoint, indicating the user identifer ("login_hint"), list of client supported authentication mechanisms ("challenge_type") and desired authentication contexts ("acr_values").
+- (A) The native client collects a user identifier and initiates the flow in response to a resource server challenge or as part of a sign-up or login flow.
+- (B) The native client sends an Authorization Initiation Request to the Authorization Initiation Endpoint, indicating the user identifer ("login_hint"), list of client supported authentication mechanisms ("challenge_type") and desired authentication contexts ("acr_values").
 - (C) The Authorization Intiation Endpoint responds with an MFA Token ("mfa_token") in the Authorization Initiation Response.
-- (D Optional) The native client presents the MFA Token ("mfa_token"), supported authentication methods for which it requires a challenge and an authenticator ID to identify the specific authenticator device.
+- (D Optional) The native client presents the MFA Token ("mfa_token") and supported authentication methods for which it requires a challenge.
 - (E Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
 - (F) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
-- (G) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
-- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue a Authorization Server Challenge to initiate a [Authorization Server Initiated Direct Interaction Grant](#Authorization Server Initiated Direct Interaction Grant). This will result in steps (D) through (G) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client.
+- (G) The native client sends the collected information and additional parameters received in step (E) to obtain a token from the Token Endpoint.
+- (H) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue an Authorization Server Challenge to initiate a {{as-initiated-interaction}}. This will result in steps (D) through (G) being repeated. Once the Authorization server ensures that all conditions are satisfied, it returns and Access Token to the client.
 
-## Authorization Server Initiated Direct Interaction Grant
+## Authorization Server Initiated Direct Interaction Grant {#as-initiated-interaction}
 
-The Authorization Server may initiate the direct interaction grant whenever the client access the Token Endpoint. This allows the Authroization Server to request additional authentication methods to be presented before issuing an access token.
+The Authorization Server may initiate the direct interaction grant when the client accesses the Token Endpoint. This allows the Authorization Server to request additional authentication methods to be presented before issuing an access token. This can happen on any grant type request to the token endpoint, such as a refresh token request.
 
 The authorization-server-initiated direct interaction is shown below:
 
@@ -177,24 +177,13 @@ The authorization-server-initiated direct interaction is shown below:
 ~~~
 Figure: Authorization Server Initiated Direct Interaction Grant
 
-- (A) The native client access the Token Endpoint, as part of performing an Authorization Grant to retrieve a token. 
-- (B) The Authorization Server determines that additional requirements needs to met before issueing the token, and issues an Authorization Server Challenge, along with an MFA Token ("mfa_token").
-- (C Optional) The native client presents the MFA Token ("mfa_token"), supported authentication methods for which it requires a challenge and an authenticator ID to identify the specific authenticator device.
+- (A) The native client requests a token from the Token Endpoint, such as when presenting a refresh token.
+- (B) The Authorization Server determines that additional requirements need to met before issuing the token, and issues an Authorization Server Challenge, along with an MFA Token ("mfa_token").
+- (C Optional) The native client presents the MFA Token ("mfa_token") and supported authentication methods for which it requires a challenge.
 - (D Optional) The Authorization Challenge Endpoint responds with the required authentication type ("challenge_type") and additional parameters needed to complete the authentication.
 - (E) The native client interacts with the user to complete the authentications steps (obtain OTP, Out-of-Band code, FIDO interaction, recovery code etc).
-- (F) The native client initiates the Authorization Grant flow using the authentication method and additional parameters received in step (E) to obtain a token from the Token Endpoint.
-- (G) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue another Authorization Server Challenge. This will result in steps (A) through (F) being repeated. Once the Authorization server ensured that all conditions were satisfied, it returns and Access Token to the native client.
-
-TODO: Add text to explain below, move it earlier in the section/document, or remove it.
-
-1. The client prompts the user and collects their user identifier (e.g. email address)
-2. The client sends the user identifier to the AS, along with any hint it may have received about the authentication level required
-3. The AS replies with the authentication mechanism required based on the user ID provided (should these be amr values?)
-4. The client requests an authentication challenge from the AS (this is optional - only if the authentication method requires it)
-5. The AS delivers a challenge to the user (e.g. one-time code via email, SMS, or a push notification in an app) (this is optional - only if it is a challenge response type authentiation method).
-6. The client collects the necessary authentication details from the user and sends them back to the AS
-7. The AS decides if additional requirements need to be met, repeating steps 3 through 6 as needed (the AS knows this due to the acr_value sent by the client initially, or from its own requirements)
-8. The AS replies with the token response
+- (F) The native client sends the collected information and additional parameters received in step (E) to obtain a token from the Token Endpoint.
+- (G) If the Authorization Server needs to satisfy additional conditions to satisfy an "acr" context, it may issue another Authorization Server Challenge. This will result in steps (A) through (F) being repeated. Once the Authorization server ensures that all conditions are satisfied, it returns and Access Token to the client.
 
 
 
