@@ -88,11 +88,11 @@ TODO: List terms defined in this specification.
 
 
 # Protocol Overview
-The direct interaction grant may be initiated by the client or the authorization server. 
+The direct interaction grant may be initiated by the client or the authorization server.
 
 ## Native Client Initiated Direct Interaction Grant
 
-The client may initiate the direct interaction grant as part of a 
+The client may initiate the direct interaction grant as part of a
 sign-up flow, or as a result of an interaction with a resource provider
 that requires a step-up authentication (TODO: add reference to step-up auth)
 
