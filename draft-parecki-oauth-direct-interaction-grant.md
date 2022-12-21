@@ -252,8 +252,9 @@ OOB methods include:
 
 The recovery code is numeric or character string from a set of
 secrets shared between the resource owner and the authorization
-server.  These secrets are typically used by the resource owner in
-the event another authenticator is lost or malfunctions.
+server.  These secrets are typically established when enrolling
+another authenticator as a backup in the event the user's other
+authenticators are lost or malfunction.
 
 ### FIDO passkey
 
@@ -334,8 +335,6 @@ format with a character encoding of UTF-8 in the HTTP request body:
 "scope":
 : OPTIONAL. The OAuth scope defined in {{RFC6749}}.
 
-QUESTION: It feels like we are really defining authentication methods here. Can we replace "challenge_type" with "amr" or "amr_values"? 
-
 "challenge_type":
 : OPTIONAL.  List of authorization challenge type strings that the
   client supports, expressed as a list of space-delimited, case-insensitive strings,
@@ -398,8 +397,7 @@ as described in {{redirect-challenge}}:
 
 TODO: Add JWT representation of MFA token.
 
-# Authorization Challenge Response {#mfa-token-response}
-QUESTION: Can this headeing be changed to something like Authorization Server Challenge? There is another Authorization Challenge Response sub-heading, which I found a bit confusing.
+# Token Endpoint Challenge {#mfa-token-response}
 
 Upon any request to the token endpoint, the authorization server can
 respond with an authorization challenge instead of a successful access token response.
@@ -445,7 +443,7 @@ it can obtain a strong authorization grant directly.
 ## Authorization Challenge Request {#authorization-challenge-request}
 
 The client makes a request to the authorization challenge endpoint by
-adding the following parameters using the "application/x-www-form-urlencoded" format with a character encoding of UTF-8 in the HTTP
+adding the following parameters using the `application/x-www-form-urlencoded` format with a character encoding of UTF-8 in the HTTP
 request body:
 
 "mfa_token":
@@ -458,9 +456,10 @@ request body:
   defined in {{challenge-types}}.
 
 "authenticator_id":
-: OPTIONAL.  The identifier of the authenticator to challenge.  The
+: OPTIONAL.  The identifier of the authenticator to challenge, if the
+  client knows this from out-of-band methods.  The
   authorization server MUST ensure that the authenticator is
-  associated with the resource owner. QUESTION: is this only one authenticator ID, even if the user may have different authenticators for different challenge types? Which one should be included if there is more than one?
+  associated with the resource owner. (TBD: this may be out of scope of this document)
 
 "device_session":
 : OPTIONAL. The device session, described in {{device-session}}.
@@ -596,10 +595,9 @@ authorization challenge type containing the following parameters:
 "challenge_type":
 : REQUIRED.  Value MUST be set to "oob".
 
-QUESTION: Why is the oob_code sent back to the client? Does it risk bypassing the OOB channel by having the OOB code leak as it is being passed back to the client (in addition to also being sent to the users phone). Should the code only be sent via the out-of-band process? If it needs to be displayed for comparison purposes, should that be a different parameter so the client knows when to display the code (e.g. display_oob_code)?
-
 "oob_code":
-: REQUIRED.  The out-of-band transaction code.  The out-of-band
+: REQUIRED.  The out-of-band transaction code, which the client will
+  include later in the token request.  The out-of-band
   transaction code MUST expire shortly after it is issued to
   mitigate the risk of leaks.  A maximum out-of-band transaction
   code lifetime of 10 minutes is RECOMMENDED.
@@ -692,7 +690,6 @@ While this is likely to be an uncommon challenge response,
 the AS may decide a recovery code is required, for example if
 it is known that the user has lost their other MFA options.
 
-QUESTION: what is expected of the client if the challenge is "recvery code"? Should there be an optional parameter directing the user to an interactive flow for recovery? Can the AS signal information about the recovery flow (e.g. request a specific recovery code - mothers maiden name for instance)?
 
 ### Redirect Challenge {#redirect-challenge}
 
