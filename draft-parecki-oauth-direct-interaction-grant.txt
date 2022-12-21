@@ -5,9 +5,9 @@
 OAuth Working Group                                           A. Parecki
 Internet-Draft                                                 J. Hanson
 Intended status: Standards Track                                    Okta
-Expires: 19 June 2023                                       P. Kasselman
+Expires: 24 June 2023                                       P. Kasselman
                                                                Microsoft
-                                                        16 December 2022
+                                                        21 December 2022
 
 
                   OAuth 2.0 Direct Interaction Grants
@@ -66,7 +66,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 June 2023.
+   This Internet-Draft will expire on 24 June 2023.
 
 Copyright Notice
 
@@ -89,16 +89,19 @@ Table of Contents
    2.  Conventions and Definitions
      2.1.  Terminology
    3.  Protocol Overview
-     3.1.  Authorization Grants
-       3.1.1.  One-Time Passwords (OTP)
-       3.1.2.  Out-of-Band Authorization (OOB)
-       3.1.3.  Recovery Code
-     3.2.  Challenge Types
+     3.1.  Native Client Initiated Direct Interaction Grant
+     3.2.  Authorization Server Initiated Direct Interaction Grant
+     3.3.  Authorization Grants
+       3.3.1.  One-Time Passwords (OTP)
+       3.3.2.  Out-of-Band Authorization (OOB)
+       3.3.3.  Recovery Code
+       3.3.4.  FIDO passkey
+     3.4.  Challenge Types
    4.  Protocol Endpoints
    5.  Authorization Initiation
      5.1.  Authorization Initiation Request
      5.2.  Authorization Initiation Response
-   6.  Authorization Challenge Response
+   6.  Token Endpoint Challenge
    7.  Authorization Challenge Endpoint
      7.1.  Authorization Challenge Request
      7.2.  Authorization Challenge Response
@@ -106,11 +109,13 @@ Table of Contents
        7.2.2.  OOB Challenge
        7.2.3.  Recovery Code Challenge
        7.2.4.  Redirect Challenge
+       7.2.5.  FIDO passkey Challenge
      7.3.  User Interaction
        7.3.1.  OTP Challenge Interaction
        7.3.2.  OOB Challenge Interaction
        7.3.3.  Recovery Code Challenge Interaction
        7.3.4.  Redirect Challenge Interaction
+       7.3.5.  FIDO passkey Interaction
    8.  Token Request Grant Types
      8.1.  MFA OTP Grant
      8.2.  MFA OOB Grant
@@ -120,7 +125,8 @@ Table of Contents
      8.4.  Redirect Grant
      8.5.  OTP Grant
      8.6.  OOB Grant
-     8.7.  Device Session
+     8.7.  FIDO passkey Grant
+     8.8.  Device Session
    9.  Refresh Token Grant
    10. Security Considerations
      10.1.  Native client and Authorisation Server trust relationship
@@ -190,37 +196,165 @@ Table of Contents
 
    TODO: Replace RFC6749 references with OAuth 2.1
 
+   TODO: List terms defined in this specification.
+
 3.  Protocol Overview
 
-   1.  The client prompts the user and collects their user identifier
-       (e.g. email address)
+   The direct interaction grant may be initiated by the client or the
+   authorization server.
 
-   2.  The client sends the user identifier to the AS, along with any
-       hint it may have received about the authentication level required
+3.1.  Native Client Initiated Direct Interaction Grant
 
-   3.  The AS replies with the authentication mechanism required based
-       on the user ID provided (should these be amr values?)
+   The client may initiate the direct interaction grant as part of a
+   sign-up flow, or as a result of an interaction with a resource
+   provider that requires a step-up authentication (TODO: add reference
+   to step-up auth)
 
-   4.  The client requests an authentication challenge from the AS (this
-       is optional - only if the authentication method requires it)
+   The client-initiated direct interaction is shown below:
 
-   5.  The AS delivers a challenge to the user (e.g. one-time code via
-       email, SMS, or a push notification in an app) (this is optional -
-       only if it is a challenge response type authentiation method).
+                                                   +-------------------+
+                                                   |   Authorization   |
+                             (B)Authorization      |      Server       |
+                +----------+    Initiation Request |+-----------------+|
+   (A)Client+---|  Native  |---------------------->||  Authorization  ||
+      Starts|   |  Client  |                       ||   Initiation    ||
+      Flow  +-->|          |<----------------------||    Endpoint     ||
+                |          | (C)Authorization      |+-----------------+|
+                |          |    Initiation Response|                   |
+                |          |                       |                   |
+                |          | (D)Authorization      |+-----------------+|
+                |          |    Challenge Request  ||  Authorization  ||
+                |          |---------------------->||    Challenge    ||
+                |          |                       ||    Endpoint     ||
+                |          |<----------------------|+-----------------+|
+                |          | (E) Authorization     |                   |
+                |          |     Challenge Response|                   |
+                |          |                       |                   |
+   (F)User  +---|          |                       |                   |
+     Action |   |          |                       |                   |
+            +-->|          | (G) Authorization     |                   |
+                |          |     Grant             |+-----------------+|
+                |          |---------------------->||      Token      ||
+                |          |                       ||     Endpoint    ||
+                |          |<----------------------||                 ||
+                |          | (H) Access Token      |+-----------------+|
+                |          |                       |                   |
+                +----------+                       +-------------------+
 
-   6.  The client collects the necessary authentication details from the
-       user and sends them back to the AS
+   Figure: Native Client Initiated Direct Interaction Grant
 
-   7.  The AS decides if additional requirements need to be met,
-       repeating steps 3 through 6 as needed (the AS knows this due to
-       the acr_value sent by the client initially, or from its own
-       requirements)
+   *  (A) The native client collects a user identifier and initiates the
+      flow in response to a resource server challenge or as part of a
+      sign-up or login flow.
 
-   8.  The AS replies with the token response
+   *  (B) The native client sends an Authorization Initiation Request to
+      the Authorization Initiation Endpoint, indicating the user
+      identifer ("login_hint"), list of client supported authentication
+      mechanisms ("challenge_type") and desired authentication contexts
+      ("acr_values").
 
-3.1.  Authorization Grants
+   *  (C) The Authorization Intiation Endpoint responds with an MFA
+      Token ("mfa_token") in the Authorization Initiation Response.
 
-3.1.1.  One-Time Passwords (OTP)
+   *  (D Optional) The native client presents the MFA Token
+      ("mfa_token") and supported authentication methods for which it
+      requires a challenge.
+
+   *  (E Optional) The Authorization Challenge Endpoint responds with
+      the required authentication type ("challenge_type") and additional
+      parameters needed to complete the authentication.
+
+   *  (F) The native client interacts with the user to complete the
+      authentications steps (obtain OTP, Out-of-Band code, FIDO
+      interaction, recovery code etc).
+
+   *  (G) The native client sends the collected information and
+      additional parameters received in step (E) to obtain a token from
+      the Token Endpoint.
+
+   *  (H) If the Authorization Server needs to satisfy additional
+      conditions to satisfy an "acr" context, it may issue an
+      Authorization Server Challenge to initiate a Section 3.2.  This
+      will result in steps (D) through (G) being repeated.  Once the
+      Authorization server ensures that all conditions are satisfied, it
+      returns and Access Token to the client.
+
+3.2.  Authorization Server Initiated Direct Interaction Grant
+
+   The Authorization Server may initiate the direct interaction grant
+   when the client accesses the Token Endpoint.  This allows the
+   Authorization Server to request additional authentication methods to
+   be presented before issuing an access token.  This can happen on any
+   grant type request to the token endpoint, such as a refresh token
+   request.
+
+   The authorization-server-initiated direct interaction is shown below:
+
+                                                   +-------------------+
+                                                   |   Authorization   |
+                             (A)Authorization      |      Server       |
+                +----------+    Grant              |+-----------------+|
+                |  Native  |---------------------->||     Token       ||
+                |  Client  |                       ||    Endpoint     ||
+                |          |<----------------------||                 ||
+                |          | (B)Authorization      |+-----------------+|
+                |          |    Server Challenge   |                   |
+                |          |                       |                   |
+                |          | (C)Authorization      |+-----------------+|
+                |          |    Challenge Request  ||  Authorization  ||
+                |          |---------------------->||    Challenge    ||
+                |          |                       ||    Endpoint     ||
+                |          |<----------------------|+-----------------+|
+                |          | (D) Authorization     |                   |
+                |          |     Challenge Response|                   |
+                |          |                       |                   |
+   (E)User  +---|          |                       |                   |
+     Action |   |          |                       |                   |
+            +-->|          | (F) Authorization     |                   |
+                |          |     Grant             |+-----------------+|
+                |          |---------------------->||      Token      ||
+                |          |                       ||     Endpoint    ||
+                |          |<----------------------||                 ||
+                |          | (G) Access Token      |+-----------------+|
+                |          |                       |                   |
+                +----------+                       +-------------------+
+
+   Figure: Authorization Server Initiated Direct Interaction Grant
+
+   *  (A) The native client requests a token from the Token Endpoint,
+      such as when presenting a refresh token.
+
+   *  (B) The Authorization Server determines that additional
+      requirements need to met before issuing the token, and issues an
+      Authorization Server Challenge, along with an MFA Token
+      ("mfa_token").
+
+   *  (C Optional) The native client presents the MFA Token
+      ("mfa_token") and supported authentication methods for which it
+      requires a challenge.
+
+   *  (D Optional) The Authorization Challenge Endpoint responds with
+      the required authentication type ("challenge_type") and additional
+      parameters needed to complete the authentication.
+
+   *  (E) The native client interacts with the user to complete the
+      authentications steps (obtain OTP, Out-of-Band code, FIDO
+      interaction, recovery code etc).
+
+   *  (F) The native client sends the collected information and
+      additional parameters received in step (E) to obtain a token from
+      the Token Endpoint.
+
+   *  (G) If the Authorization Server needs to satisfy additional
+      conditions to satisfy an "acr" context, it may issue another
+      Authorization Server Challenge.  This will result in steps (A)
+      through (F) being repeated.  Once the Authorization server ensures
+      that all conditions are satisfied, it returns and Access Token to
+      the client.
+
+3.3.  Authorization Grants
+
+3.3.1.  One-Time Passwords (OTP)
 
    The one-time password (OTP) credentials can be used as an
    authorization grant to obtain an access token.  An OTP is generated
@@ -244,7 +378,7 @@ Table of Contents
 
    *  Code generators such as Google Authenticator
 
-3.1.2.  Out-of-Band Authorization (OOB)
+3.3.2.  Out-of-Band Authorization (OOB)
 
    The out-of-band (OOB) authorization grant allows authorization to be
    obtained via a secondary channel.  Once authorized, the grant can be
@@ -275,14 +409,19 @@ Table of Contents
 
    *  Compare the codes displayed on two devices
 
-3.1.3.  Recovery Code
+3.3.3.  Recovery Code
 
    The recovery code is numeric or character string from a set of
    secrets shared between the resource owner and the authorization
-   server.  These secrets are typically used by the resource owner in
-   the event another authenticator is lost or malfunctions.
+   server.  These secrets are typically established when enrolling
+   another authenticator as a backup in the event the user's other
+   authenticators are lost or malfunction.
 
-3.2.  Challenge Types
+3.3.4.  FIDO passkey
+
+   TODO: Add description of FIDO passkey.
+
+3.4.  Challenge Types
 
    This document defines several challenge type strings which are used
    by the client to indicate the supported challenge types and by the
@@ -341,6 +480,8 @@ Table of Contents
 
    Extension Grant Types
 
+   TODO: Clarify difference between mfa-otp and otp
+
    *  grant_type=urn:ietf:params:oauth:grant-type:mfa-otp
 
    *  grant_type=urn:ietf:params:oauth:grant-type:mfa-oob
@@ -350,6 +491,8 @@ Table of Contents
    *  grant_type=urn:ietf:params:oauth:grant-type:otp
 
    *  grant_type=urn:ietf:params:oauth:grant-type:oob
+
+   *  grant_type=urn:ietf:params:oauth:grant-type:fido-passkey
 
 5.  Authorization Initiation
 
@@ -366,8 +509,8 @@ Table of Contents
 5.1.  Authorization Initiation Request
 
    The client makes a request to the authorization initiation endpoint
-   by adding the following parameters using the "application/x-www-form-
-   urlencoded" format with a character encoding of UTF-8 in the HTTP
+   by adding the following parameters using the `application/x-www-form-
+   urlencoded format with a character encoding of UTF-8 in the HTTP
    request body:
 
    "login_hint":  OPTIONAL.  If the client has collected the user's
@@ -381,12 +524,12 @@ Table of Contents
 
    "challenge_type":  OPTIONAL.  List of authorization challenge type
       strings that the client supports, expressed as a list of space-
-      delimited, case-insensitive strings, as defined in Section 3.2.
+      delimited, case-insensitive strings, as defined in Section 3.4.
 
    "acr_values":  OPTIONAL.  The acr_values requested by the client.
 
    "device_session":  OPTIONAL.  If the client has previously obtained a
-      device session, described in Section 8.7.
+      device session, described in Section 8.8.
 
    "client_id":  REQUIRED if the client is not authenticating with the
       authorization server.
@@ -438,7 +581,9 @@ Table of Contents
      "challenge_type": "redirect"
    }
 
-6.  Authorization Challenge Response
+   TODO: Add JWT representation of MFA token.
+
+6.  Token Endpoint Challenge
 
    Upon any request to the token endpoint, the authorization server can
    respond with an authorization challenge instead of a successful
@@ -482,8 +627,8 @@ Table of Contents
 7.1.  Authorization Challenge Request
 
    The client makes a request to the authorization challenge endpoint by
-   adding the following parameters using the "application/x-www-form-
-   urlencoded" format with a character encoding of UTF-8 in the HTTP
+   adding the following parameters using the application/x-www-form-
+   urlencoded format with a character encoding of UTF-8 in the HTTP
    request body:
 
    "mfa_token":  REQUIRED.  The MFA token received from the
@@ -492,14 +637,16 @@ Table of Contents
 
    "challenge_type":  OPTIONAL.  List of authorization challenge type
       strings that the client supports, expressed as a list of space-
-      delimited, case-insensitive strings, defined in Section 3.2.
+      delimited, case-insensitive strings, defined in Section 3.4.
 
    "authenticator_id":  OPTIONAL.  The identifier of the authenticator
-      to challenge.  The authorization server MUST ensure that the
-      authenticator is associated with the resource owner.
+      to challenge, if the client knows this from out-of-band methods.
+      The authorization server MUST ensure that the authenticator is
+      associated with the resource owner.  (TBD: this may be out of
+      scope of this document)
 
    "device_session":  OPTIONAL.  The device session, described in
-      Section 8.7.
+      Section 8.8.
 
    "client_id":  REQUIRED if the client is not authenticating with the
       authorization server as described in Section 3.2.1 of OAuth 2.0
@@ -516,9 +663,8 @@ Table of Contents
 
    The authorization server MUST:
 
-   *  require client authentication for confidential clients or for any
-      client that was issued client credentials (or with other
-      authentication requirements),
+   *  require client authentication for confidential clients (or with
+      other authentication requirements),
 
    *  authenticate the client if client authentication is included,
 
@@ -541,7 +687,7 @@ Table of Contents
    (OK) status code:
 
    "challenge_type":  REQUIRED.  The type of the authorization challenge
-      issued.  Value is case insensitive.  Defined in Section 3.2.
+      issued.  Value is case insensitive.  Defined in Section 3.4.
 
    TODO: Maybe add "alternative_challenge_types" or allow the whole
    response to be an array in case the AS wants to let the client
@@ -624,8 +770,9 @@ Table of Contents
 
    "challenge_type":  REQUIRED.  Value MUST be set to "oob".
 
-   "oob_code":  REQUIRED.  The out-of-band transaction code.  The out-
-      of-band transaction code MUST expire shortly after it is issued to
+   "oob_code":  REQUIRED.  The out-of-band transaction code, which the
+      client will include later in the token request.  The out-of-band
+      transaction code MUST expire shortly after it is issued to
       mitigate the risk of leaks.  A maximum out-of-band transaction
       code lifetime of 10 minutes is RECOMMENDED.  TODO: Determine
       whether this is required or what benefit it provides if any.
@@ -743,6 +890,10 @@ Table of Contents
    through a "Sign in with Google" flow (the AS would be the OAuth
    client to Google in that flow).
 
+7.2.5.  FIDO passkey Challenge
+
+   TODO: Describe FIDO passkey challenge.
+
 7.3.  User Interaction
 
 7.3.1.  OTP Challenge Interaction
@@ -782,6 +933,10 @@ Table of Contents
    authorization code flow with the authorization server.  The tokens
    are obtained with the traditional authorization code grant.
 
+7.3.5.  FIDO passkey Interaction
+
+   TODO: Define passkey interaction.
+
 8.  Token Request Grant Types
 
    This specification defines new grant types at the token endpoint,
@@ -791,7 +946,7 @@ Table of Contents
 8.1.  MFA OTP Grant
 
    The client makes a request to the token endpoint by adding the
-   following parameters using the "application/x-www-form-urlencoded"
+   following parameters using the application/x-www-form-urlencoded
    format with a character encoding of UTF-8 in the HTTP request body:
 
    "grant_type":  REQUIRED. urn:ietf:params:oauth:grant-type:mfa-otp
@@ -817,9 +972,8 @@ Table of Contents
 
    The authorization server MUST:
 
-   *  require client authentication for confidential clients or for any
-      client that was issued client credentials (or with other
-      authentication requirements),
+   *  require client authentication for confidential clients (or with
+      other authentication requirements),
 
    *  authenticate the client if client authentication is included,
 
@@ -876,9 +1030,8 @@ Table of Contents
 
    The authorization server MUST:
 
-   *  require client authentication for confidential clients or for any
-      client that was issued client credentials (or with other
-      authentication requirements),
+   *  require client authentication for confidential clients (or with
+      other authentication requirements),
 
    *  authenticate the client if client authentication is included,
 
@@ -978,9 +1131,8 @@ Table of Contents
 
    The authorization server MUST:
 
-   *  require client authentication for confidential clients or for any
-      client that was issued client credentials (or with other
-      authentication requirements),
+   *  require client authentication for confidential clients (or with
+      other authentication requirements),
 
    *  authenticate the client if client authentication is included,
 
@@ -1040,7 +1192,14 @@ Table of Contents
    TODO: OOB only, not in response to an MFA challenge.  Looks almost
    just like the MFA+OOB grant, just without the mfa_token.
 
-8.7.  Device Session
+8.7.  FIDO passkey Grant
+
+   TODO: Define passkey grant.
+
+8.8.  Device Session
+
+   QUESTION: do we need device session as a seperate parameter, or can
+   it be replaced by MFA token?
 
    In addition to the parameters defined in Section 5.1 of OAuth 2.0
    [RFC6749], the following additional parameters are specified for the
