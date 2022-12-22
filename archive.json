@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-12-20T00:55:49.791017+00:00",
+  "timestamp": "2022-12-22T00:54:09.444318+00:00",
   "repo": "aaronpk/oauth-direct-interaction-grant",
   "labels": [
     {
@@ -49,7 +49,24 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOIk8Zl85Z0Tve",
+      "title": "Rename `mfa_token` to `mfa_code`?",
+      "url": "https://github.com/aaronpk/oauth-direct-interaction-grant/issues/3",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The current `mfa_token` is more like an authorization code, in that it is relatively short lived, does not provide access to any resources directly, and is only used in order to obtain an access token. So maybe this should be called `mfa_code` instead?",
+      "createdAt": "2022-12-21T20:37:54Z",
+      "updatedAt": "2022-12-21T20:38:00Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
@@ -75,6 +92,34 @@
       "mergedBy": "aaronpk",
       "mergeCommit": {
         "oid": "a1a9117ea305068adbca1aad63b6bd5ca2b4f8f1"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOIk8Zl85F48cn",
+      "title": "Added diagrams, TODOs and QUESTIONS",
+      "url": "https://github.com/aaronpk/oauth-direct-interaction-grant/pull/2",
+      "state": "MERGED",
+      "author": "PieterKas",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Added two diagrams to capture  protocol flow (one for client initiated and one for AS initiated). Added references/placeholders for FIDO (TBD on how we do that) and also added QUESTIONS (possibly not very well informed ones ;)).",
+      "createdAt": "2022-12-20T17:35:22Z",
+      "updatedAt": "2022-12-21T20:38:16Z",
+      "baseRepository": "aaronpk/oauth-direct-interaction-grant",
+      "baseRefName": "main",
+      "baseRefOid": "11f37a4a9c644fdde5fe688edc4f534805f91810",
+      "headRepository": "PieterKas/oauth-direct-interaction-grant",
+      "headRefName": "patch-2",
+      "headRefOid": "4038625d2d630a9a47c07e3397d06be2c809e8a5",
+      "closedAt": "2022-12-21T20:38:15Z",
+      "mergedAt": "2022-12-21T20:38:15Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "940346a2bcffcf5249e40bb82d7d3acf2755cb7b"
       },
       "comments": [],
       "reviews": []
